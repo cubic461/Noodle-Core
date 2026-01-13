@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: w2ikg-wtmoz
+created: 2026-01-11T12:23:42+01:00

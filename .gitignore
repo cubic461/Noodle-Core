@@ -36,3 +36,39 @@ htmlcov/
 
 # Logs
 *.log
+
+# Archive folder (temporary storage for archived files)
+.archive/
+.archive_backup/
+
+# Test data and temporary files
+test_data/
+test_output/
+test-noodle-workspace/
+golden_tests/
+demo_migration/
+output/
+result_images/
+
+# Generated and temporary code
+generated_go_project/
+go-migration-template/
+go_scaffolder/
+
+# AI tool configurations (optional)
+.goose/
+.kilocode/
+.roo/
+.cospec/
+
+# Project management tools
+code_index/
+project-management/
+
+# Empty or placeholder directories
+-p/
+client/
+server/
+syntaxes/
+target_generation/
+test/
