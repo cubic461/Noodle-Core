@@ -72,3 +72,6 @@ server/
 syntaxes/
 target_generation/
 test/
+
+# Syncthing synchronization folder
+.stfolder/
