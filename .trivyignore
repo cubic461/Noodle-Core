@@ -1,0 +1,60 @@
+# Trivy ignore file for Noodle project
+# This file lists vulnerabilities that are intentionally ignored
+# Use with caution and document the reason for each ignore
+
+# Format: vulnerability-id:reason
+# Example: CVE-2021-12345:Fixed in next release
+
+# Development dependencies (only used in dev environment)
+# CVE-2022-12345:Development dependency only
+
+# Test dependencies (only used in testing)
+# CVE-2022-23456:Test dependency only
+
+# Known false positives
+# CVE-2022-34567:False positive - not applicable to our usage
+
+# Vulnerabilities with acceptable risk
+# CVE-2022-45678:Acceptable risk - mitigated by other controls
+
+# Third-party libraries that will be updated soon
+# CVE-2022-56789:Will be updated in next sprint
+
+# OS-level packages in base images
+# CVE-2023-12345:Base image package - not exploitable in our context
+
+# Documentation tools
+# CVE-2023-23456:Documentation tool - not used in production
+
+# Build tools
+# CVE-2023-34567:Build tool only - not present in runtime
+
+# Development tools
+# CVE-2023-45678:Development tool only - not present in production
+
+# Testing tools
+# CVE-2023-56789:Testing tool only - not present in production
+
+# Linting tools
+# CVE-2023-67890:Linting tool only - not present in production
+
+# Code coverage tools
+# CVE-2023-78901:Coverage tool only - not present in production
+
+# Benchmarking tools
+# CVE-2023-89012:Benchmark tool only - not present in production
+
+# Profiling tools
+# CVE-2023-90123:Profiling tool only - not present in production
+
+# Debugging tools
+# CVE-2023-01234:Debug tool only - not present in production
+
+# Monitoring tools
+# CVE-2023-12345:Monitoring tool only - not present in production
+
+# Logging tools
+# CVE-2023-23456:Logging tool only - not present in production
+
+# Note: Add specific CVEs with proper justification
+# Each ignore should be reviewed regularly and removed when possible

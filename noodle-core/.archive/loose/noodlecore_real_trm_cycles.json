@@ -1,0 +1,1439 @@
+{
+  "controller_start": 1763315021.0220828,
+  "current_cycle": 100,
+  "cycle_log": {
+    "cycle": 100,
+    "timestamp": 1763320966.0011215,
+    "duration": 0.0443730354309082,
+    "performance_data": {
+      "type": "real_monitoring",
+      "performance_score": 81.0,
+      "timestamp": 1763320965.9567485,
+      "monitoring_active": true
+    },
+    "ai_analysis": {
+      "type": "real_ai_analysis",
+      "analyses": [
+        {
+          "file_path": "noodlecore_trm_agent.py",
+          "analysis_id": "analysis_298",
+          "timestamp": 1763320965.9768407,
+          "ast_analysis": {
+            "complexity_score": 87,
+            "function_count": 15,
+            "class_count": 1,
+            "import_count": 17,
+            "async_count": 2,
+            "error_handling": true,
+            "performance_issues": [],
+            "security_issues": [],
+            "code_patterns": [
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "large_module"
+            ]
+          },
+          "ai_suggestions": [
+            {
+              "type": "Performance",
+              "issue": "High complexity score detected",
+              "solution": "Consider breaking down complex functions into smaller ones",
+              "impact": "10-20% performance improvement"
+            }
+          ],
+          "optimization_potential": {
+            "score": 30,
+            "potential_improvement": "70%",
+            "priority_level": "Medium",
+            "estimated_effort": "Medium"
+          }
+        },
+        {
+          "file_path": "noodlecore_real_learning_loop.py",
+          "analysis_id": "analysis_299",
+          "timestamp": 1763320965.9778419,
+          "ast_analysis": {
+            "complexity_score": 5,
+            "function_count": 3,
+            "class_count": 1,
+            "import_count": 0,
+            "async_count": 0,
+            "error_handling": false,
+            "performance_issues": [],
+            "security_issues": [],
+            "code_patterns": []
+          },
+          "ai_suggestions": [],
+          "optimization_potential": {
+            "score": 50,
+            "potential_improvement": "50%",
+            "priority_level": "Medium",
+            "estimated_effort": "Medium"
+          }
+        },
+        {
+          "file_path": "noodlecore_self_improvement_system.py",
+          "analysis_id": "analysis_300",
+          "timestamp": 1763320966.0011215,
+          "ast_analysis": {
+            "complexity_score": 99,
+            "function_count": 16,
+            "class_count": 1,
+            "import_count": 11,
+            "async_count": 0,
+            "error_handling": true,
+            "performance_issues": [],
+            "security_issues": [],
+            "code_patterns": [
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "typed_function",
+              "large_module"
+            ]
+          },
+          "ai_suggestions": [
+            {
+              "type": "Performance",
+              "issue": "High complexity score detected",
+              "solution": "Consider breaking down complex functions into smaller ones",
+              "impact": "10-20% performance improvement"
+            }
+          ],
+          "optimization_potential": {
+            "score": 30,
+            "potential_improvement": "70%",
+            "priority_level": "Medium",
+            "estimated_effort": "Medium"
+          }
+        }
+      ],
+      "timestamp": 1763320966.0011215,
+      "files_analyzed": 3
+    },
+    "learning_result": {
+      "type": "real_ai_learning",
+      "learning_results": [
+        {
+          "learning_score": 7.5,
+          "improvements_found": 2
+        },
+        {
+          "learning_score": 8.2,
+          "improvements_found": 1
+        }
+      ],
+      "timestamp": 1763320966.0011215,
+      "total_learning": 2
+    }
+  },
+  "history": {
+    "performance_history": [
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320425.569521,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320485.6108265,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320545.65096,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320605.6934369,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320665.734227,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320725.776619,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320785.8193846,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320845.8636065,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320905.9119182,
+        "monitoring_active": true
+      },
+      {
+        "type": "real_monitoring",
+        "performance_score": 81.0,
+        "timestamp": 1763320965.9567485,
+        "monitoring_active": true
+      }
+    ],
+    "ai_analysis_history": [
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_271",
+            "timestamp": 1763320425.58863,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_272",
+            "timestamp": 1763320425.5901375,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_273",
+            "timestamp": 1763320425.6152873,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320425.6152873,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_274",
+            "timestamp": 1763320485.6302164,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_275",
+            "timestamp": 1763320485.6322134,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_276",
+            "timestamp": 1763320485.6541903,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320485.6541903,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_277",
+            "timestamp": 1763320545.6685247,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_278",
+            "timestamp": 1763320545.670559,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_279",
+            "timestamp": 1763320545.695386,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320545.695386,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_280",
+            "timestamp": 1763320605.7112553,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_281",
+            "timestamp": 1763320605.7132545,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_282",
+            "timestamp": 1763320605.7359004,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320605.7359004,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_283",
+            "timestamp": 1763320665.7529461,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_284",
+            "timestamp": 1763320665.7541928,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_285",
+            "timestamp": 1763320665.7778304,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320665.7778304,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_286",
+            "timestamp": 1763320725.795723,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_287",
+            "timestamp": 1763320725.7967436,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_288",
+            "timestamp": 1763320725.8211155,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320725.8211155,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_289",
+            "timestamp": 1763320785.838415,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_290",
+            "timestamp": 1763320785.8394148,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_291",
+            "timestamp": 1763320785.8649569,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320785.8649569,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_292",
+            "timestamp": 1763320845.8848097,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_293",
+            "timestamp": 1763320845.8863227,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_294",
+            "timestamp": 1763320845.9123433,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320845.9123433,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_295",
+            "timestamp": 1763320905.9310417,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_296",
+            "timestamp": 1763320905.9325485,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_297",
+            "timestamp": 1763320905.956509,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320905.956509,
+        "files_analyzed": 3
+      },
+      {
+        "type": "real_ai_analysis",
+        "analyses": [
+          {
+            "file_path": "noodlecore_trm_agent.py",
+            "analysis_id": "analysis_298",
+            "timestamp": 1763320965.9768407,
+            "ast_analysis": {
+              "complexity_score": 87,
+              "function_count": 15,
+              "class_count": 1,
+              "import_count": 17,
+              "async_count": 2,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_real_learning_loop.py",
+            "analysis_id": "analysis_299",
+            "timestamp": 1763320965.9778419,
+            "ast_analysis": {
+              "complexity_score": 5,
+              "function_count": 3,
+              "class_count": 1,
+              "import_count": 0,
+              "async_count": 0,
+              "error_handling": false,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": []
+            },
+            "ai_suggestions": [],
+            "optimization_potential": {
+              "score": 50,
+              "potential_improvement": "50%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          },
+          {
+            "file_path": "noodlecore_self_improvement_system.py",
+            "analysis_id": "analysis_300",
+            "timestamp": 1763320966.0011215,
+            "ast_analysis": {
+              "complexity_score": 99,
+              "function_count": 16,
+              "class_count": 1,
+              "import_count": 11,
+              "async_count": 0,
+              "error_handling": true,
+              "performance_issues": [],
+              "security_issues": [],
+              "code_patterns": [
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "typed_function",
+                "large_module"
+              ]
+            },
+            "ai_suggestions": [
+              {
+                "type": "Performance",
+                "issue": "High complexity score detected",
+                "solution": "Consider breaking down complex functions into smaller ones",
+                "impact": "10-20% performance improvement"
+              }
+            ],
+            "optimization_potential": {
+              "score": 30,
+              "potential_improvement": "70%",
+              "priority_level": "Medium",
+              "estimated_effort": "Medium"
+            }
+          }
+        ],
+        "timestamp": 1763320966.0011215,
+        "files_analyzed": 3
+      }
+    ],
+    "improvement_history": []
+  }
+}

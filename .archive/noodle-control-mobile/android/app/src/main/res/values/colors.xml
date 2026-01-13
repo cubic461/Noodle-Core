@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App theme colors -->
+    <color name="primary">#6200EE</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="accent">#03DAC6</color>
+    
+    <!-- Launcher icon background color -->
+    <color name="ic_launcher_background">#6200EE</color>
+    
+    <!-- Status bar and navigation bar colors -->
+    <color name="status_bar">#6200EE</color>
+    <color name="navigation_bar">#6200EE</color>
+    
+    <!-- Common colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="gray">#808080</color>
+    <color name="light_gray">#F5F5F5</color>
+    <color name="dark_gray">#424242</color>
+</resources>

@@ -1,0 +1,150 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-09T16:59:34.323297",
+  "roles": [
+    {
+      "id": "eda65286-9a20-4765-afd5-13ff430231d9",
+      "name": "NoodleCore Manager",
+      "description": "Central orchestrator for all IDE operations and task coordination",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\noodlecore_manager.md",
+      "category": "orchestration",
+      "tags": [
+        "orchestration",
+        "coordination",
+        "management",
+        "noodlecore-vision"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.301491",
+      "updated_at": "2025-11-09T16:59:34.301491"
+    },
+    {
+      "id": "330aa7f6-2f37-4749-abf4-3a1f2b4e9c43",
+      "name": "Code Architect",
+      "description": "System design and architectural guidance for NoodleCore development",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\code_architect.md",
+      "category": "architecture",
+      "tags": [
+        "design",
+        "architecture",
+        "system",
+        "planning"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.304491",
+      "updated_at": "2025-11-09T16:59:34.304491"
+    },
+    {
+      "id": "e71e2123-1188-4b90-9f4c-dbba3a71967f",
+      "name": "NoodleCore Developer",
+      "description": "Expert in NoodleCore language development and implementation",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\noodlecore_developer.md",
+      "category": "development",
+      "tags": [
+        "development",
+        "coding",
+        "noodlecore",
+        "implementation"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.307426",
+      "updated_at": "2025-11-09T16:59:34.307426"
+    },
+    {
+      "id": "1ce32d63-1167-457e-8f21-2531970593db",
+      "name": "Code Reviewer",
+      "description": "Quality assurance and code review specialist",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\code_reviewer.md",
+      "category": "review",
+      "tags": [
+        "review",
+        "quality",
+        "testing",
+        "best-practices"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.310450",
+      "updated_at": "2025-11-09T16:59:34.310450"
+    },
+    {
+      "id": "52e734c6-ab82-460e-ac16-457679f63cfb",
+      "name": "Debugging Expert",
+      "description": "Specialized in debugging, error analysis, and problem resolution",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\debugging_expert.md",
+      "category": "debugging",
+      "tags": [
+        "debugging",
+        "troubleshooting",
+        "error-analysis",
+        "problem-solving"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.313449",
+      "updated_at": "2025-11-09T16:59:34.313449"
+    },
+    {
+      "id": "25470f93-6823-4840-8565-663cc8b7a06b",
+      "name": "Documentation Specialist",
+      "description": "Expert in creating clear, comprehensive documentation",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\documentation_specialist.md",
+      "category": "documentation",
+      "tags": [
+        "documentation",
+        "writing",
+        "guides",
+        "api-documentation"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.315449",
+      "updated_at": "2025-11-09T16:59:34.315449"
+    },
+    {
+      "id": "4c0cb92f-671f-4f9a-b6ac-4b6a1847bf36",
+      "name": "Test Engineer",
+      "description": "Specialized in testing strategies and quality assurance",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\test_engineer.md",
+      "category": "testing",
+      "tags": [
+        "testing",
+        "quality",
+        "test-strategy",
+        "automation"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.318283",
+      "updated_at": "2025-11-09T16:59:34.318283"
+    },
+    {
+      "id": "b1e11e89-e6e9-43a7-9335-917af308ee86",
+      "name": "Performance Optimizer",
+      "description": "Expert in performance analysis and optimization techniques",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\performance_optimizer.md",
+      "category": "optimization",
+      "tags": [
+        "performance",
+        "optimization",
+        "profiling",
+        "efficiency"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.320302",
+      "updated_at": "2025-11-09T16:59:34.320302"
+    },
+    {
+      "id": "7e431775-31ed-4d53-afbf-fe01e4d5fdbc",
+      "name": "Security Analyst",
+      "description": "Security-focused role for code review and security analysis",
+      "document_path": "C:\\Users\\micha\\Noodle\\.noodlecore\\ai_roles\\security_analyst.md",
+      "category": "security",
+      "tags": [
+        "security",
+        "vulnerabilities",
+        "compliance",
+        "safety"
+      ],
+      "is_default": false,
+      "created_at": "2025-11-09T16:59:34.323297",
+      "updated_at": "2025-11-09T16:59:34.323297"
+    }
+  ]
+}

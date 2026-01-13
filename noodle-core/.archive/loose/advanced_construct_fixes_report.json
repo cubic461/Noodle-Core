@@ -1,0 +1,75 @@
+{
+    "summary": {
+        "files_processed": 851,
+        "total_fixes": 27255,
+        "fixes_by_category": {
+            "decorators": 80,
+            "async_await": 220,
+            "type_hints": 1489,
+            "imports": 190,
+            "dataclasses": 325,
+            "function_annotations": 60,
+            "class_definitions": 361
+        }
+    },
+    "most_common_issues": {
+        "type_hints": {
+            "count": 1489,
+            "examples": [
+                "': Optional[...]' -> ': Optional[...]'",
+                "': List[...]' -> ': List[...]'",
+                "': Dict[...]' -> ': Dict[...]'",
+                "': Tuple[...]' -> ': Tuple[...]'",
+                "': Union[...]' -> ': Union[...]'",
+                "': Callable[...]' -> ': Callable[...]'",
+                "-> Optional[...]" -> "-> Optional[...]",
+                "-> List[...]" -> "-> List[...]",
+                "-> Dict[...]" -> "-> Dict[...]'",
+                "-> Tuple[...]" -> "-> Tuple[...]'",
+                "-> Union[...]" -> "-> Union[...]'",
+                "-> Callable[...]" -> "-> Callable[...]'"
+            ]
+        },
+        "dataclasses": {
+            "count": 325,
+            "examples": [
+                "# @dataclass\\\\nclass" -> "dataclass\\\\nclass",
+                "# @dataclass\\\\n@dataclass\\\\nclass" -> "dataclass\\\\nclass",
+                "field(...)" -> "field()"
+            ]
+        },
+        "imports": {
+            "count": 190,
+            "examples": [
+                "import .module.(" -> "import .module.(",
+                "import ..module.(" -> "import ..module.(",
+                "from .module import (#...)" -> "from .module import (...)",
+                "from ..module import (#...)" -> "from ..module import (...)"
+            ]
+        },
+        "decorators": {
+            "count": 80,
+            "examples": [
+                "@decorator(" -> "decorator(",
+                "@module.decorator(" -> "module.decorator(",
+                "function backwards_compatible" -> "@backwards_compatible"
+            ]
+        },
+        "math_functions": {
+            "count": 0,
+            "examples": [
+                "math.subtract((...), (...))" -> "(...) - (...)",
+                "math.add((...), (...))" -> "(...) + (...)",
+                "math.multiply((...), (...))" -> "(...) * (...)"
+            ]
+        },
+        "function_annotations": {
+            "count": 60,
+            "examples": [
+                "def (...) -> (...):" -> "def (...):\\\\n    \\\"...\\\"\\\"\"",
+                "async def (...) -> (...):" -> "async def (...):\\\\n    \\\"...\\\"\\\""
+            ]
+        }
+    },
+    "timestamp": "2025-10-24T07:40:20.453Z"
+}

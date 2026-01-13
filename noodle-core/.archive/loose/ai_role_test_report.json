@@ -1,0 +1,36 @@
+{
+  "test_timestamp": "2025-11-05 22:45:43",
+  "test_environment": {
+    "python_version": "3.12.4 (tags/v3.12.4:8e8a4ba, Jun  6 2024, 19:30:16) [MSC v.1940 64 bit (AMD64)]",
+    "working_directory": "C:\\Users\\micha\\Noodle\\noodle-core",
+    "platform": "win32"
+  },
+  "test_results": {
+    "Role Manager Core": {
+      "status": "PASS",
+      "timestamp": 1762379144.177889
+    },
+    "Role Document Integration": {
+      "status": "PASS",
+      "timestamp": 1762379144.3042765
+    },
+    "IDE Integration": {
+      "status": "FAIL",
+      "timestamp": 1762379144.351577
+    },
+    "Workflow Demonstration": {
+      "status": "PASS",
+      "timestamp": 1762379144.4910662
+    },
+    "Chat Integration": {
+      "status": "PASS",
+      "timestamp": 1762379144.5753381
+    }
+  },
+  "summary": {
+    "total_tests": 5,
+    "passed_tests": 4,
+    "failed_tests": 1,
+    "success_rate": 80.0
+  }
+}

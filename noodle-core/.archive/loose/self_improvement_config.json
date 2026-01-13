@@ -1,0 +1,97 @@
+{
+    "self_improvement": {
+        "enabled": true,
+        "auto_activation": true,
+        "performance_monitoring": {
+            "enabled": true,
+            "collection_interval": 30,
+            "comparison_enabled": true,
+            "metrics_retention": 10000,
+            "auto_comparison_threshold": 10,
+            "alert_thresholds": {
+                "execution_time": 500.0,
+                "memory_usage": 80.0,
+                "cpu_usage": 80.0,
+                "error_rate": 5.0
+            }
+        },
+        "feedback_collection": {
+            "enabled": true,
+            "storage_file": "feedback_data.json",
+            "retention_count": 10000,
+            "auto_learning": true,
+            "batch_size": 50,
+            "learning_interval": 300
+        },
+        "adaptive_optimization": {
+            "enabled": true,
+            "critical_components": [
+                "compiler",
+                "optimizer",
+                "runtime",
+                "memory_manager",
+                "task_distributor"
+            ],
+            "hybrid_mode_enabled": true,
+            "default_rollout_percentage": 10.0,
+            "performance_threshold": 0.1,
+            "error_threshold": 5,
+            "evaluation_interval": 300,
+            "max_rollout_percentage": 100.0,
+            "rollout_increment": 10.0
+        },
+        "safety_mode": {
+            "enabled": true,
+            "memory_usage_threshold": 0.8,
+            "error_rate_threshold": 0.1,
+            "performance_degradation_threshold": 0.2
+        }
+    },
+    "feature_flags": {
+        "use_noodlecore_implementation": {
+            "status": "conditional",
+            "description": "Use NoodleCore implementation when performance criteria met",
+            "rollout_percentage": 10.0,
+            "conditions": {
+                "performance_threshold": 0.1,
+                "error_threshold": 5,
+                "critical_components": [
+                    "compiler",
+                    "optimizer",
+                    "runtime"
+                ]
+            }
+        },
+        "enable_hybrid_mode": {
+            "status": "enabled",
+            "description": "Enable hybrid implementation combining Python and NoodleCore"
+        },
+        "enable_performance_monitoring": {
+            "status": "enabled",
+            "description": "Enable performance monitoring for component selection"
+        }
+    },
+    "data_storage": {
+        "feedback_data": "feedback_data.json",
+        "learning_data": "feedback_learning.json",
+        "performance_data": "performance_metrics.json",
+        "optimization_data": "optimization_decisions.json",
+        "report_directory": "reports",
+        "retention_days": 30
+    },
+    "logging": {
+        "level": "INFO",
+        "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "file": "self_improvement.log"
+    },
+    "api": {
+        "host": "0.0.0.0",
+        "port": 8080,
+        "timeout": 30,
+        "request_id_format": "uuid_v4"
+    },
+    "environment": {
+        "debug": false,
+        "production": false
+    }
+}

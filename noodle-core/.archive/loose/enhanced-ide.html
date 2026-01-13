@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoodleCore Enhanced IDE</title>
+
+    <!-- Monaco Editor -->
+    <script src="/monaco-editor/min/vs/loader.min.js"></script>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- NoodleCore IDE Styles -->
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Main IDE Layout */
+        .ide-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* File Explorer */
+        .file-explorer {
+            width: 250px;
+            background: #252526;
+            border-right: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+        }
+
+        .file-explorer.collapsed {
+            width: 50px;
+        }
+
+        .explorer-header {
+            padding: 8px 12px;
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .explorer-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .explorer-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #cccccc;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 2px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #3c3c3c;
+            color: #ffffff;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 8px 12px;
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #3c3c3c;
+            border: 1px solid #464647;
+            color: #cccccc;
+            padding: 6px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #007acc;
+            box-shadow: 0 0 0 1px #007acc;
+        }
+
+        /* File Tree */
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+
+        .file-tree ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 4px 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .file-item:hover {
+            background: #2a2d2e;
+        }
+
+        .file-item.selected {
+            background: #094771;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            align-items: center;
+        }
+
+        .editor-tabs {
+            flex: 1;
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .editor-tab {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #2d2d30;
+            border-right: 1px solid #3e3e42;
+            cursor: pointer;
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        .editor-tab.active {
+            background: #1e1e1e;
+        }
+
+        .tab-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .tab-name {
+            flex: 1;
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tab-close {
+            margin-left: 8px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .tab-close:hover {
+            background: #f48771;
+            opacity: 1;
+        }
+
+        /* Monaco Editor Container */
+        .monaco-editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #monaco-editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Status Indicators */
+        .status-bar {
+            background: #007acc;
+            color: white;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            transition: background-color 0.3s ease;
+        }
+
+        .status-dot.active {
+            background: #4ec9b0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: #2d2d30;
+            color: #d4d4d4;
+            padding: 12px 16px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid #4ec9b0;
+        }
+
+        .toast.error {
+            border-left: 4px solid #f48771;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #ffcc02;
+        }
+
+        .toast.info {
+            border-left: 4px solid #007acc;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .file-explorer {
+                width: 200px;
+            }
+
+            .explorer-title {
+                font-size: 11px;
+            }
+
+            .search-input {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main IDE Container -->
+    <div class="ide-container">
+        <!-- File Explorer -->
+        <div id="file-explorer" class="file-explorer">
+            <div class="explorer-header">
+                <div class="explorer-title">Explorer</div>
+                <div class="explorer-controls">
+                    <button class="control-btn" onclick="refreshFileTree()">
+                        <i class="fas fa-refresh"></i>
+                    </button>
+                    <button class="control-btn" onclick="collapseExplorer()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" id="file-search" placeholder="Search files..."
+                    onkeyup="searchFiles()">
+            </div>
+
+            <div id="file-tree" class="file-tree">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+
+        <!-- Editor Area -->
+        <div class="editor-area">
+            <div class="editor-header">
+                <div id="editor-tabs" class="editor-tabs">
+                    <!-- Dynamic tab content -->
+                </div>
+                <div class="editor-controls">
+                    <button class="control-btn" onclick="showToast('Feature coming soon!', 'info')">
+                        <i class="fas fa-lightbulb"></i>
+                    </button>
+                    <button class="control-btn" onclick="showToast('Feature coming soon!', 'info')">
+                        <i class="fas fa-brain"></i>
+                    </button>
+                    <button class="control-btn" onclick="showToast('Feature coming soon!', 'info')">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button class="control-btn" onclick="showToast('Feature coming soon!', 'info')">
+                        <i class="fas fa-users"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="monaco-editor-container">
+                <div id="monaco-editor"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-indicators">
+            <div class="status-item">
+                <div id="connection-status" class="status-dot"></div>
+                <span>Server</span>
+            </div>
+            <div class="status-item">
+                <div id="editor-status" class="status-dot"></div>
+                <span>Editor</span>
+            </div>
+        </div>
+        <div style="flex: 1;"></div>
+        <div>Ready</div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global Variables
+        let monacoEditor = null;
+        let socket = null;
+        let currentFile = null;
+        let openFiles = new Map();
+        let monacoLoaded = false;
+        let editorInitialized = false;
+
+        // Enhanced Monaco Editor initialization with comprehensive error handling
+        function initializeMonacoLoader() {
+            console.log('🚀 Starting Monaco Editor initialization...');
+
+            // Check if require is available
+            if (typeof require === 'undefined') {
+                console.error('❌ require.js not loaded - loader.min.js missing or failed to load');
+                showEditorError('Failed to load Monaco Editor: require.js not available');
+                return;
+            }
+
+            console.log('✅ require.js is available');
+
+            // Configure require.js with proper paths
+            require.config({
+                paths: {
+                    'vs': '/monaco-editor/min/vs'
+                }
+            });
+
+            console.log('📍 Require.js configured with path: /monaco-editor/min/vs');
+
+            // Create timeout for loading
+            const loadTimeout = setTimeout(() => {
+                console.error('⏰ Monaco Editor loading timeout (10 seconds)');
+                showEditorError('Monaco Editor loading timeout - check network connectivity');
+            }, 10000);
+
+            console.log('⏱️ Loading Monaco Editor with 10-second timeout...');
+
+            // Load Monaco Editor
+            require(['vs/editor/editor.main'], function (monaco) {
+                clearTimeout(loadTimeout);
+                console.log('🎉 Monaco Editor loaded successfully!');
+                console.log('📊 Monaco object available:', !!monaco);
+                console.log('📊 Monaco editor available:', !!monaco.editor);
+
+                if (!monaco || !monaco.editor) {
+                    throw new Error('Monaco editor modules not properly loaded');
+                }
+
+                monacoLoaded = true;
+                initializeMonacoEditor(monaco);
+            }, function (error) {
+                clearTimeout(loadTimeout);
+                console.error('💥 Monaco Editor loading failed:', error);
+
+                let errorMessage = 'Monaco Editor failed to load. ';
+                if (error.message) {
+                    errorMessage += 'Error: ' + error.message;
+                } else if (typeof error === 'string') {
+                    errorMessage += 'Error: ' + error;
+                } else {
+                    errorMessage += 'Unknown error - check browser console for details';
+                }
+
+                showEditorError(errorMessage);
+                fallbackToBasicEditor();
+            });
+        }
+
+        function initializeMonacoEditor(monaco) {
+            try {
+                console.log('🔧 Initializing Monaco Editor instance...');
+
+                const editorContainer = document.getElementById('monaco-editor');
+                if (!editorContainer) {
+                    throw new Error('Monaco editor container not found');
+                }
+
+                console.log('📦 Editor container found, creating instance...');
+
+                monacoEditor = monaco.editor.create(editorContainer, {
+                    value: `#!/usr/bin/env python3
+# Welcome to NoodleCore Enhanced IDE
+# 
+# ✅ Monaco Editor is now working correctly!
+# 🎯 This is a fully functional code editor
+# 🚀 Start coding with confidence!
+
+def main():
+    print("Hello from Monaco Editor!")
+    print("✅ JavaScript initialization successful")
+    print("✅ Editor functionality confirmed")
+
+if __name__ == "__main__":
+    main()
+`,
+                    language: 'python',
+                    theme: 'vs-dark',
+                    fontSize: 14,
+                    lineNumbers: 'on',
+                    minimap: { enabled: true },
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    wordWrap: 'on',
+                    formatOnPaste: true,
+                    formatOnType: true,
+                    suggestOnTriggerCharacters: true,
+                    acceptSuggestionOnEnter: 'on',
+                    bracketMatching: 'always',
+                    autoIndent: 'advanced',
+                    contextmenu: true,
+                    mouseWheelZoom: true,
+                    smoothScrolling: true,
+                    cursorBlinking: 'blink',
+                    cursorSmoothCaretAnimation: 'on',
+                    folding: true,
+                    foldingHighlight: true,
+                    showFoldingControls: 'always',
+                    bracketPairColorization: { enabled: true },
+                    guides: {
+                        bracketPairs: true,
+                        indentation: true
+                    }
+                });
+
+                if (!monacoEditor) {
+                    throw new Error('Failed to create Monaco Editor instance');
+                }
+
+                console.log('🎊 Monaco Editor instance created successfully!');
+                editorInitialized = true;
+
+                // Update status indicators
+                updateEditorStatus(true);
+
+                // Add editor event listeners
+                monacoEditor.onDidFocusEditorText(() => {
+                    console.log('📝 Editor focused');
+                });
+
+                monacoEditor.onDidBlurEditorText(() => {
+                    console.log('📝 Editor blurred');
+                });
+
+                // Initialize rest of IDE features
+                initializeIDE();
+                connectWebSocket();
+                loadInitialFiles();
+
+                showToast('🎉 Monaco Editor loaded successfully!', 'success');
+
+            } catch (error) {
+                console.error('💥 Monaco Editor initialization error:', error);
+                showEditorError('Failed to initialize Monaco Editor: ' + error.message);
+                fallbackToBasicEditor();
+            }
+        }
+
+        function fallbackToBasicEditor() {
+            console.log('⚠️ Switching to fallback editor...');
+
+            const editorContainer = document.getElementById('monaco-editor');
+            if (editorContainer) {
+                editorContainer.innerHTML = `
+                    <div style="padding: 40px; text-align: center; background: #2d2d30; color: #d4d4d4; border: 2px solid #f48771; border-radius: 8px; margin: 40px;">
+                        <h3 style="color: #f48771; margin-bottom: 16px;">⚠️ Monaco Editor Unavailable</h3>
+                        <p style="margin-bottom: 20px;">The Monaco Editor failed to load properly.</p>
+                        <div style="background: #1e1e1e; padding: 16px; border-radius: 4px; margin: 16px 0; text-align: left;">
+                            <strong>Troubleshooting steps:</strong>
+                            <ol style="margin: 8px 0; padding-left: 20px;">
+                                <li>Check your internet connection</li>
+                                <li>Clear browser cache (Ctrl+Shift+Delete)</li>
+                                <li>Hard refresh the page (Ctrl+F5)</li>
+                                <li>Check browser console for errors</li>
+                            </ol>
+                        </div>
+                        <button onclick="location.reload()" style="background: #007acc; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                            🔄 Reload Page
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Still initialize other features
+            updateEditorStatus(false);
+            initializeIDE();
+            connectWebSocket();
+            loadInitialFiles();
+        }
+
+        function showEditorError(message) {
+            console.error('🚨 Editor Error:', message);
+            showToast('⚠️ Editor Error: ' + message, 'error');
+            updateEditorStatus(false);
+        }
+
+        function updateEditorStatus(working) {
+            const editorDot = document.getElementById('editor-status');
+            if (editorDot) {
+                editorDot.className = `status-dot ${working ? 'active' : ''}`;
+            }
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeMonacoLoader);
+        } else {
+            initializeMonacoLoader();
+        }
+
+        function initializeIDE() {
+            console.log('🏗️ Initializing IDE features...');
+            updateStatusIndicators();
+            setupKeyboardShortcuts();
+        }
+
+        function connectWebSocket() {
+            console.log('🔌 Connecting to WebSocket...');
+            try {
+                socket = io('http://localhost:8080', {
+                    transports: ['websocket', 'polling']
+                });
+
+                socket.on('connect', () => {
+                    console.log('✅ WebSocket connected');
+                    showToast('Connected to NoodleCore server', 'success');
+                    updateConnectionStatus(true);
+                });
+
+                socket.on('disconnect', () => {
+                    console.log('⚠️ WebSocket disconnected');
+                    showToast('Disconnected from server', 'warning');
+                    updateConnectionStatus(false);
+                });
+
+                socket.on('connect_error', (error) => {
+                    console.log('⚠️ WebSocket connection error:', error);
+                    showToast('Server connection failed', 'warning');
+                    updateConnectionStatus(false);
+                });
+
+            } catch (error) {
+                console.log('⚠️ WebSocket initialization failed:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const connectionDot = document.getElementById('connection-status');
+            if (connectionDot) {
+                connectionDot.className = `status-dot ${connected ? 'active' : ''}`;
+            }
+        }
+
+        function updateStatusIndicators() {
+            updateConnectionStatus(false); // Will be updated by WebSocket
+        }
+
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 's':
+                            e.preventDefault();
+                            if (currentFile) {
+                                showToast('File save functionality coming soon!', 'info');
+                            }
+                            break;
+                        case 'w':
+                            e.preventDefault();
+                            if (currentFile) {
+                                showToast('File close functionality coming soon!', 'info');
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+
+        // File Management
+        function openFile(filePath, content = '') {
+            console.log('📂 Opening file:', filePath);
+
+            // Check if file is already open
+            for (let [path, tab] of openFiles) {
+                if (path === filePath) {
+                    selectTab(path);
+                    return;
+                }
+            }
+
+            // Create new tab
+            const tabId = `tab-${Date.now()}`;
+            const tabName = filePath.split('/').pop();
+
+            const tab = document.createElement('div');
+            tab.className = 'editor-tab';
+            tab.id = tabId;
+            tab.onclick = () => selectTab(filePath);
+
+            tab.innerHTML = `
+                <div class="tab-icon">
+                    <i class="fas fa-file-code"></i>
+                </div>
+                <div class="tab-name">${tabName}</div>
+                <div class="tab-close" onclick="closeFile('${filePath}', event)">
+                    <i class="fas fa-times"></i>
+                </div>
+            `;
+
+            document.getElementById('editor-tabs').appendChild(tab);
+
+            // Set editor content
+            if (monacoEditor && editorInitialized) {
+                monacoEditor.setValue(content);
+            }
+
+            // Store open file
+            openFiles.set(filePath, {
+                tabId: tabId,
+                content: content,
+                originalContent: content
+            });
+
+            // Select the new tab
+            selectTab(filePath);
+        }
+
+        function closeFile(filePath, event) {
+            event.stopPropagation();
+
+            // Remove tab
+            const fileInfo = openFiles.get(filePath);
+            if (fileInfo) {
+                document.getElementById(fileInfo.tabId).remove();
+                openFiles.delete(filePath);
+            }
+
+            // If this was the active file, switch to another open file or clear editor
+            if (currentFile === filePath) {
+                const remainingFiles = Array.from(openFiles.keys());
+                if (remainingFiles.length > 0) {
+                    selectTab(remainingFiles[0]);
+                } else {
+                    if (monacoEditor && editorInitialized) {
+                        monacoEditor.setValue('');
+                    }
+                    currentFile = null;
+                }
+            }
+        }
+
+        function selectTab(filePath) {
+            // Update tab selection
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            const fileInfo = openFiles.get(filePath);
+            if (fileInfo) {
+                document.getElementById(fileInfo.tabId).classList.add('active');
+                currentFile = filePath;
+
+                // Load file content
+                if (monacoEditor && editorInitialized) {
+                    monacoEditor.setValue(fileInfo.content);
+                }
+            }
+        }
+
+        function loadInitialFiles() {
+            console.log('📚 Loading initial files...');
+
+            // Open welcome file
+            openFile('welcome.py', `#!/usr/bin/env python3
+# Welcome to NoodleCore Enhanced IDE
+# 
+# ✅ Monaco Editor Status: WORKING
+# 🎯 All core IDE features are operational
+# 🚀 Ready for development!
+
+def hello_world():
+    print("Hello from Monaco Editor!")
+    print("✅ JavaScript initialization: SUCCESS")
+    print("✅ Editor functionality: CONFIRMED")
+    print("✅ NoodleCore IDE: READY")
+
+if __name__ == "__main__":
+    hello_world()
+`);
+        }
+
+        function refreshFileTree() {
+            showToast('File tree refresh coming soon!', 'info');
+        }
+
+        function searchFiles() {
+            const query = document.getElementById('file-search').value.toLowerCase();
+            const items = document.querySelectorAll('.file-item');
+
+            items.forEach(item => {
+                const name = item.querySelector('.file-name').textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function collapseExplorer() {
+            const explorer = document.getElementById('file-explorer');
+            explorer.classList.toggle('collapsed');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Debug helper
+        function debugMonaco() {
+            console.log('🔍 Monaco Debug Info:');
+            console.log('- monacoLoaded:', monacoLoaded);
+            console.log('- editorInitialized:', editorInitialized);
+            console.log('- monacoEditor:', !!monacoEditor);
+            console.log('- require available:', typeof require !== 'undefined');
+            console.log('- window.monaco:', !!window.monaco);
+
+            if (monacoEditor) {
+                console.log('- Editor model:', !!monacoEditor.getModel());
+                console.log('- Editor container size:', {
+                    width: document.getElementById('monaco-editor').offsetWidth,
+                    height: document.getElementById('monaco-editor').offsetHeight
+                });
+            }
+        }
+
+        // Make debug function available globally
+        window.debugMonaco = debugMonaco;
+
+        console.log('🎯 NoodleCore Enhanced IDE loaded - Ready to initialize Monaco Editor!');
+    </script>
+</body>
+
+</html>

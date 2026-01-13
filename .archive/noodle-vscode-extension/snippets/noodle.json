@@ -1,0 +1,169 @@
+{
+  "Function Definition": {
+    "prefix": "func",
+    "body": [
+      "func ${1:function_name}(${2:parameters}) -> ${3:return_type} {",
+      "\t${4:// function body}",
+      "}"
+    ],
+    "description": "Create a Noodle function"
+  },
+  "Variable Declaration": {
+    "prefix": "let",
+    "body": [
+      "let ${1:variable_name}: ${2:type} = ${3:value}"
+    ],
+    "description": "Declare a Noodle variable"
+  },
+  "If Statement": {
+    "prefix": "if",
+    "body": [
+      "if ${1:condition} {",
+      "\t${2:// code block}",
+      "}"
+    ],
+    "description": "Create an if statement"
+  },
+  "For Loop": {
+    "prefix": "for",
+    "body": [
+      "for ${1:item} in ${2:collection} {",
+      "\t${3:// loop body}",
+      "}"
+    ],
+    "description": "Create a for loop"
+  },
+  "While Loop": {
+    "prefix": "while",
+    "body": [
+      "while ${1:condition} {",
+      "\t${2:// loop body}",
+      "}"
+    ],
+    "description": "Create a while loop"
+  },
+  "Class Definition": {
+    "prefix": "class",
+    "body": [
+      "class ${1:ClassName} {",
+      "\t${2:// class properties and methods}",
+      "}"
+    ],
+    "description": "Create a Noodle class"
+  },
+  "Import Module": {
+    "prefix": "import",
+    "body": [
+      "import ${1:module_name}"
+    ],
+    "description": "Import a Noodle module"
+  },
+  "AI Function Call": {
+    "prefix": "ai",
+    "body": [
+      "ai.${1:function}(${2:parameters})"
+    ],
+    "description": "Call an AI function"
+  },
+  "Debug Print": {
+    "prefix": "debug",
+    "body": [
+      "debug.print(${1:message})"
+    ],
+    "description": "Print debug message"
+  },
+  "Error Handling": {
+    "prefix": "try",
+    "body": [
+      "try {",
+      "\t${1:// try block}",
+      "} catch ${2:error} {",
+      "\t${3:// catch block}",
+      "}"
+    ],
+    "description": "Create try-catch block"
+  },
+  "Async Function": {
+    "prefix": "async",
+    "body": [
+      "async func ${1:function_name}(${2:parameters}) -> ${3:return_type} {",
+      "\t${4:// async function body}",
+      "}"
+    ],
+    "description": "Create an async Noodle function"
+  },
+  "Match Statement": {
+    "prefix": "match",
+    "body": [
+      "match ${1:expression} {",
+      "\tcase ${2:pattern} => ${3:result},",
+      "\t_ => ${4:default_result}",
+      "}"
+    ],
+    "description": "Create a match statement"
+  },
+  "Type Definition": {
+    "prefix": "type",
+    "body": [
+      "type ${1:TypeName} = ${2:definition}"
+    ],
+    "description": "Define a custom type"
+  },
+  "Module Export": {
+    "prefix": "export",
+    "body": [
+      "export ${1:function_name}"
+    ],
+    "description": "Export a function from module"
+  },
+  "Comment Block": {
+    "prefix": "/*",
+    "body": [
+      "/*",
+      " * ${1:comment}",
+      " */"
+    ],
+    "description": "Create a comment block"
+  },
+  "Array Declaration": {
+    "prefix": "array",
+    "body": [
+      "let ${1:array_name}: [${2:type}] = [${3:items}]"
+    ],
+    "description": "Declare an array"
+  },
+  "Dictionary Declaration": {
+    "prefix": "dict",
+    "body": [
+      "let ${1:dict_name}: [${2:key_type}: ${3:value_type}] = {${4:key}: ${5:value}}"
+    ],
+    "description": "Declare a dictionary"
+  },
+  "Lambda Function": {
+    "prefix": "lambda",
+    "body": [
+      "|${1:parameters}| ${2:expression}"
+    ],
+    "description": "Create a lambda function"
+  },
+  "AI Generate": {
+    "prefix": "ai_generate",
+    "body": [
+      "ai.generate(\"${1:prompt}\", {",
+      "\tmodel: \"${2:gpt-4}\",",
+      "\tmax_tokens: ${3:1000}",
+      "})"
+    ],
+    "description": "Generate code with AI"
+  },
+  "NBC Compile": {
+    "prefix": "nbc_compile",
+    "body": [
+      "nbc.compile(\"${1:file_path}\", {",
+      "\toutput: \"${2:output_path}\",",
+      "\toptimize: ${3:true}",
+      "})"
+    ],
+    "description": "Compile to NBC bytecode"
+  }
+}

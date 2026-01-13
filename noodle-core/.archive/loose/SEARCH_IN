@@ -1,0 +1,656 @@
+# NoodleCore File Search System - Integration Guide
+
+## Overview
+
+The NoodleCore File Search System provides lightning-fast, intelligent file and content discovery capabilities integrated with Monaco Editor and the noodlecore architecture. This system delivers instant search results with AI-powered semantic understanding, fuzzy matching, and advanced navigation features.
+
+## Architecture
+
+### Core Components
+
+```
+noodle-core/src/noodlecore/search/
+├── file_indexer.nc          # File system indexing and management
+├── content_searcher.nc       # Text content search engine
+├── semantic_searcher.nc      # AI-powered semantic search
+├── search_engine.nc          # Unified search orchestration
+├── search_cache.nc           # Search result caching and optimization
+├── search_navigator.nc       # Search result navigation and highlighting
+```
+
+### API Endpoints
+
+All search endpoints are served through `/api/v1/search/*` with the following endpoints:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/status` | GET | Search service status and capabilities |
+| `/files` | GET/POST | Filename and path search |
+| `/content` | GET/POST | Text content search within files |
+| `/semantic` | GET/POST | AI-powered semantic search |
+| `/global` | GET/POST | Multi-type search (filename + content) |
+| `/suggest` | GET | Search suggestions and autocomplete |
+| `/history` | GET/DELETE | Search history management |
+| `/index` | GET/POST/DELETE | File system indexing management |
+| `/results` | GET | Detailed search results with context |
+
+## Quick Start
+
+### 1. Server Integration
+
+The search system is automatically integrated when the enhanced server starts:
+
+```bash
+cd noodle-core/src/noodlecore/api
+python -m server_enhanced --debug
+```
+
+The server will automatically initialize all search components and expose the endpoints.
+
+### 2. Test the Search API
+
+```bash
+# Check search service status
+curl http://localhost:8080/api/v1/search/status
+
+# Search for files
+curl "http://localhost:8080/api/v1/search/files?q=test&limit=10"
+
+# Search content within files
+curl "http://localhost:8080/api/v1/search/content?q=function&types=py,js"
+
+# AI semantic search
+curl "http://localhost:8080/api/v1/search/semantic?q=data processing"
+
+# Global search (files + content)
+curl "http://localhost:8080/api/v1/search/global?q=python&types=py,js,ts"
+```
+
+### 3. Run Automated Tests
+
+```bash
+cd noodle-core
+python test_search_api.py
+```
+
+## API Reference
+
+### Search Response Format
+
+All search responses follow a standardized format:
+
+```json
+{
+  "requestId": "uuid-v4",
+  "success": true,
+  "timestamp": "2025-10-31T17:09:44.925Z",
+  "data": {
+    "results": [...],
+    "summary": {
+      "total_found": 42,
+      "query": "search term",
+      "search_time": 0.045,
+      "file_types": ["py", "js", "ts"]
+    }
+  },
+  "processingTime": 0.045
+}
+```
+
+### Error Response Format
+
+```json
+{
+  "requestId": "uuid-v4",
+  "success": false,
+  "timestamp": "2025-10-31T17:09:44.925Z",
+  "error": {
+    "code": "MISSING_QUERY",
+    "message": "Query parameter is required",
+    "details": {...}
+  }
+}
+```
+
+### Endpoint Details
+
+#### Files Search (`/api/v1/search/files`)
+
+Search for files by name and path patterns.
+
+**Request:**
+
+- `q` (string): Search query
+- `types` (comma-separated): File extensions to filter
+- `limit` (integer): Maximum results (default: 50)
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "path": "/src/components/test.js",
+      "name": "test.js", 
+      "type": "javascript",
+      "size": 1024,
+      "modified": 1698784384
+    }
+  ]
+}
+```
+
+#### Content Search (`/api/v1/search/content`)
+
+Search text content within files with line-by-line results.
+
+**Request:**
+
+- `q` (string): Search query
+- `types` (comma-separated): File extensions to filter
+- `limit` (integer): Maximum results (default: 50)
+- `context_lines` (integer): Context lines around matches (default: 2)
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "file_path": "/src/utils/helper.js",
+      "matches": [
+        {
+          "line": 42,
+          "column": 5,
+          "text": "function testHelper()",
+          "context": [
+            {"line": 40, "text": "// Helper function"},
+            {"line": 41, "text": "// that processes data"},
+            {"line": 42, "text": "function testHelper() {"},
+            {"line": 43, "text": "    return processed;"},
+            {"line": 44, "text": "}"}
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Semantic Search (`/api/v1/search/semantic`)
+
+AI-powered search that understands meaning and concepts.
+
+**Request:**
+
+- `q` (string): Natural language query
+- `limit` (integer): Maximum results (default: 50)
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "text": "This file contains data processing algorithms",
+      "score": 0.92,
+      "file_path": "/src/algorithms/processor.py",
+      "explanation": "Found conceptual match for data processing functionality"
+    }
+  ]
+}
+```
+
+#### Global Search (`/api/v1/search/global`)
+
+Combines multiple search types in a single query.
+
+**Request:**
+
+- `q` (string): Search query
+- `types` (comma-separated): File extensions to filter
+- `limit` (integer): Maximum results (default: 50)
+- `types_search` (comma-separated): Search types to include (files, content)
+
+**Response:**
+
+```json
+{
+  "results": {
+    "files": [...],
+    "content": [...]
+  }
+}
+```
+
+#### Search Suggestions (`/api/v1/search/suggest`)
+
+Get autocomplete suggestions based on existing files and content.
+
+**Request:**
+
+- `q` (string): Partial query for suggestions
+- `limit` (integer): Maximum suggestions (default: 10)
+
+**Response:**
+
+```json
+{
+  "suggestions": [
+    {
+      "text": "test_function",
+      "type": "file",
+      "path": "/src/test_function.py",
+      "relevance": 1.0
+    }
+  ]
+}
+```
+
+## Advanced Features
+
+### Real-time Search
+
+The system supports real-time search via WebSocket connections:
+
+```javascript
+const socket = io('http://localhost:8080');
+socket.emit('search_live', {
+    query: 'python function',
+    type: 'files',
+    limit: 10
+});
+
+socket.on('search_results', (data) => {
+    console.log('Results:', data.results);
+});
+```
+
+### Search History
+
+Search history is automatically tracked and can be retrieved:
+
+```bash
+curl http://localhost:8080/api/v1/search/history?limit=20
+
+# Clear history
+curl -X DELETE http://localhost:8080/api/v1/search/history
+```
+
+### Index Management
+
+Manage the search index for optimal performance:
+
+```bash
+# Get index status
+curl http://localhost:8080/api/v1/search/index
+
+# Trigger reindexing
+curl -X POST http://localhost:8080/api/v1/search/index \
+  -H "Content-Type: application/json" \
+  -d '{"action": "rebuild"}'
+
+# Clear index
+curl -X DELETE http://localhost:8080/api/v1/search/index
+```
+
+## Monaco Editor Integration
+
+### Frontend Search Panel
+
+Create a search panel in your Monaco Editor:
+
+```javascript
+class NoodleCoreSearchPanel {
+    constructor(monacoEditor) {
+        this.editor = monacoEditor;
+        this.searchContainer = this.createSearchContainer();
+        this.initializeEventListeners();
+    }
+    
+    createSearchContainer() {
+        const container = document.createElement('div');
+        container.className = 'noodle-search-container';
+        container.innerHTML = `
+            <div class="noodle-search-input-container">
+                <input type="text" class="noodle-search-input" placeholder="Search files and content...">
+                <button class="noodle-search-button">Search</button>
+            </div>
+            <div class="noodle-search-filters">
+                <select class="noodle-search-type">
+                    <option value="files">Files</option>
+                    <option value="content">Content</option>
+                    <option value="semantic">Semantic</option>
+                    <option value="global">Global</option>
+                </select>
+                <input type="text" class="noodle-file-types" placeholder="File types (py,js,ts)">
+            </div>
+            <div class="noodle-search-results"></div>
+            <div class="noodle-search-history"></div>
+        `;
+        return container;
+    }
+    
+    async performSearch(query, searchType, fileTypes) {
+        const endpoint = `/api/v1/search/${searchType}`;
+        const params = new URLSearchParams({
+            q: query,
+            types: fileTypes,
+            limit: '50'
+        });
+        
+        try {
+            const response = await fetch(`${endpoint}?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.displayResults(data.data.results, searchType);
+                this.addToHistory(query, searchType);
+            }
+        } catch (error) {
+            console.error('Search failed:', error);
+        }
+    }
+    
+    displayResults(results, searchType) {
+        const resultsContainer = this.searchContainer.querySelector('.noodle-search-results');
+        resultsContainer.innerHTML = '';
+        
+        results.forEach(result => {
+            const resultElement = this.createResultElement(result, searchType);
+            resultsContainer.appendChild(resultElement);
+        });
+    }
+    
+    createResultElement(result, searchType) {
+        const element = document.createElement('div');
+        element.className = 'noodle-search-result';
+        
+        if (searchType === 'content' && result.matches) {
+            element.innerHTML = `
+                <div class="noodle-result-header">
+                    <span class="noodle-file-path">${result.file_path}</span>
+                </div>
+                <div class="noodle-result-matches">
+                    ${result.matches.map(match => `
+                        <div class="noodle-match" data-line="${match.line}" data-column="${match.column}">
+                            <span class="noodle-match-line">${match.line}:</span>
+                            <span class="noodle-match-text">${match.text}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else {
+            element.innerHTML = `
+                <div class="noodle-result-header">
+                    <span class="noodle-file-name">${result.name || result.text}</span>
+                    <span class="noodle-file-path">${result.path}</span>
+                </div>
+            `;
+        }
+        
+        // Add click handler for navigation
+        element.addEventListener('click', () => {
+            this.navigateToResult(result);
+        });
+        
+        return element;
+    }
+    
+    navigateToResult(result) {
+        if (result.line && result.column) {
+            // Navigate to specific line/column
+            this.editor.revealPosition({
+                lineNumber: result.line,
+                column: result.column
+            });
+            this.editor.setPosition({
+                lineNumber: result.line,
+                column: result.column
+            });
+        } else if (result.path) {
+            // Open file in editor
+            this.openFile(result.path);
+        }
+    }
+    
+    async openFile(filePath) {
+        // Implementation to open file in Monaco Editor
+        const response = await fetch(`/api/v1/ide/files/open?path=${encodeURIComponent(filePath)}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const model = monaco.editor.createModel(data.data.content, data.data.language);
+            this.editor.setModel(model);
+        }
+    }
+    
+    addToHistory(query, searchType) {
+        const history = this.getSearchHistory();
+        history.unshift({
+            query,
+            searchType,
+            timestamp: Date.now()
+        });
+        
+        // Keep only last 50 searches
+        if (history.length > 50) {
+            history.splice(50);
+        }
+        
+        localStorage.setItem('noodle-search-history', JSON.stringify(history));
+        this.displaySearchHistory();
+    }
+    
+    displaySearchHistory() {
+        const history = this.getSearchHistory();
+        const historyContainer = this.searchContainer.querySelector('.noodle-search-history');
+        
+        historyContainer.innerHTML = `
+            <h4>Recent Searches</h4>
+            <ul>
+                ${history.slice(0, 10).map(item => `
+                    <li class="noodle-history-item" data-query="${item.query}" data-type="${item.searchType}">
+                        ${item.query} (${item.searchType})
+                    </li>
+                `).join('')}
+            </ul>
+        `;
+        
+        // Add click handlers for history items
+        historyContainer.querySelectorAll('.noodle-history-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const query = item.dataset.query;
+                const type = item.dataset.type;
+                this.performSearch(query, type, '');
+            });
+        });
+    }
+    
+    getSearchHistory() {
+        try {
+            return JSON.parse(localStorage.getItem('noodle-search-history') || '[]');
+        } catch {
+            return [];
+        }
+    }
+}
+
+// Initialize search panel when Monaco Editor is ready
+window.addEventListener('load', () => {
+    const editor = monaco.editor.create(document.getElementById('container'), {
+        value: '',
+        language: 'javascript'
+    });
+    
+    const searchPanel = new NoodleCoreSearchPanel(editor);
+    
+    // Add search panel to the interface
+    const sidebar = document.querySelector('.monaco-scrollable-element');
+    sidebar.appendChild(searchPanel.searchContainer);
+});
+```
+
+### WebSocket Integration
+
+For real-time search features:
+
+```javascript
+class NoodleCoreSearchWebSocket {
+    constructor(serverUrl = 'http://localhost:8080') {
+        this.serverUrl = serverUrl;
+        this.socket = null;
+        this.isConnected = false;
+    }
+    
+    connect() {
+        this.socket = io(this.serverUrl);
+        
+        this.socket.on('connect', () => {
+            this.isConnected = true;
+            console.log('Connected to search service');
+        });
+        
+        this.socket.on('disconnect', () => {
+            this.isConnected = false;
+            console.log('Disconnected from search service');
+        });
+        
+        this.socket.on('search_results', (data) => {
+            this.handleSearchResults(data);
+        });
+        
+        this.socket.on('search_error', (error) => {
+            console.error('Search error:', error);
+        });
+    }
+    
+    performLiveSearch(query, searchType = 'files', limit = 10) {
+        if (!this.isConnected) {
+            this.connect();
+        }
+        
+        this.socket.emit('search_live', {
+            query,
+            type: searchType,
+            limit
+        });
+    }
+    
+    handleSearchResults(data) {
+        // Emit custom event for the application to handle
+        const event = new CustomEvent('noodle-search-results', {
+            detail: data
+        });
+        window.dispatchEvent(event);
+    }
+}
+
+// Usage example
+const searchWS = new NoodleCoreSearchWebSocket();
+searchWS.connect();
+
+// Real-time search as user types
+let searchTimeout;
+document.querySelector('.noodle-search-input').addEventListener('input', (e) => {
+    const query = e.target.value;
+    if (query.length > 2) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchWS.performLiveSearch(query, 'global', 20);
+        }, 300); // Debounce search
+    }
+});
+```
+
+## Performance Optimization
+
+### Caching Strategy
+
+The search system implements multiple caching layers:
+
+1. **Memory Cache**: Recent search results (TTL: 5 minutes)
+2. **File Index Cache**: Pre-indexed file metadata
+3. **Content Cache**: Cached file contents for fast searching
+4. **Semantic Cache**: AI-generated embeddings
+
+### Optimization Tips
+
+1. **File Type Filtering**: Always specify file types to reduce search scope
+2. **Limit Results**: Use appropriate limits to prevent memory issues
+3. **Incremental Indexing**: Enable automatic indexing for real-time updates
+4. **Connection Pooling**: Use persistent connections for multiple searches
+5. **Batch Processing**: For large projects, use batch indexing
+
+### Performance Monitoring
+
+Monitor search performance with built-in metrics:
+
+```bash
+# Check search service performance
+curl http://localhost:8080/api/v1/search/status | jq '.data.statistics'
+
+# Response includes:
+# - Average search time
+# - Cache hit rate
+# - Index size
+# - Active connections
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Import Errors**: Ensure all search modules are properly placed in `noodle-core/src/noodlecore/search/`
+2. **Search Not Working**: Check server logs for component initialization issues
+3. **Slow Performance**: Verify index size and consider reindexing
+4. **Missing Results**: Check file type filters and search scope
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+cd noodle-core/src/noodlecore/api
+DEBUG=1 python -m server_enhanced --debug
+```
+
+### Manual Testing
+
+Test individual components:
+
+```python
+# Test file indexer
+from noodlecore.search.file_indexer import get_file_indexer
+indexer = get_file_indexer()
+results = indexer.search_files("test", limit=10)
+print(f"Found {len(results)} files")
+
+# Test content searcher  
+from noodlecore.search.content_searcher import get_content_searcher
+searcher = get_content_searcher()
+results = searcher.search_content("function", limit=10)
+print(f"Found {len(results)} content matches")
+```
+
+## Support
+
+For additional support and documentation:
+
+1. Check the server logs for detailed error messages
+2. Use the `/api/v1/search/status` endpoint to verify system health
+3. Refer to the NoodleCore architecture documentation
+4. Review the Monaco Editor integration patterns
+
+## Version History
+
+- **v1.0.0** (2025-10-31): Initial implementation with basic search functionality
+  - File and content search
+  - Semantic search with AI
+  - WebSocket real-time features
+  - Monaco Editor integration
+  - Advanced caching and optimization
+
+---
+
+*This documentation is part of the NoodleCore IDE Enhancement Project. For the latest updates, see the project repository.*

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noodle IDE - Language Independent Development Environment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: #2d2d30;
+            padding: 10px 20px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #569cd6;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #4ec9b0;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #252526;
+            border-right: 1px solid #3e3e42;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: #cccccc;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-item {
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .file-item:hover {
+            background-color: #2a2d2e;
+        }
+
+        .file-item.active {
+            background-color: #094771;
+            color: #ffffff;
+        }
+
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            background-color: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+        }
+
+        .tab {
+            padding: 8px 15px;
+            background-color: #2d2d30;
+            border-right: 1px solid #3e3e42;
+            cursor: pointer;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .tab.active {
+            background-color: #1e1e1e;
+            border-bottom: 2px solid #007acc;
+        }
+
+        .tab-close {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #cccccc;
+        }
+
+        .tab-close:hover {
+            color: #ffffff;
+        }
+
+        .editor {
+            flex: 1;
+            background-color: #1e1e1e;
+            border: none;
+            outline: none;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            resize: none;
+        }
+
+        .editor::placeholder {
+            color: #6a6a6a;
+        }
+
+        .output-panel {
+            height: 200px;
+            background-color: #1e1e1e;
+            border-top: 1px solid #3e3e42;
+            display: none;
+        }
+
+        .output-panel.visible {
+            display: block;
+        }
+
+        .output-header {
+            background-color: #2d2d30;
+            padding: 5px 10px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-content {
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            height: calc(100% - 30px);
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .toolbar {
+            background-color: #2d2d30;
+            padding: 5px 10px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            background-color: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background-color: #1177bb;
+        }
+
+        .btn.success {
+            background-color: #4ec9b0;
+        }
+
+        .btn.success:hover {
+            background-color: #5dc9b0;
+        }
+
+        .connection-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .connected {
+            background-color: #4ec9b0;
+        }
+
+        .disconnected {
+            background-color: #f48771;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="title">
+            🟨 Noodle IDE - Language Independent Development Environment
+        </div>
+        <div class="status">
+            <span class="connection-indicator" id="connection-indicator"></span>
+            <span id="connection-text">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <button class="btn" onclick="newFile()">New File</button>
+        <button class="btn" onclick="openFile()">Open File</button>
+        <button class="btn success" onclick="saveFile()">Save</button>
+        <button class="btn" onclick="executeCode()">Execute (F5)</button>
+        <button class="btn" onclick="toggleOutput()">Output</button>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h3>Files</h3>
+            <ul class="file-list" id="file-list">
+                <li class="file-item active"
+                    onclick="openFileTab('welcome', '# Welcome to Noodle IDE\n\n# Start coding in Noodle language...\n\n')">
+                    📄 Welcome
+                </li>
+            </ul>
+
+            <h3 style="margin-top: 20px;">Recent Files</h3>
+            <ul class="file-list" id="recent-files">
+                <li class="file-item" onclick="loadFile('untitled.nc')">
+                    📄 untitled.nc
+                </li>
+            </ul>
+        </div>
+
+        <div class="editor-area">
+            <div class="tabs" id="tabs">
+                <div class="tab active" data-file="welcome" onclick="switchTab('welcome')">
+                    <span>Welcome</span>
+                    <span class="tab-close" onclick="closeTab('welcome')">×</span>
+                </div>
+            </div>
+            <textarea class="editor" id="editor" placeholder="Start coding in Noodle language..."># Welcome to Noodle IDE
+
+# This is a language-independent development environment
+# All operations are handled through NoodleCore APIs
+# demonstrating true language independence
+
+def hello_world():
+    """A simple hello world function"""
+    print("Hello from Noodle IDE!")
+    return "Language independence achieved"
+
+# Try executing this code!
+if __name__ == "__main__":
+    hello_world()</textarea>
+        </div>
+    </div>
+
+    <div class="output-panel" id="output-panel">
+        <div class="output-header">
+            <span>Output</span>
+            <button class="btn" onclick="clearOutput()">Clear</button>
+        </div>
+        <div class="output-content" id="output-content">
+            Noodle IDE initialized successfully!
+            Ready to execute Noodle language code...
+        </div>
+    </div>
+
+    <script>
+        // NoodleCore API Integration
+        const API_BASE = 'http://localhost:8080';
+        let currentFile = 'welcome';
+        let openFiles = new Map();
+        let isConnected = false;
+
+        // Initialize IDE
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeAPI();
+            setupEventListeners();
+            checkConnection();
+        });
+
+        async function initializeAPI() {
+            updateConnectionStatus('connecting');
+
+            try {
+                // Test NoodleCore connection
+                const response = await fetch(`${API_BASE}/api/v1/health`);
+                const data = await response.json();
+
+                if (data.success) {
+                    isConnected = true;
+                    updateConnectionStatus('connected');
+                    logToOutput('✅ Connected to NoodleCore successfully!');
+                    logToOutput(`📊 API Response Time: ${data.data?.response_time || 'N/A'}ms`);
+                } else {
+                    throw new Error('Health check failed');
+                }
+            } catch (error) {
+                isConnected = false;
+                updateConnectionStatus('disconnected');
+                logToOutput(`❌ Failed to connect to NoodleCore: ${error.message}`);
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('connection-indicator');
+            const text = document.getElementById('connection-text');
+
+            indicator.className = `connection-indicator ${status === 'connected' ? 'connected' : 'disconnected'}`;
+            text.textContent = status === 'connected' ? 'Connected to NoodleCore' :
+                status === 'connecting' ? 'Connecting...' : 'Disconnected';
+        }
+
+        function setupEventListeners() {
+            const editor = document.getElementById('editor');
+
+            editor.addEventListener('input', function () {
+                markUnsaved();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    saveFile();
+                } else if (e.key === 'F5') {
+                    e.preventDefault();
+                    executeCode();
+                } else if (e.ctrlKey && e.key === 'n') {
+                    e.preventDefault();
+                    newFile();
+                }
+            });
+        }
+
+        async function checkConnection() {
+            // Periodic connection check
+            setInterval(async () => {
+                if (isConnected) {
+                    try {
+                        await fetch(`${API_BASE}/api/v1/health`);
+                    } catch (error) {
+                        isConnected = false;
+                        updateConnectionStatus('disconnected');
+                        logToOutput('⚠️ Connection to NoodleCore lost');
+                    }
+                }
+            }, 30000);
+        }
+
+        async function executeCode() {
+            if (!isConnected) {
+                logToOutput('❌ Cannot execute: Not connected to NoodleCore');
+                return;
+            }
+
+            const code = document.getElementById('editor').value;
+            logToOutput('🚀 Executing code via NoodleCore API...');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/ide/execute`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        language: 'noodle'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    logToOutput('✅ Execution successful!');
+                    if (result.data.output) {
+                        logToOutput('📤 Output:');
+                        logToOutput(result.data.output);
+                    }
+                    if (result.data.error) {
+                        logToOutput('⚠️ Error:');
+                        logToOutput(result.data.error);
+                    }
+                } else {
+                    logToOutput(`❌ Execution failed: ${result.error}`);
+                }
+            } catch (error) {
+                logToOutput(`❌ Execution error: ${error.message}`);
+            }
+        }
+
+        async function saveFile() {
+            const code = document.getElementById('editor').value;
+
+            if (currentFile === 'welcome') {
+                const fileName = prompt('Enter file name:');
+                if (!fileName) return;
+                currentFile = fileName;
+            }
+
+            logToOutput(`💾 Saving file: ${currentFile}`);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/ide/file/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_path: currentFile,
+                        content: code,
+                        language: 'noodle'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    logToOutput('✅ File saved successfully!');
+                    markSaved();
+                    addToFileList(currentFile);
+                } else {
+                    logToOutput(`❌ Save failed: ${result.error}`);
+                }
+            } catch (error) {
+                logToOutput(`❌ Save error: ${error.message}`);
+            }
+        }
+
+        async function openFile() {
+            const fileName = prompt('Enter file name to open:');
+            if (!fileName) return;
+
+            await loadFile(fileName);
+        }
+
+        async function loadFile(fileName) {
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/ide/file/open`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file_path: fileName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentFile = fileName;
+                    document.getElementById('editor').value = result.data.content || '';
+                    logToOutput(`📂 Opened file: ${fileName}`);
+                    markSaved();
+                    openFileTab(fileName, result.data.content || '');
+                } else {
+                    logToOutput(`❌ Failed to open file: ${result.error}`);
+                }
+            } catch (error) {
+                logToOutput(`❌ File open error: ${error.message}`);
+            }
+        }
+
+        function newFile() {
+            const fileName = `untitled_${Date.now()}.nc`;
+            currentFile = fileName;
+            document.getElementById('editor').value = `# New Noodle File
+# Created: ${new Date().toISOString()}
+
+`;
+
+            openFileTab(fileName, document.getElementById('editor').value);
+            markUnsaved();
+            logToOutput(`📄 Created new file: ${fileName}`);
+        }
+
+        function openFileTab(fileName, content) {
+            // Add to tabs if not exists
+            if (!document.querySelector(`[data-file="${fileName}"]`)) {
+                const tab = document.createElement('div');
+                tab.className = 'tab';
+                tab.dataset.file = fileName;
+                tab.innerHTML = `
+                    <span>${fileName}</span>
+                    <span class="tab-close" onclick="closeTab('${fileName}')">×</span>
+                `;
+                tab.onclick = () => switchTab(fileName);
+
+                document.getElementById('tabs').appendChild(tab);
+                openFiles.set(fileName, content);
+            }
+
+            switchTab(fileName);
+        }
+
+        function switchTab(fileName) {
+            // Update tab selection
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-file="${fileName}"]`).classList.add('active');
+
+            // Update editor content
+            currentFile = fileName;
+            const content = openFiles.get(fileName) || '';
+            document.getElementById('editor').value = content;
+
+            // Update file list selection
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            logToOutput(`📝 Switched to: ${fileName}`);
+        }
+
+        function closeTab(fileName) {
+            if (fileName === 'welcome') return;
+
+            const tab = document.querySelector(`[data-file="${fileName}"]`);
+            if (tab) tab.remove();
+
+            openFiles.delete(fileName);
+
+            // Switch to welcome tab if closed file was active
+            if (currentFile === fileName) {
+                switchTab('welcome');
+            }
+        }
+
+        function markUnsaved() {
+            const tab = document.querySelector(`[data-file="${currentFile}"] span`);
+            if (tab && !tab.textContent.includes('*')) {
+                tab.textContent = tab.textContent + '*';
+            }
+        }
+
+        function markSaved() {
+            const tab = document.querySelector(`[data-file="${currentFile}"] span`);
+            if (tab) {
+                tab.textContent = currentFile;
+            }
+        }
+
+        function toggleOutput() {
+            const panel = document.getElementById('output-panel');
+            panel.classList.toggle('visible');
+        }
+
+        function clearOutput() {
+            document.getElementById('output-content').textContent = 'Output cleared.\n';
+        }
+
+        function logToOutput(message) {
+            const output = document.getElementById('output-content');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function addToFileList(fileName) {
+            const fileList = document.getElementById('recent-files');
+            const existingItem = fileList.querySelector(`[onclick*="${fileName}"]`);
+
+            if (!existingItem) {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.onclick = () => loadFile(fileName);
+                li.innerHTML = `📄 ${fileName}`;
+                fileList.appendChild(li);
+            }
+        }
+    </script>
+</body>
+
+</html>

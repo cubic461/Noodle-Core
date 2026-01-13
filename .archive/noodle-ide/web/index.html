@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noodle IDE - Language Independent Development Environment</title>
+    <meta name="description"
+        content="Complete IDE built entirely in Noodle language - demonstrating true language independence">
+    <meta name="author" content="NoodleCore Team">
+    <meta name="version" content="1.0.0">
+
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="styles/ide-layout.css">
+    <link rel="stylesheet" href="styles/code-editor.css">
+    <link rel="stylesheet" href="styles/syntax-highlight.css">
+    <link rel="stylesheet" href="styles/themes.css">
+
+    <!-- CodeMirror for advanced editor features -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon -->
+    <link rel="icon" type="image/svg+xml" href="assets/noodle-icon.svg">
+</head>
+
+<body class="theme-dark">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="noodle-logo">
+                <svg width="64" height="64" viewBox="0 0 64 64">
+                    <circle cx="32" cy="32" r="30" fill="#4A90E2" />
+                    <text x="32" y="40" text-anchor="middle" fill="white" font-size="24" font-weight="bold">N</text>
+                </svg>
+            </div>
+            <h1>Noodle IDE</h1>
+            <p>Language Independent Development Environment</p>
+            <div class="loading-spinner"></div>
+            <p class="loading-status">Initializing Noodle Core...</p>
+        </div>
+    </div>
+
+    <!-- Main IDE Container -->
+    <div id="ide-container" class="ide-container" style="display: none;">
+
+        <!-- Top Menu Bar -->
+        <div class="menu-bar">
+            <div class="menu-section">
+                <div class="menu-item" data-menu="file">File</div>
+                <div class="menu-item" data-menu="edit">Edit</div>
+                <div class="menu-item" data-menu="view">View</div>
+                <div class="menu-item" data-menu="run">Run</div>
+                <div class="menu-item" data-menu="tools">Tools</div>
+                <div class="menu-item" data-menu="help">Help</div>
+            </div>
+            <div class="menu-section right">
+                <div class="ide-status">
+                    <span id="connection-status" class="status-indicator connected">Connected</span>
+                    <span id="mode-indicator" class="mode-indicator">Noodle</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Sidebar - File Explorer -->
+        <div class="sidebar left" id="sidebar-left">
+            <div class="sidebar-header">
+                <h3>Project Explorer</h3>
+                <div class="sidebar-actions">
+                    <button id="btn-new-file" class="btn-icon" title="New File">+</button>
+                    <button id="btn-new-folder" class="btn-icon" title="New Folder">📁</button>
+                    <button id="btn-refresh-files" class="btn-icon" title="Refresh">🔄</button>
+                </div>
+            </div>
+            <div class="file-tree" id="file-tree">
+                <div class="file-item" data-type="project" data-name="Current Project">
+                    <span class="file-icon">📂</span>
+                    <span class="file-name">Current Project</span>
+                    <div class="file-actions">
+                        <button class="btn-icon small" title="Run Project">▶️</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Tabs -->
+            <div class="file-tabs" id="file-tabs">
+                <!-- Dynamic tab content -->
+            </div>
+        </div>
+
+        <!-- Main Editor Area -->
+        <div class="main-content">
+            <div class="editor-container">
+                <!-- Code Editor -->
+                <div class="editor-section" id="editor-section">
+                    <div class="editor-header">
+                        <div class="editor-tabs" id="editor-tabs">
+                            <div class="tab active" data-file="welcome">
+                                <span class="tab-name">Welcome</span>
+                                <button class="tab-close">×</button>
+                            </div>
+                        </div>
+                        <div class="editor-actions">
+                            <button id="btn-save" class="btn-icon" title="Save (Ctrl+S)">💾</button>
+                            <button id="btn-run" class="btn-icon primary" title="Run Code (F5)">▶️</button>
+                            <button id="btn-debug" class="btn-icon" title="Debug (F9)">🐛</button>
+                            <button id="btn-format" class="btn-icon" title="Format Code">✨</button>
+                        </div>
+                    </div>
+                    <div class="editor-content">
+                        <textarea id="code-editor" class="code-editor"
+                            placeholder="Start coding in Noodle language..."></textarea>
+                        <div id="line-numbers" class="line-numbers"></div>
+                        <div id="syntax-highlight" class="syntax-highlight-overlay"></div>
+                    </div>
+                </div>
+
+                <!-- Terminal/Output Panel -->
+                <div class="output-section" id="output-section">
+                    <div class="output-header">
+                        <div class="output-tabs">
+                            <button class="tab-button active" data-tab="terminal">Terminal</button>
+                            <button class="tab-button" data-tab="output">Output</button>
+                            <button class="tab-button" data-tab="errors">Errors</button>
+                            <button class="tab-button" data-tab="debug">Debug</button>
+                        </div>
+                        <div class="output-actions">
+                            <button id="btn-clear-terminal" class="btn-icon" title="Clear">🗑️</button>
+                            <button id="btn-toggle-terminal" class="btn-icon" title="Hide Terminal">⬇️</button>
+                        </div>
+                    </div>
+                    <div class="output-content">
+                        <div id="terminal-panel" class="output-panel active">
+                            <div id="terminal-output" class="terminal-output"></div>
+                            <input type="text" id="terminal-input" class="terminal-input"
+                                placeholder="Noodle terminal ready...">
+                        </div>
+                        <div id="output-panel" class="output-panel">
+                            <div id="program-output" class="program-output"></div>
+                        </div>
+                        <div id="errors-panel" class="output-panel">
+                            <div id="error-list" class="error-list"></div>
+                        </div>
+                        <div id="debug-panel" class="output-panel">
+                            <div id="debug-variables" class="debug-variables"></div>
+                            <div id="debug-watches" class="debug-watches"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Properties/AI Assistant -->
+        <div class="sidebar right" id="sidebar-right">
+            <div class="sidebar-header">
+                <h3>AI Assistant</h3>
+                <div class="sidebar-actions">
+                    <button id="btn-chat-toggle" class="btn-icon">💬</button>
+                </div>
+            </div>
+            <div class="assistant-panel" id="assistant-panel">
+                <div class="assistant-tabs">
+                    <button class="tab-button active" data-tab="completion">Completion</button>
+                    <button class="tab-button" data-tab="documentation">Docs</button>
+                    <button class="tab-button" data-tab="chat">Chat</button>
+                </div>
+                <div class="assistant-content">
+                    <div id="completion-panel" class="assistant-panel active">
+                        <div id="completion-suggestions" class="completion-suggestions">
+                            <p class="hint">Type in the editor to see suggestions...</p>
+                        </div>
+                    </div>
+                    <div id="documentation-panel" class="assistant-panel">
+                        <div id="documentation-content" class="documentation-content">
+                            <h4>Noodle Language Reference</h4>
+                            <div class="doc-section">
+                                <h5>Basic Syntax</h5>
+                                <pre><code># Comments start with #
+def function_name(parameters):
+    """Function documentation"""
+    return value
+
+class ClassName:
+    """Class documentation"""
+    def __init__(self):
+        pass</code></pre>
+                            </div>
+                            <div class="doc-section">
+                                <h5>Keywords</h5>
+                                <div class="keyword-list">
+                                    <span class="keyword">import</span>
+                                    <span class="keyword">from</span>
+                                    <span class="keyword">async</span>
+                                    <span class="keyword">await</span>
+                                    <span class="keyword">return</span>
+                                    <span class="keyword">if</span>
+                                    <span class="keyword">else</span>
+                                    <span class="keyword">for</span>
+                                    <span class="keyword">while</span>
+                                    <span class="keyword">try</span>
+                                    <span class="keyword">except</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chat-panel" class="assistant-panel">
+                        <div id="chat-history" class="chat-history">
+                            <div class="message ai-message">
+                                <div class="message-avatar">🤖</div>
+                                <div class="message-content">
+                                    <p>Welcome to Noodle IDE! I'm your AI coding assistant. Ask me anything about Noodle
+                                        language or get help with your code.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" id="chat-input" class="chat-input"
+                                placeholder="Ask about Noodle language...">
+                            <button id="btn-send-chat" class="btn-primary">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Status Bar -->
+        <div class="status-bar">
+            <div class="status-section">
+                <span id="cursor-position">Line 1, Col 1</span>
+                <span class="separator">|</span>
+                <span id="file-encoding">UTF-8</span>
+                <span class="separator">|</span>
+                <span id="line-ending">LF</span>
+            </div>
+            <div class="status-section center">
+                <span id="language-mode">Noodle</span>
+                <span class="separator">|</span>
+                <span id="syntax-mode">Syntax: Noodle</span>
+            </div>
+            <div class="status-section right">
+                <span id="last-save-time">Not saved</span>
+                <span class="separator">|</span>
+                <span id="performance-stats">Memory: 0MB</span>
+            </div>
+        </div>
+
+        <!-- Context Menus -->
+        <div id="file-context-menu" class="context-menu" style="display: none;">
+            <div class="context-item" data-action="open">Open</div>
+            <div class="context-item" data-action="rename">Rename</div>
+            <div class="context-item" data-action="delete">Delete</div>
+            <div class="context-separator"></div>
+            <div class="context-item" data-action="duplicate">Duplicate</div>
+            <div class="context-item" data-action="new-file">New File</div>
+            <div class="context-item" data-action="new-folder">New Folder</div>
+        </div>
+
+        <div id="editor-context-menu" class="context-menu" style="display: none;">
+            <div class="context-item" data-action="cut">Cut</div>
+            <div class="context-item" data-action="copy">Copy</div>
+            <div class="context-item" data-action="paste">Paste</div>
+            <div class="context-separator"></div>
+            <div class="context-item" data-action="find">Find</div>
+            <div class="context-item" data-action="replace">Replace</div>
+            <div class="context-separator"></div>
+            <div class="context-item" data-action="go-to-line">Go to Line</div>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="welcome-screen" style="display: none;">
+            <div class="welcome-content">
+                <div class="welcome-logo">
+                    <svg width="128" height="128" viewBox="0 0 128 128">
+                        <circle cx="64" cy="64" r="60" fill="#4A90E2" />
+                        <text x="64" y="80" text-anchor="middle" fill="white" font-size="48" font-weight="bold">N</text>
+                    </svg>
+                </div>
+                <h1>Welcome to Noodle IDE</h1>
+                <p class="subtitle">Language Independent Development Environment</p>
+                <p class="description">A complete development environment built entirely in Noodle language,
+                    demonstrating true language independence.</p>
+
+                <div class="welcome-features">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>✨ Syntax highlighting for Noodle language</li>
+                        <li>🤖 AI-powered code completion</li>
+                        <li>📁 Advanced file and project management</li>
+                        <li>🚀 Integrated code execution</li>
+                        <li>🎨 Dark/Light theme support</li>
+                        <li>🔧 Real-time error detection</li>
+                        <li>⚡ Performance optimized</li>
+                        <li>🌐 Web-based interface</li>
+                    </ul>
+                </div>
+
+                <div class="welcome-actions">
+                    <button id="btn-new-project" class="btn-primary">New Project</button>
+                    <button id="btn-open-project" class="btn-secondary">Open Project</button>
+                    <button id="btn-load-recent" class="btn-secondary">Recent Projects</button>
+                </div>
+
+                <div class="welcome-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="stat-operations">0</div>
+                        <div class="stat-label">Operations</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="stat-files">0</div>
+                        <div class="stat-label">Files</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="stat-uptime">00:00</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>IDE Settings</h2>
+                    <button class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h3>Appearance</h3>
+                        <div class="setting-item">
+                            <label>Theme</label>
+                            <select id="theme-selector">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="high-contrast">High Contrast</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label>Font Size</label>
+                            <input type="range" id="font-size" min="10" max="24" value="14">
+                            <span id="font-size-value">14px</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Editor</h3>
+                        <div class="setting-item">
+                            <label>Auto Save</label>
+                            <input type="checkbox" id="auto-save" checked>
+                        </div>
+                        <div class="setting-item">
+                            <label>Auto Save Interval (seconds)</label>
+                            <input type="number" id="auto-save-interval" value="30" min="10" max="300">
+                        </div>
+                        <div class="setting-item">
+                            <label>Show Line Numbers</label>
+                            <input type="checkbox" id="show-line-numbers" checked>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Noodle Core</h3>
+                        <div class="setting-item">
+                            <label>API Endpoint</label>
+                            <input type="url" id="api-endpoint" value="http://localhost:8080">
+                        </div>
+                        <div class="setting-item">
+                            <label>Connection Timeout (ms)</label>
+                            <input type="number" id="connection-timeout" value="5000" min="1000" max="30000">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btn-save-settings" class="btn-primary">Save Settings</button>
+                    <button id="btn-cancel-settings" class="btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/selection/active-line.min.js"></script>
+
+    <!-- Noodle IDE JavaScript -->
+    <script src="js/noodle-core-api.js"></script>
+    <script src="js/code-editor.js"></script>
+    <script src="js/file-manager.js"></script>
+    <script src="js/syntax-highlighter.js"></script>
+    <script src="js/code-completion.js"></script>
+    <script src="js/project-manager.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/ai-assistant.js"></script>
+    <script src="js/theme-manager.js"></script>
+    <script src="js/settings-manager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

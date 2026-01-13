@@ -1,0 +1,75 @@
+# Production Dockerfile for NoodleCore Self-Improvement System
+FROM python:3.9-slim
+
+# Set environment variables
+ENV NOODLE_ENV=production
+ENV NOODLE_DEBUG=0
+ENV NOODLE_PORT=8080
+ENV NOODLE_SELF_IMPROVEMENT=1
+ENV NOODLE_AUTO_ACTIVATION=1
+ENV NOODLE_SAFETY_MODE=1
+ENV NOODLE_DEPLOYMENT_MODE=gradual
+ENV NOODLE_INITIAL_ROLLOUT=5.0
+ENV NOODLE_INCREMENT_ROLLOUT=10.0
+ENV NOODLE_STABILIZATION_PERIOD=300
+ENV NOODLE_VALIDATION_THRESHOLD=0.8
+ENV NOODLE_ROLLBACK_THRESHOLD=0.2
+ENV NOODLE_MAX_ROLLBACK_ATTEMPTS=3
+ENV NOODLE_HEALTH_CHECK_INTERVAL=30
+ENV NOODLE_MONITORING_WINDOW=1800
+ENV NOODLE_CIRCUIT_BREAKER_THRESHOLD=0.3
+ENV NOODLE_MAX_CPU=80.0
+ENV NOODLE_MAX_MEMORY=70.0
+ENV NOODLE_MAX_RPS=100.0
+ENV NOODLE_MAX_CONNECTIONS=50
+ENV NOODLE_API_RATE_LIMIT=1000
+ENV NOODLE_OPTIMIZATION_RATE_LIMIT=10
+ENV NOODLE_ROLLBACK_RATE_LIMIT=3
+ENV NOODLE_DASHBOARD_ENABLED=1
+ENV NOODLE_DASHBOARD_HOST=0.0.0.0
+ENV NOODLE_DASHBOARD_PORT=8081
+ENV NOODLE_ANOMALY_DETECTION=1
+ENV NOODLE_MODEL_MANAGEMENT=1
+ENV NOODLE_AB_TESTING=1
+ENV NOODLE_AUTO_RETRAINING=1
+ENV NOODLE_MODEL_REGISTRY_PATH=/app/data/model_registry.json
+ENV NOODLE_CIRCUIT_BREAKER_ENABLED=1
+ENV NOODLE_LOG_LEVEL=INFO
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    jq \
+    netcat \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir /tmp/pip -r /tmp/requirements.txt
+
+# Create application directory
+WORKDIR /app
+
+# Copy application code
+COPY . /app/
+
+# Create data directories
+RUN mkdir -p /app/data /app/logs /app/monitoring
+
+# Create non-root user
+RUN groupadd -r noodlecore && useradd -r -g noodlecore noodlecore
+RUN chown -R noodlecore:noodlecore /app
+
+# Switch to non-root user
+USER noodlecore
+
+# Health check script
+COPY scripts/health_check.sh /app/scripts/health_check.sh
+RUN chmod +x /app/scripts/health_check.sh
+
+# Expose ports
+EXPOSE 8080 8081
+
+# Set entrypoint
+ENTRYPOINT ["python", "-m", "noodlecore.api.server"]

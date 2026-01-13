@@ -1,0 +1,22 @@
+chore: professional repository cleanup and reorganization
+
+- Removed temporary files from root directory (duplicate_report.json, repo_inventory.json, etc.)
+- Removed cache directories (.mypy_cache/, .sonarqube/, .stfolder/, .terraform/)
+- Removed development scripts from scripts/ directory
+- Removed temporary documentation files
+- Removed external test files (NumPy, Pandas, SciPy, etc.)
+- Moved source code from noodle-core/src/noodlecore/ to src/noodlecore/
+- Moved enterprise features to src/noodlecore-enterprise/
+- Reorganized test directories under tests/ with specialized categories
+- Added comprehensive test suites from noodle-core/
+- Updated README.md with correct project structure paths
+- Updated .gitignore with patterns for cache directories and temporary files
+- Created SECURITY.md with security policy and vulnerability reporting
+- Created config/noodle.json.example and config/security.json.example
+- Updated CHANGELOG.md with cleanup and reorganization details
+- Moved test reports to docs/reports/
+- Created .pre-commit-config.yaml for code quality checks
+
+This commit prepares the repository for professional GitHub publication
+by removing sensitive data, temporary files, and organizing the
+project structure according to best practices.

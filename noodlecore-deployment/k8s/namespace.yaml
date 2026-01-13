@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: noodle-core
+  labels:
+    name: noodle-core
+    environment: production
+    version: v1
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: noodle-core-monitoring
+  labels:
+    name: noodle-core-monitoring
+    environment: production
+    version: v1
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: noodle-core-logging
+  labels:
+    name: noodle-core-logging
+    environment: production
+    version: v1

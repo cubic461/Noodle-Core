@@ -1,0 +1,176 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  # Check for Python dependency updates
+  python-updates:
+    name: Check Python Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install pip-tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-tools
+
+    - name: Check for outdated packages
+      run: |
+        pip list --outdated --format=json > outdated-packages.json || true
+
+    - name: Generate update report
+      run: |
+        cat > python-update-report.md << EOF
+        # Python Dependency Update Report
+        
+        Generated on: $(date -u)
+        
+        ## Outdated Packages
+        
+        $(cat outdated-packages.json | jq -r '.[] | "- \(.name) (\(.installed}) -> \(.latest})"')
+        
+        ## Recommendations
+        
+        1. Review outdated packages for security vulnerabilities
+        2. Test updates in a staging environment
+        3. Update packages incrementively to avoid breaking changes
+        4. Monitor for deprecation warnings
+        
+        ## Next Steps
+        
+        1. Create a PR with the necessary updates
+        2. Run full test suite after updates
+        3. Monitor for any regressions
+        EOF
+
+    - name: Upload update report
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-update-report
+        path: |
+          python-update-report.md
+          outdated-packages.json
+
+  # Check for Docker base image updates
+  docker-updates:
+    name: Check Docker Base Image Updates
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check for Docker base image updates
+      run: |
+        echo "Checking for Docker base image updates..."
+        # This would typically use a tool like Dependabot or Renovate
+        # For now, we'll just log that this should be done manually
+        echo "Please check Dockerfile for base image updates"
+
+  # Check for GitHub Actions updates
+  actions-updates:
+    name: Check GitHub Actions Updates
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check for outdated actions
+      run: |
+        echo "Checking for outdated GitHub Actions..."
+        # This would typically use a tool like Dependabot or Renovate
+        # For now, we'll just log that this should be done manually
+        echo "Please check .github/workflows/ for outdated actions"
+
+  # Create PR for updates
+  create-pr:
+    name: Create Update PR
+    runs-on: ubuntu-latest
+    needs: [python-updates, docker-updates, actions-updates]
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download Python update report
+      uses: actions/download-artifact@v3
+      with:
+        name: python-update-report
+        path: artifacts/
+
+    - name: Create PR
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: 'dependency-updates-$(date +%Y%m%d)'
+        title: 'chore(deps): update dependencies'
+        body: |
+          ## Dependency Update Summary
+          
+          This PR updates dependencies to their latest versions.
+          
+          ### Python Packages
+          $(cat artifacts/python-update-report.md)
+          
+          ### Docker Images
+          Check Docker base image updates in the Dockerfile.
+          
+          ### GitHub Actions
+          Check for updated actions in the workflow files.
+          
+          ### Testing
+          Please run the full test suite after merging this PR.
+          
+          ### Security
+          Review all updates for security vulnerabilities before merging.
+        labels: |
+          dependencies
+          automated
+          security
+        assignees: 'maintainers'
+        reviewers: 'maintainers'
+        team-reviewers: 'core-team'
+
+  # Notify about updates
+  notify:
+    name: Notify About Updates
+    runs-on: ubuntu-latest
+    needs: [python-updates, docker-updates, actions-updates]
+    if: always() && (github.event_name == 'schedule')
+    
+    steps:
+    - name: Download Python update report
+      uses: actions/download-artifact@v3
+      with:
+        name: python-update-report
+        path: artifacts/
+
+    - name: Notify Slack
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#dependency-updates'
+        fields: repo,message,commit,author,action,workflow
+        text: 'Dependency update check completed. See artifacts for details.'

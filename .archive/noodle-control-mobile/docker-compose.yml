@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  noodlecontrol-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        FLUTTER_BUILD_MODE: release
+        FLUTTER_TARGET_PLATFORM: android-arm64
+    ports:
+      - "8080:8080"
+    environment:
+      - NOODLE_ENV=production
+      - NOODLE_PORT=8080
+    volumes:
+      - ./build:/app/build
+    restart: unless-stopped
+    
+  noodlecontrol-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    volumes:
+      - .:/app
+      - flutter_cache:/root/.flutter-cache
+    command: >
+      bash -c "
+        flutter pub get &&
+        flutter build apk --release --target-platform android-arm64 &&
+        flutter build apk --release --target-platform android-x64 &&
+        flutter build appbundle --release
+      "
+    environment:
+      - NOODLE_ENV=production
+    profiles:
+      - build
+
+volumes:
+  flutter_cache:

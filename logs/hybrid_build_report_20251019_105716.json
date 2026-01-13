@@ -1,0 +1,94 @@
+{
+  "timestamp": "2025-10-19T10:57:10.141553",
+  "python_components": {
+    "path": {
+      "success": true,
+      "output": "Added to path"
+    },
+    "dep_numpy": {
+      "success": true,
+      "output": "Requirement already satisfied: numpy in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (1.26.4)",
+      "error": "",
+      "return_code": 0
+    },
+    "dep_pytest": {
+      "success": true,
+      "output": "Requirement already satisfied: pytest in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (8.3.4)\nRequirement already satisfied: colorama in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (from pytest) (0.4.6)\nRequirement already satisfied: iniconfig in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (from pytest) (2.0.0)\nRequirement already satisfied: packaging in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (from pytest) (25.0)\nRequirement already satisfied: pluggy<2,>=1.5 in c:\\users\\micha\\appdata\\local\\programs\\python\\python312\\lib\\site-packages (from pytest) (1.5.0)",
+      "error": "",
+      "return_code": 0
+    },
+    "imports": [
+      {
+        "import": "import sys",
+        "result": {
+          "success": true,
+          "output": "",
+          "error": "",
+          "return_code": 0
+        }
+      },
+      {
+        "import": "import os",
+        "result": {
+          "success": true,
+          "output": "",
+          "error": "",
+          "return_code": 0
+        }
+      },
+      {
+        "import": "import json",
+        "result": {
+          "success": true,
+          "output": "",
+          "error": "",
+          "return_code": 0
+        }
+      }
+    ]
+  },
+  "noodlecore_components": {
+    "path": {
+      "success": true,
+      "output": "Added to path"
+    },
+    "imports": [
+      {
+        "import": "import noodlecore",
+        "result": {
+          "success": true,
+          "output": "",
+          "error": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\__init__.py:19: UserWarning: Could not import NBC math from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC math from noodlecore, using stub implementations\")",
+          "return_code": 0
+        }
+      },
+      {
+        "import": "from noodlecore.config import NoodleCoreConfig",
+        "result": {
+          "success": false,
+          "output": "",
+          "error": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\__init__.py:19: UserWarning: Could not import NBC math from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC math from noodlecore, using stub implementations\")\nC:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\config.py:19: UserWarning: Could not import NBC config from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC config from noodlecore, using stub implementations\")\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nImportError: cannot import name 'NoodleCoreConfig' from 'noodlecore.config' (C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\config.py)",
+          "return_code": 1
+        }
+      },
+      {
+        "import": "from noodlecore.core_entry_point import CoreEntryPoint",
+        "result": {
+          "success": false,
+          "output": "",
+          "error": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\__init__.py:19: UserWarning: Could not import NBC math from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC math from noodlecore, using stub implementations\")\nC:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\config.py:19: UserWarning: Could not import NBC config from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC config from noodlecore, using stub implementations\")\nWarning: Runtime modules not available: No module named 'noodlecore.runtime.database_query_cache'\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nImportError: cannot import name 'CoreEntryPoint' from 'noodlecore.core_entry_point' (C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\core_entry_point.py)",
+          "return_code": 1
+        }
+      }
+    ]
+  },
+  "integration_tests": {
+    "comprehensive": {
+      "success": false,
+      "output": "SUCCESS: noodlecore imported successfully\nFAILED: Component interaction error: cannot import name 'NoodleCoreConfig' from 'noodlecore.config' (C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\config.py)\nFAILED: Some integration tests failed",
+      "error": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\__init__.py:19: UserWarning: Could not import NBC math from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC math from noodlecore, using stub implementations\")\nC:\\Users\\micha\\Noodle\\noodle-core\\src\\noodlecore\\config.py:19: UserWarning: Could not import NBC config from noodlecore, using stub implementations\n  warnings.warn(\"Could not import NBC config from noodlecore, using stub implementations\")",
+      "return_code": 1
+    }
+  },
+  "overall_status": "partial"
+}

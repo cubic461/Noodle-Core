@@ -1,0 +1,41 @@
+======================================================================
+NOODLE PARTITION PLAN REPORT
+======================================================================
+Total Stages: 3
+Total Layers: 40
+
+Stage: stage_0
+----------------------------------------------------------------------
+  Layers: 1
+  Total Latency: 610.65 ms
+  Avg Latency: 610.65 ms
+  Memory: 0.00 MB
+  Parameters: 38,597,376
+  Layer Names: lm_head
+
+Stage: stage_1
+----------------------------------------------------------------------
+  Layers: 9
+  Total Latency: 293.78 ms
+  Avg Latency: 32.64 ms
+  Memory: 0.00 MB
+  Parameters: 42,531,840
+  Layer Names: transformer.h.0, transformer.h.10, transformer.h.2, transformer.h.5, transformer.h.3
+  ... and 4 more
+
+Stage: stage_2
+----------------------------------------------------------------------
+  Layers: 30
+  Total Latency: 293.61 ms
+  Avg Latency: 9.79 ms
+  Memory: 0.00 MB
+  Parameters: 81,944,832
+  Layer Names: transformer.h.8, transformer.h.11, transformer.h.1, transformer.h.9, transformer.h.6
+  ... and 25 more
+
+======================================================================
+SUMMARY
+======================================================================
+Bottleneck Stage: 610.65 ms
+Pipeline Throughput: 1.64 req/s
+======================================================================

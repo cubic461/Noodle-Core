@@ -1,0 +1,3 @@
+Hello, Python to Go Migration Demo!
+This file demonstrates basic text processing.
+Lines will be processed and converted to uppercase.

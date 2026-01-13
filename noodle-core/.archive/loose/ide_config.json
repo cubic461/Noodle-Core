@@ -1,0 +1,9 @@
+{
+  "ai_configuration": {
+    "provider": "OpenRouter",
+    "model": "minimax/minimax-m2:free",
+    "api_key": "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",
+    "connected": true
+  },
+  "recent_files": []
+}

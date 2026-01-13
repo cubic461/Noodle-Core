@@ -1,0 +1,3 @@
+lsprotocol>=2023.0.0
+noodlecore>=1.0.0
+pytest-benchmark>=4.0.0

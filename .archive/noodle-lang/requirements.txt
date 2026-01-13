@@ -1,0 +1,16 @@
+# Noodle Language Dependencies
+# Consolidated from multiple implementations
+
+# Parser/Lexer dependencies
+ply==3.11
+# Compiler dependencies
+antlr4-python3-runtime==4.13.1
+# Runtime dependencies
+psutil==5.9.6
+# Testing dependencies
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Python version requirement
+# Enforce Python 3.9+ as per project standards
+python-version>=3.9.0

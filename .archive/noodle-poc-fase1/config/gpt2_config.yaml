@@ -1,0 +1,45 @@
+# NoodleCore Observability Engine - Configuration
+
+model_name: gpt2
+device: cuda:0  # Options: cuda:0, cuda:1, cpu, auto
+
+# Profiling settings
+batch_size: 1
+sequence_length: 128
+num_warmup_runs: 10
+num_profile_runs: 100
+
+# Logging
+log_level: INFO
+log_dir: "data/metrics"
+
+# Output
+export_dashboard: true
+export_jsonl: true
+export_csv: false
+
+# Instrumentation
+instrument_all_layers: true
+skip_embeddings: false
+skip_lm_head: false
+
+# Memory tracking
+track_vram: true
+track_ram: true
+track_cache: true
+
+# Dashboard settings
+dashboard_template: default
+include_plots:
+  - latency_overview
+  - memory_timeline
+  - layer_summary
+
+# Advanced: Specific layer configuration
+layer_blacklist: []
+layer_whitelist: []
+
+# Example for multi-GPU setups
+# process_group_config:
+#   world_size: 4
+#   rank: 0

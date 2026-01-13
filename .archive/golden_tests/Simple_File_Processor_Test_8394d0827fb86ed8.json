@@ -1,0 +1,45 @@
+{
+  "test_id": "8394d0827fb86ed8",
+  "name": "Simple File Processor Test",
+  "description": "Basic file processing with uppercase conversion",
+  "input": {
+    "script_path": "C:/Users/micha/Noodle/simple_file_processor_fixed.py",
+    "args": [
+      "C:/Users/micha/Noodle/sample_input.csv",
+      "C:/Users/micha/Noodle/output.csv"
+    ],
+    "env_vars": {},
+    "stdin": null,
+    "working_dir": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples",
+    "timeout": 30
+  },
+  "expected_output": {
+    "stdout": "\n=== Trace ===\nDuration: 0.126s\nCalls: 4554\nIO: 1\nTrace ID: trace_1765896105_2155169236044050345\n",
+    "stderr": "usage: python [-h] [--verbose] [input_file] [output_file]\npython: error: unrecognized arguments: C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples\\test_output.csv\nException ignored in atexit callback: <function finalize at 0x00000242CDBC91C0>\nTraceback (most recent call last):\n  File \"C:\\Users\\micha\\AppData\\Local\\Temp\\tmpaqr82nuw.py\", line 87, in finalize\n    sys.exit(0)\nSystemExit: 0\n",
+    "exit_code": 2,
+    "files_created": {},
+    "duration_seconds": null,
+    "call_count_range": [
+      -50,
+      50
+    ],
+    "io_count_range": [
+      0,
+      5
+    ]
+  },
+  "tags": [
+    "file-io",
+    "csv",
+    "basic"
+  ],
+  "created_at": "2025-12-17 18:43:36",
+  "last_updated": "2025-12-17 18:43:36",
+  "metadata": {
+    "trace_id": "trace_1765896105_2155169236044050345",
+    "duration": null,
+    "peak_memory": 22327296,
+    "call_count": 0,
+    "io_count": 0
+  }
+}

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - NoodleControl</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1976D2">
+    <meta name="description" content="NoodleControl is currently offline">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #fff;
+            flex: 1;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-header {
+            background-color: #1976D2;
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .app-header .material-icons {
+            margin-right: 12px;
+            font-size: 28px;
+        }
+        
+        .app-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .offline-icon {
+            font-size: 80px;
+            color: #9E9E9E;
+            margin-bottom: 24px;
+        }
+        
+        .offline-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #424242;
+        }
+        
+        .offline-message {
+            font-size: 16px;
+            color: #757575;
+            margin-bottom: 32px;
+            line-height: 1.5;
+            max-width: 300px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #1976D2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1565C0;
+        }
+        
+        .btn-secondary {
+            background-color: #E0E0E0;
+            color: #333;
+            margin-top: 12px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #D0D0D0;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 12px 16px;
+            background-color: #F5F5F5;
+            border-radius: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #F44336;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-text {
+            font-size: 14px;
+            color: #757575;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .offline-features {
+            margin-top: 32px;
+            width: 100%;
+        }
+        
+        .feature-list {
+            list-style: none;
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #757575;
+        }
+        
+        .feature-item .material-icons {
+            color: #4CAF50;
+            font-size: 18px;
+        }
+        
+        /* Tablet Styles */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .app-container {
+                max-width: 768px;
+            }
+            
+            .app-header {
+                padding: 20px;
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 32px;
+            }
+            
+            .offline-icon {
+                font-size: 100px;
+            }
+            
+            .offline-title {
+                font-size: 28px;
+            }
+            
+            .offline-message {
+                font-size: 18px;
+                max-width: 400px;
+            }
+            
+            .btn {
+                font-size: 18px;
+                padding: 14px 28px;
+            }
+        }
+        
+        /* Desktop Styles */
+        @media screen and (min-width: 1025px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .offline-icon {
+                font-size: 120px;
+            }
+            
+            .offline-title {
+                font-size: 32px;
+            }
+            
+            .offline-message {
+                font-size: 20px;
+                max-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <i class="material-icons">dashboard</i>
+            <h1 class="app-title">NoodleControl</h1>
+        </header>
+        
+        <div class="content">
+            <i class="material-icons offline-icon">wifi_off</i>
+            <h2 class="offline-title">You're offline</h2>
+            <p class="offline-message">
+                It looks like you've lost your internet connection. Some features may be limited until you're back online.
+            </p>
+            
+            <button class="btn btn-primary" onclick="retryConnection()">
+                <i class="material-icons">refresh</i>
+                Try Again
+            </button>
+            
+            <button class="btn btn-secondary" onclick="goToApp()">
+                <i class="material-icons">home</i>
+                Continue Anyway
+            </button>
+            
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span class="status-text" id="connection-status">Checking connection...</span>
+            </div>
+            
+            <div class="offline-features">
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <i class="material-icons">check_circle</i>
+                        <span>View previously loaded data</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="material-icons">check_circle</i>
+                        <span>Navigate through cached pages</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="material-icons">check_circle</i>
+                        <span>Access app interface</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check connection status
+        function checkConnection() {
+            const statusText = document.getElementById('connection-status');
+            
+            if (navigator.onLine) {
+                statusText.textContent = 'Connection available';
+                document.querySelector('.status-dot').style.backgroundColor = '#4CAF50';
+                
+                // If online, redirect to main app after a short delay
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                statusText.textContent = 'No internet connection';
+                document.querySelector('.status-dot').style.backgroundColor = '#F44336';
+            }
+        }
+        
+        // Retry connection
+        function retryConnection() {
+            const statusText = document.getElementById('connection-status');
+            statusText.textContent = 'Checking connection...';
+            
+            // Simulate a connection check
+            setTimeout(() => {
+                checkConnection();
+            }, 1500);
+        }
+        
+        // Continue to app anyway
+        function goToApp() {
+            window.location.href = '/';
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', function() {
+            checkConnection();
+        });
+        
+        window.addEventListener('offline', function() {
+            const statusText = document.getElementById('connection-status');
+            statusText.textContent = 'No internet connection';
+            document.querySelector('.status-dot').style.backgroundColor = '#F44336';
+        });
+        
+        // Check connection on page load
+        window.addEventListener('load', function() {
+            checkConnection();
+        });
+    </script>
+</body>
+</html>

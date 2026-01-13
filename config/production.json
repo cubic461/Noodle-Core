@@ -1,0 +1,50 @@
+{
+  "environment": "production",
+  "log_level": "INFO",
+  "database": {
+    "host": "${NOODLE_DB_HOST}",
+    "port": "${NOODLE_DB_PORT}",
+    "name": "${NOODLE_DB_NAME}",
+    "user": "${NOODLE_DB_USER}",
+    "password": "${NOODLE_DB_PASSWORD}",
+    "pool_size": 20,
+    "timeout": 30
+  },
+  "redis": {
+    "host": "${NOODLE_REDIS_HOST}",
+    "port": "${NOODLE_REDIS_PORT}",
+    "db": 0,
+    "pool_size": 10
+  },
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "workers": 4,
+    "reload": false,
+    "debug": false
+  },
+  "ai": {
+    "provider": "zai",
+    "model": "glm-4.6",
+    "api_key": "${NOODLE_ZAI_API_KEY}",
+    "timeout": 60,
+    "max_retries": 3
+  },
+  "migration": {
+    "capability_profile": "restricted",
+    "memory_limit": 512,
+    "timeout": 120,
+    "enable_tracing": false
+  },
+  "features": {
+    "gpu_acceleration": true,
+    "caching": true,
+    "monitoring": true,
+    "self_improvement": false
+  },
+  "security": {
+    "encryption_enabled": true,
+    "audit_logging": true,
+    "rate_limiting": true
+  }
+}

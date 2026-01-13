@@ -1,0 +1,292 @@
+name: Documentation Build and Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'memory-bank/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'memory-bank/**'
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install sphinx sphinx-intl sphinx-rtd-theme transifex-client
+
+    - name: Build English documentation
+      run: |
+        cd docs
+        make html
+      env:
+        SPHINXOPTS: '-D language=en'
+
+    - name: Build Dutch documentation
+      run: |
+        cd docs
+        make html
+      env:
+        SPHINXOPTS: '-D language=nl'
+        ENABLE_TRANSLATIONS: 'true'
+
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/_build/html/
+
+    - name: Check for broken links
+      run: |
+        pip install sphinx-build-linkcheck
+        cd docs
+        make linkcheck
+
+    - name: Validate documentation structure
+      run: |
+        python -c "
+        import os
+        import json
+
+        # Check if all required files exist
+        required_files = [
+            'conf.py',
+            'index.rst',
+            'api/index.rst',
+            'guides/index.rst',
+            'features/index.rst'
+        ]
+
+        for file in required_files:
+            if not os.path.exists(file):
+                print(f'ERROR: Missing required file: {file}')
+                exit(1)
+
+        print('All required documentation files exist')
+        "
+
+  translate-docs:
+    needs: build-docs
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx-intl
+
+    - name: Extract translatable strings
+      run: |
+        cd docs
+        sphinx-build -b gettext . _build/gettext
+      env:
+        ENABLE_TRANSLATIONS: 'true'
+
+    - name: Push translations to Transifex
+      run: |
+        # Configure Transifex client
+        echo '[https://www.transifex.com]' > ~/.transifexrc
+        echo 'api_token = ${{ secrets.TRANSIFEX_API_TOKEN }}' >> ~/.transifexrc
+        echo 'hostname = https://www.transifex.com' >> ~/.transifexrc
+
+        # Push source strings
+        cd docs
+        tx push -s
+      env:
+        TRANSIFEX_API_TOKEN: ${{ secrets.TRANSIFEX_API_TOKEN }}
+
+    - name: Pull translations from Transifex
+      run: |
+        # Pull translations
+        cd docs
+        tx pull -t --all
+      env:
+        TRANSIFEX_API_TOKEN: ${{ secrets.TRANSIFEX_API_TOKEN }}
+
+    - name: Build translated documentation
+      run: |
+        cd docs
+        sphinx-intl build
+        make html
+      env:
+        SPHINXOPTS: '-D language=nl'
+
+    - name: Commit and push translations
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add locales/
+        git commit -m "Update translation files" || exit 0
+        git push
+
+  deploy-docs:
+    needs: [build-docs, translate-docs]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Download documentation artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: documentation
+        path: docs/_build/html/
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html/
+        destination_dir: docs
+        keep_files: true
+        cname: docs.noodle-lang.org
+
+    - name: Update documentation index
+      run: |
+        # Create or update documentation index
+        cat > docs-index.json << EOF
+        {
+          "last_updated": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+          "version": "${{ github.ref_name }}",
+          "documentation_url": "https://docs.noodle-lang.org",
+          "languages": {
+            "en": "https://docs.noodle-lang.org",
+            "nl": "https://docs.noodle-lang.org/nl/"
+          },
+          "sections": {
+            "api": "https://docs.noodle-lang.org/api/",
+            "guides": "https://docs.noodle-lang.org/guides/",
+            "features": "https://docs.noodle-lang.org/features/",
+            "deployment": "https://docs.noodle-lang.org/guides/deployment/"
+          }
+        }
+        EOF
+
+        # Commit and push the index
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs-index.json
+        git commit -m "Update documentation index" || exit 0
+        git push
+
+  validate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx-rtd-theme
+
+    - name: Validate documentation links
+      run: |
+        pip install sphinx-build-linkcheck
+        cd docs
+        make linkcheck
+
+    - name: Check documentation consistency
+      run: |
+        python -c "
+        import os
+        import re
+
+        # Check for consistent formatting
+        issues = []
+
+        # Check all .rst files
+        for root, dirs, files in os.walk('.'):
+            for file in files:
+                if file.endswith('.rst'):
+                    filepath = os.path.join(root, file)
+                    with open(filepath, 'r') as f:
+                        content = f.read()
+
+                        # Check for consistent heading styles
+                        if re.search(r'^=+$', content, re.MULTILINE):
+                            if not re.search(r'^[^\n]+\n=+\n', content):
+                                issues.append(f'Inconsistent heading in {filepath}')
+
+                        # Check for broken references
+                        if re.search(r':doc:`[^`]*`', content):
+                            # This is a simplified check - in practice you'd want to verify references exist
+                            pass
+
+        if issues:
+            print('Documentation consistency issues found:')
+            for issue in issues:
+                print(f'  - {issue}')
+            exit(1)
+        else:
+            print('Documentation consistency check passed')
+        "
+      working-directory: docs
+
+    - name: Validate memory bank integration
+      run: |
+        python -c "
+        import os
+        import json
+
+        # Check if memory bank entries reference documentation
+        memory_bank_files = []
+        for root, dirs, files in os.walk('../memory-bank'):
+            for file in files:
+                if file.endswith('.md'):
+                    memory_bank_files.append(os.path.join(root, file))
+
+        doc_references = 0
+        for file in memory_bank_files:
+            with open(file, 'r') as f:
+                content = f.read()
+                if 'docs/' in content or 'documentation' in content.lower():
+                    doc_references += 1
+
+        print(f'Found {doc_references} memory bank entries referencing documentation')
+
+        if doc_references == 0:
+            print('WARNING: No memory bank entries reference documentation')
+        "

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">192.168.1.1</domain>
+        <domain includeSubdomains="true">192.168.0.1</domain>
+        <!-- Add your development server IPs here -->
+    </domain-config>
+    
+    <!-- Allow connection to your production servers -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.noodlecontrol.com</domain>
+        <domain includeSubdomains="true">noodlecontrol.com</domain>
+    </domain-config>
+    
+    <!-- Debug configuration (only for debug builds) -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

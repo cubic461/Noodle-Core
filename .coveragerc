@@ -1,0 +1,98 @@
+[run]
+# Coverage measurement settings
+branch = True
+source =
+    noodle-core
+    src
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */site-packages/*
+    */venv/*
+    */.venv/*
+    */.tox/*
+    */build/*
+    */dist/*
+    */.eggs/*
+    */migrations/*
+    */conftest.py
+
+# Parallel execution support
+parallel = False
+concurrency = multiprocessing
+
+[report]
+# Report formatting
+precision = 2
+show_missing = True
+skip_covered = False
+exclude_lines =
+    # Default exclusions
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    @abc.abstractmethod
+
+    # Debug and development code
+    if DEBUG:
+    if settings.DEBUG
+    logger.debug
+    print\(.*\)
+
+    # Type checking
+    class .*\bProtocol\):
+    @typing.overload
+
+    # Test-related
+    @pytest.fixture
+    @pytest.mark
+
+    # Exception handling that's hard to test
+    except Exception:
+    except ImportError:
+
+    # Abstract methods
+    pass\s*$
+
+# Coverage thresholds
+fail_under = 80.0
+
+# Specific module thresholds
+[report:critical_paths]
+# Critical paths requiring 95% coverage
+fail_under = 95.0
+include_patterns =
+    */compiler/*
+    */runtime/*
+    */ai_agents/*
+    */database/*
+
+[html]
+# HTML report settings
+directory = htmlcov
+title = NoodleCore Coverage Report
+
+[xml]
+# XML report settings
+output = coverage.xml
+
+[json]
+# JSON report settings
+output = coverage.json
+pretty_print = True
+
+[paths]
+# Source path mapping for combining coverage from different locations
+source =
+    noodle-core/src/noodlecore
+    src/noodlecore
+    */noodlecore
+
+[comment]
+# Comment format for coverage reports
+prefix = COVERAGE:

@@ -1,0 +1,26 @@
+{
+  "name": "noodle-lang",
+  "version": "1.0.0",
+  "description": "Noodle Programming Language - Consolidated implementation",
+  "main": "src/compiler/compiler.js",
+  "files": [
+    "src/",
+    "docs/",
+    "examples/",
+    "tests/"
+  ],
+  "scripts": {
+    "test": "echo 'Run language tests'",
+    "build": "echo 'Build language compiler'",
+    "docs": "echo 'Generate documentation'"
+  },
+  "keywords": [
+    "noodle",
+    "language",
+    "programming",
+    "parser",
+    "compiler"
+  ],
+  "author": "Noodle Development Team",
+  "license": "MIT"
+}

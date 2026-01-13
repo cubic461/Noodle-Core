@@ -1,0 +1,245 @@
+Detected Transformer model - using specialized hooks
+=== Metrics Summary ===
+transformer.wte: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=38,597,376
+transformer.wpe: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=786,432
+transformer.h.0.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.0.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.0: avg_lat=108.15ms, p95=113.60ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.1.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.1.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.1: avg_lat=97.63ms, p95=99.73ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.2.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.2.ln_2: avg_lat=0.40ms, p95=0.79ms, vram=0.00MB, params=1,536
+transformer.h.2: avg_lat=96.89ms, p95=99.20ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.3.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.3.ln_2: avg_lat=0.50ms, p95=1.01ms, vram=0.00MB, params=1,536
+transformer.h.3: avg_lat=93.70ms, p95=99.24ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.4.ln_1: avg_lat=0.21ms, p95=0.43ms, vram=0.00MB, params=1,536
+transformer.h.4.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.4: avg_lat=92.94ms, p95=93.45ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.5.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.5.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.5: avg_lat=94.18ms, p95=95.69ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.6.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.6.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.6: avg_lat=93.98ms, p95=97.43ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.7.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.7.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.7: avg_lat=91.48ms, p95=95.18ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.8.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.8.ln_2: avg_lat=0.29ms, p95=0.59ms, vram=0.00MB, params=1,536
+transformer.h.8: avg_lat=103.74ms, p95=103.94ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.9.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.9.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.9: avg_lat=94.85ms, p95=95.92ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.10.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.10.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.10: avg_lat=100.93ms, p95=103.64ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.h.11.ln_1: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.11.ln_2: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+transformer.h.11: avg_lat=103.50ms, p95=105.05ms, vram=0.00MB, params=7,087,872
+GPT2Block(
+  (ln_1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (attn): GPT2Attention(
+    (c_attn): Conv1D(nf=2304, nx=768)
+    (c_proj): Conv1D(nf=768, nx=768)
+    (attn_dropout): Dropout(p=0.1, inplace=False)
+    (resid_dropout): Dropout(p=0.1, inplace=False)
+  )
+  (ln_2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+  (mlp): GPT2MLP(
+    (c_fc): Conv1D(nf=3072, nx=768)
+    (c_proj): Conv1D(nf=768, nx=3072)
+    (act): NewGELUActivation()
+    (dropout): Dropout(p=0.1, inplace=False)
+  )
+): avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=0
+transformer.ln_f: avg_lat=0.00ms, p95=0.00ms, vram=0.00MB, params=1,536
+lm_head: avg_lat=610.65ms, p95=629.87ms, vram=0.00MB, params=38,597,376
+=== System Info ===
+{
+  "cpu_count": 16,
+  "total_ram_gb": 31.406578063964844,
+  "available_ram_gb": 15.88821029663086
+}
+  1. lm_head: 17.65% (629.87ms)
+  2. lm_head: 16.58% (591.42ms)
+  3. transformer.h.0: 3.18% (113.60ms)
+  4. transformer.h.11: 2.94% (105.05ms)
+  5. transformer.h.8: 2.91% (103.94ms)

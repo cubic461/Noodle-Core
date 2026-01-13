@@ -1,0 +1,35 @@
+{
+  "trace_id": "trace_1765896105_2155169236044050345",
+  "language": "python",
+  "command": [
+    "python",
+    "C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples\\simple_file_processor.py",
+    "C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples\\sample_input.csv",
+    "C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples\\test_output.csv"
+  ],
+  "working_dir": "C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples",
+  "start_time": 1765896105.9346557,
+  "end_time": 1765896106.2431982,
+  "events": [
+    {
+      "event_type": "stdout",
+      "data": {
+        "data": "\n=== Trace ===\nDuration: 0.126s\nCalls: 4554\nIO: 1\nTrace ID: trace_1765896105_2155169236044050345\n"
+      },
+      "timestamp": 1765896106.2426848
+    },
+    {
+      "event_type": "stderr",
+      "data": {
+        "data": "usage: python [-h] [--verbose] [input_file] [output_file]\npython: error: unrecognized arguments: C:\\Users\\micha\\Noodle\\noodle-core\\src\\migration\\examples\\test_output.csv\nException ignored in atexit callback: <function finalize at 0x00000242CDBC91C0>\nTraceback (most recent call last):\n  File \"C:\\Users\\micha\\AppData\\Local\\Temp\\tmpaqr82nuw.py\", line 87, in finalize\n    sys.exit(0)\nSystemExit: 0\n"
+      },
+      "timestamp": 1765896106.2426848
+    }
+  ],
+  "call_graph": [],
+  "io_log": [],
+  "cpu_time": null,
+  "peak_memory": 22327296,
+  "exit_code": 2,
+  "termination_reason": "normal"
+}

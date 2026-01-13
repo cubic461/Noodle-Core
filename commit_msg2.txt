@@ -1,0 +1,5 @@
+chore: remove NetworkAutomation directory with API keys
+
+- Removed NetworkAutomation/key.txt (OpenAI API key)
+- Removed NetworkAutomation/localAider groc key= gsk_XvaeGnJGIq.txt files
+- Added NetworkAutomation/ to .gitignore to prevent future commits

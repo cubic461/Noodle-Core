@@ -1,0 +1,247 @@
+# Converted from Python to NoodleCore
+# Original file: noodle-core
+
+# NoodleCore converted from Python
+# """
+# Comprehensive AI Agent Infrastructure Test
+# Tests all components of the AI agent infrastructure to ensure proper integration.
+# """
+
+import sys
+import traceback
+import pathlib.Path
+
+# Add the src directory to the path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
+function test_ai_agent_infrastructure()
+    #     """Test all components of the AI agent infrastructure."""
+        print("🔍 COMPREHENSIVE AI AGENT INFRASTRUCTURE TEST")
+    print(" = " * 60)
+
+    test_results = {
+    #         'imports': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'base_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'agent_registry': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'code_review_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'debugger_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'testing_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'documentation_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'refactoring_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'noodlecore_writer_agent': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'agent_manager': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'role_manager': {'passed': 0, 'failed': 0, 'errors': []},
+    #         'integration': {'passed': 0, 'failed': 0, 'errors': []}
+    #     }
+
+    #     # Test 1: Basic imports
+        print("\n📦 Testing AI Agent Imports...")
+    #     try:
+    #         from noodlecore.ai_agents.base_agent import BaseAIAgent, AIAgentManager
+            print("✅ BaseAIAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.agent_registry import AgentRegistry, get_agent_registry
+            print("✅ AgentRegistry import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.code_review_agent import CodeReviewAgent
+            print("✅ CodeReviewAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.debugger_agent import DebuggerAgent
+            print("✅ DebuggerAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.testing_agent import TestingAgent
+            print("✅ TestingAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.documentation_agent import DocumentationAgent
+            print("✅ DocumentationAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.refactoring_agent import RefactoringAgent
+            print("✅ RefactoringAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents.noodlecore_writer_agent import NoodleCoreWriterAgent
+            print("✅ NoodleCoreWriterAgent import: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+    #         from noodlecore.ai_agents import create_agent_manager, list_available_agents
+            print("✅ AI agents module functions: SUCCESS")
+    test_results['imports']['passed'] + = 1
+
+            print(f"✅ All AI agent imports successful ({test_results['imports']['passed']} components)")
+
+    #     except Exception as e:
+            print(f"❌ AI agent imports failed: {e}")
+    test_results['imports']['failed'] + = 1
+            test_results['imports']['errors'].append(str(e))
+            traceback.print_exc()
+
+    #     # Test 2: Agent instantiation
+        print("\n🧪 Testing AI Agent Instantiation...")
+    #     try:
+    code_review_agent = CodeReviewAgent()
+            print("✅ CodeReviewAgent instantiation: SUCCESS")
+    test_results['code_review_agent']['passed'] + = 1
+
+    debugger_agent = DebuggerAgent()
+            print("✅ DebuggerAgent instantiation: SUCCESS")
+    test_results['debugger_agent']['passed'] + = 1
+
+    testing_agent = TestingAgent()
+            print("✅ TestingAgent instantiation: SUCCESS")
+    test_results['testing_agent']['passed'] + = 1
+
+    documentation_agent = DocumentationAgent()
+            print("✅ DocumentationAgent instantiation: SUCCESS")
+    test_results['documentation_agent']['passed'] + = 1
+
+    refactoring_agent = RefactoringAgent()
+            print("✅ RefactoringAgent instantiation: SUCCESS")
+    test_results['refactoring_agent']['passed'] + = 1
+
+    noodlecore_writer_agent = NoodleCoreWriterAgent()
+            print("✅ NoodleCoreWriterAgent instantiation: SUCCESS")
+    test_results['noodlecore_writer_agent']['passed'] + = 1
+
+    manager = create_agent_manager()
+            print("✅ Agent manager creation: SUCCESS")
+    test_results['agent_manager']['passed'] + = 1
+
+    agents_list = list_available_agents(manager)
+            print(f"✅ Available agents: {len(agents_list)}")
+    test_results['agent_manager']['passed'] + = 1
+
+            print(f"✅ All AI agent instantiation tests passed ({test_results['agent_manager']['passed']} components)")
+
+    #     except Exception as e:
+            print(f"❌ AI agent instantiation failed: {e}")
+    test_results['agent_manager']['failed'] + = 1
+            test_results['agent_manager']['errors'].append(str(e))
+            traceback.print_exc()
+
+    #     # Test 3: Agent registry
+        print("\n🗂️ Testing Agent Registry...")
+    #     try:
+    registry = get_agent_registry()
+            print("✅ Agent registry creation: SUCCESS")
+    test_results['agent_registry']['passed'] + = 1
+
+    #         # Test registration
+    agent_id = registry.register_agent(code_review_agent, registry.role_mapping.CODE_REVIEWER)
+            print(f"✅ Agent registration: SUCCESS (ID: {agent_id[:8]}...)")
+    test_results['agent_registry']['passed'] + = 1
+
+    #         # Test listing
+    agents = registry.list_agents()
+            print(f"✅ Agent listing: {len(agents)} agents")
+    test_results['agent_registry']['passed'] + = 1
+
+    #         # Test stats
+    stats = registry.get_registry_stats()
+            print(f"✅ Registry stats: {stats['total_agents']} total agents")
+    test_results['agent_registry']['passed'] + = 1
+
+            print(f"✅ All agent registry tests passed ({test_results['agent_registry']['passed']} components)")
+
+    #     except Exception as e:
+            print(f"❌ Agent registry tests failed: {e}")
+    test_results['agent_registry']['failed'] + = 1
+            test_results['agent_registry']['errors'].append(str(e))
+            traceback.print_exc()
+
+    #     # Test 4: Role manager
+        print("\n👥 Testing Role Manager...")
+    #     try:
+    #         from noodlecore.ai.role_manager import get_role_manager, AIRoleManager
+            print("✅ Role manager import: SUCCESS")
+    test_results['role_manager']['passed'] + = 1
+
+    role_manager = get_role_manager()
+            print("✅ Role manager instantiation: SUCCESS")
+    test_results['role_manager']['passed'] + = 1
+
+    #         # Test role creation
+    roles = role_manager.get_all_roles()
+            print(f"✅ Role listing: {len(roles)} roles")
+    test_results['role_manager']['passed'] + = 1
+
+    #         # Test role categories
+    categories = role_manager.get_role_categories()
+            print(f"✅ Role categories: {len(categories)} categories")
+    test_results['role_manager']['passed'] + = 1
+
+            print(f"✅ All role manager tests passed ({test_results['role_manager']['passed']} components)")
+
+    #     except Exception as e:
+            print(f"❌ Role manager tests failed: {e}")
+    test_results['role_manager']['failed'] + = 1
+            test_results['role_manager']['errors'].append(str(e))
+            traceback.print_exc()
+
+    #     # Test 5: Integration test
+        print("\n🔗 Testing AI Agent Integration...")
+    #     try:
+    #         # Test agent manager with registry
+    registry = get_agent_registry()
+    manager = create_agent_manager()
+
+    #         # Register an agent
+    agent_id = registry.register_agent(code_review_agent, registry.role_mapping.CODE_REVIEWER)
+
+    #         # Test agent functionality
+    agent = manager.get_agent("Code Reviewer")
+    #         if agent:
+                print("✅ Agent retrieval from manager: SUCCESS")
+    test_results['integration']['passed'] + = 1
+
+    #             # Test agent capabilities
+    capabilities = agent.get_capabilities()
+    #             if capabilities:
+                    print(f"✅ Agent capabilities: {len(capabilities)} capabilities")
+    test_results['integration']['passed'] + = 1
+
+    #             # Test agent info
+    info = agent.get_agent_info()
+    #             if info:
+                    print("✅ Agent info retrieval: SUCCESS")
+    test_results['integration']['passed'] + = 1
+    #         else:
+                print("❌ Agent retrieval from manager: FAILED")
+    test_results['integration']['failed'] + = 1
+                test_results['integration']['errors'].append("Agent retrieval failed")
+
+            print(f"✅ All AI agent integration tests passed ({test_results['integration']['passed']} components)")
+
+    #     except Exception as e:
+            print(f"❌ AI agent integration tests failed: {e}")
+    test_results['integration']['failed'] + = 1
+            test_results['integration']['errors'].append(str(e))
+            traceback.print_exc()
+
+    #     # Summary
+        print("\n🎯 AI AGENT INFRASTRUCTURE TEST SUMMARY")
+    print(" = " * 60)
+
+    #     total_passed = sum(result['passed'] for result in test_results.values())
+    #     total_failed = sum(result['failed'] for result in test_results.values())
+    #     total_errors = sum(len(result['errors']) for result in test_results.values())
+
+        print(f"Total tests passed: {total_passed}")
+        print(f"Total tests failed: {total_failed}")
+        print(f"Total errors: {total_errors}")
+
+    #     if total_failed == 0 and total_errors == 0:
+            print("🎉 ALL TESTS PASSED - AI Agent Infrastructure is fully functional!")
+    #         return True
+    #     else:
+    #         print("⚠️ SOME TESTS FAILED - Check errors above for details")
+    #         return False
+
+if __name__ == "__main__"
+    success = test_ai_agent_infrastructure()
+    #     sys.exit(0 if success else 1)

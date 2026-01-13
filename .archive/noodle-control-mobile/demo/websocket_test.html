@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .notifications {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin: 10px 0;
+        }
+        .notification {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .notification.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .notification.warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button.primary {
+            background-color: #007bff;
+            color: white;
+        }
+        button.secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .metric-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            min-width: 150px;
+        }
+        .metric-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Test for NoodleControl</h1>
+    
+    <div id="connection-status" class="status disconnected">
+        Status: Disconnected
+    </div>
+    
+    <div class="metrics" id="metrics-container">
+        <!-- Metrics will be populated here -->
+    </div>
+    
+    <h2>Real-time Notifications</h2>
+    <div class="notifications" id="notifications">
+        <div class="notification info">Waiting for connection...</div>
+    </div>
+    
+    <h2>Node Actions</h2>
+    <button class="primary" onclick="startNode('node-01')">Start Node-01</button>
+    <button class="secondary" onclick="stopNode('node-01')">Stop Node-01</button>
+    <button class="secondary" onclick="restartNode('node-01')">Restart Node-01</button>
+    
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        // API base URL - configurable for Docker environment
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8082/api'
+            : `http://${window.location.hostname}:8082/api`;
+
+        // WebSocket URL - configurable for Docker environment
+        const SOCKET_IO_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8082'
+            : `http://${window.location.hostname}:8082`;
+            
+        const socket = io(SOCKET_IO_URL);
+        const statusElement = document.getElementById('connection-status');
+        const notificationsElement = document.getElementById('notifications');
+        const metricsContainer = document.getElementById('metrics-container');
+        
+        // Connection event handlers
+        socket.on('connect', function() {
+            updateConnectionStatus(true);
+            addNotification('Connected to WebSocket server', 'success');
+        });
+        
+        socket.on('disconnect', function() {
+            updateConnectionStatus(false);
+            addNotification('Disconnected from WebSocket server', 'error');
+        });
+        
+        // Data event handlers
+        socket.on('initial_data', function(data) {
+            addNotification('Received initial data', 'info');
+            updateMetrics(data.metrics);
+        });
+        
+        socket.on('metrics_update', function(data) {
+            updateMetrics(data);
+        });
+        
+        socket.on('node_status_change', function(data) {
+            const { node, action } = data;
+            addNotification(`Node ${node.name}: ${action}`, 'info');
+        });
+        
+        socket.on('notification', function(data) {
+            addNotification(data.message, data.type);
+        });
+        
+        // Helper functions
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                statusElement.className = 'status connected';
+                statusElement.textContent = 'Status: Connected';
+            } else {
+                statusElement.className = 'status disconnected';
+                statusElement.textContent = 'Status: Disconnected';
+            }
+        }
+        
+        function addNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            notification.innerHTML = `<strong>${time}</strong>: ${message}`;
+            
+            notificationsElement.appendChild(notification);
+            notificationsElement.scrollTop = notificationsElement.scrollHeight;
+        }
+        
+        function updateMetrics(metrics) {
+            metricsContainer.innerHTML = '';
+            
+            const metricsToShow = [
+                { key: 'active_nodes', title: 'Active Nodes' },
+                { key: 'total_nodes', title: 'Total Nodes' },
+                { key: 'running_tasks', title: 'Running Tasks' },
+                { key: 'cpu_usage', title: 'CPU Usage', suffix: '%' },
+                { key: 'memory_usage', title: 'Memory Usage', suffix: 'GB' },
+                { key: 'network_traffic', title: 'Network Traffic', suffix: ' MB/s' },
+                { key: 'disk_io', title: 'Disk I/O', suffix: ' MB/s' }
+            ];
+            
+            metricsToShow.forEach(metric => {
+                const value = metrics[metric.key];
+                if (value !== undefined) {
+                    const card = document.createElement('div');
+                    card.className = 'metric-card';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'metric-title';
+                    title.textContent = metric.title;
+                    
+                    const valueElement = document.createElement('div');
+                    valueElement.className = 'metric-value';
+                    valueElement.textContent = value + (metric.suffix || '');
+                    
+                    card.appendChild(title);
+                    card.appendChild(valueElement);
+                    metricsContainer.appendChild(card);
+                }
+            });
+        }
+        
+        // Node action functions
+        async function startNode(nodeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}/start`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    addNotification(`Started ${nodeId}`, 'success');
+                } else {
+                    addNotification(`Failed to start ${nodeId}`, 'error');
+                }
+            } catch (error) {
+                addNotification(`Error starting ${nodeId}: ${error.message}`, 'error');
+            }
+        }
+        
+        async function stopNode(nodeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}/stop`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    addNotification(`Stopped ${nodeId}`, 'success');
+                } else {
+                    addNotification(`Failed to stop ${nodeId}`, 'error');
+                }
+            } catch (error) {
+                addNotification(`Error stopping ${nodeId}: ${error.message}`, 'error');
+            }
+        }
+        
+        async function restartNode(nodeId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/nodes/${nodeId}/restart`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    addNotification(`Restarting ${nodeId}`, 'info');
+                } else {
+                    addNotification(`Failed to restart ${nodeId}`, 'error');
+                }
+            } catch (error) {
+                addNotification(`Error restarting ${nodeId}: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "name": "Noodle",
+  "version": "1.0.0",
+  "description": "NoodleCore AI Project",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "noodle-core": "^1.0.0"
+  },
+  "scripts": {
+    "build": "noodle build",
+    "run": "noodle run",
+    "test": "noodle test",
+    "debug": "noodle debug"
+  },
+  "ai": {
+    "defaultModel": "gpt-4",
+    "agents": [],
+    "models": [],
+    "pipelines": []
+  }
+}

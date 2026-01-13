@@ -1,0 +1,18 @@
+targets:
+  $default:
+    builders:
+      mockito:
+        enabled: true
+        options:
+          mock_packages: []
+          custom_mock_import: ""
+          throw_on_missing_stub: true
+      json_serializable:
+        enabled: true
+        options:
+          explicit_to_json: true
+          include_if_null: true
+      build_runner:
+        enabled: true
+        options:
+          delete_conflicting_outputs: true

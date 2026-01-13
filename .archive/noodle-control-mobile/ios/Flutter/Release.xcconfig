@@ -1,0 +1,37 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
+#include "Generated.xcconfig"
+
+FLUTTER_BUILD_MODE=release
+FLUTTER_FRAMEWORK_DIR=$(PROJECT_DIR)/flutter/ios
+
+// Release build optimizations
+ENABLE_BITCODE=NO
+GCC_OPTIMIZATION_LEVEL=s
+SWIFT_OPTIMIZATION_LEVEL=-O
+
+// Security settings for production
+VALIDATE_PRODUCT=YES
+SWIFT_COMPILATION_MODE=wholemodule
+
+// Debug information for crash reporting
+DEBUG_INFORMATION_FORMAT=dwarf-with-dsym
+
+// Strip symbols for smaller binary
+STRIP_INSTALLED_PRODUCT=YES
+
+// Network security for production
+NSAppTransportSecurity:
+  NSAllowsArbitraryLoads=false
+  NSExceptionDomains:
+    api.noodlecontrol.com:
+      NSExceptionRequiresForwardSecrecy=false
+      NSIncludesSubdomains=true
+
+// Code signing (to be configured for release)
+CODE_SIGN_STYLE=Manual
+PROVISIONING_PROFILE_SPECIFIER=
+CODE_SIGN_IDENTITY=
+
+// App store distribution settings
+ITUNES_CONNECT_APPLICATION_ID=
+DEVELOPMENT_TEAM=

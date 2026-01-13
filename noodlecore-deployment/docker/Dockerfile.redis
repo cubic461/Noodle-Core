@@ -1,0 +1,33 @@
+# Redis Dockerfile for NoodleCore
+# Based on official Redis image with custom configuration
+
+FROM redis:7-alpine
+
+# Create directories for data and configuration
+RUN mkdir -p /data /etc/redis /var/log/redis
+
+# Copy custom Redis configuration
+COPY redis.conf /etc/redis/redis.conf
+
+# Set proper permissions
+RUN chown -R redis:redis /data /etc/redis /var/log/redis
+
+# Switch to redis user
+USER redis
+
+# Set working directory
+WORKDIR /data
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD redis-cli ping
+
+# Expose port
+EXPOSE 6379
+
+# Custom entrypoint script
+COPY redis-entrypoint.sh /redis-entrypoint.sh
+RUN chmod +x /redis-entrypoint.sh
+
+ENTRYPOINT ["/redis-entrypoint.sh"]
+CMD ["redis-server", "/etc/redis/redis.conf"]

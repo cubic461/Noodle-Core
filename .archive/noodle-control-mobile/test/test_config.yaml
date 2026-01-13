@@ -1,0 +1,77 @@
+# Test configuration for NoodleControl Mobile App
+# This file contains configuration settings for running tests
+
+# Test Environment Configuration
+environment:
+  test_mode: true
+  mock_network: true
+  mock_storage: true
+  
+# Timeout Configuration
+timeouts:
+  unit_test: 30s
+  widget_test: 60s
+  integration_test: 120s
+  performance_test: 300s
+  
+# Coverage Configuration
+coverage:
+  enabled: true
+  minimum_coverage: 80
+  exclude_paths:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+    - "**/l10n/**"
+  
+# Test Groups
+test_groups:
+  - unit:
+    - core/repositories
+    - core/services
+    - core/network
+    - shared/models
+    - shared/utils
+    
+  - widget:
+    - shared/widgets
+    - features/**/screens
+    
+  - integration:
+    - flows/authentication
+    - flows/node_management
+    - flows/task_management
+    - flows/ide_management
+    
+  - performance:
+    - network/requests
+    - ui/rendering
+    - data_processing
+    
+# Mock Configuration
+mocks:
+  auto_generate: true
+  mock_network_responses: true
+  mock_native_plugins: true
+  
+# Reporting Configuration
+reports:
+  format: [json, html, lcov]
+  output: test/reports
+  include_performance_metrics: true
+  include_coverage_report: true
+  
+# CI/CD Configuration
+ci:
+  parallel: true
+  fail_fast: true
+  retry_failed_tests: 1
+  
+# Device Configuration
+devices:
+  android:
+    - pixel_4
+    - galaxy_s20
+  ios:
+    - iphone_12
+    - iphone_13

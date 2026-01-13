@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Frontend service with nginx
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: noodle_frontend
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    networks:
+      - noodle_network
+    restart: unless-stopped
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=8081
+
+  # Backend API service with WebSocket support
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: noodle_backend
+    ports:
+      - "8082:8082"
+    networks:
+      - noodle_network
+    restart: unless-stopped
+    environment:
+      - NOODLE_ENV=production
+      - NOODLE_PORT=8082
+      - DEBUG=0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Define the network
+networks:
+  noodle_network:
+    driver: bridge

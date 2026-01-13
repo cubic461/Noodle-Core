@@ -1,0 +1,88 @@
+{
+  "version": "1.0.0",
+  "major": 1,
+  "minor": 0,
+  "patch": 0,
+  "prerelease": null,
+  "build": null,
+  "updated_at": "2025-12-31T22:38:00.000Z",
+  "bumpFiles": [
+    {
+      "filename": "noodle-core/src/noodlecore/__init__.py",
+      "updater": "scripts/version_manager.py"
+    },
+    {
+      "filename": "pyproject.toml",
+      "updater": "scripts/version_manager.py"
+    },
+    {
+      "filename": "setup.py",
+      "updater": "scripts/version_manager.py"
+    },
+    {
+      "filename": "package.json",
+      "updater": "scripts/version_manager.py"
+    }
+  ],
+  "types": [
+    {
+      "type": "feat",
+      "section": "Added",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Fixed",
+      "hidden": false
+    },
+    {
+      "type": "perf",
+      "section": "Performance",
+      "hidden": false
+    },
+    {
+      "type": "revert",
+      "section": "Reverts",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Documentation",
+      "hidden": false
+    },
+    {
+      "type": "style",
+      "section": "Style",
+      "hidden": true
+    },
+    {
+      "type": "chore",
+      "section": "Chore",
+      "hidden": true
+    },
+    {
+      "type": "refactor",
+      "section": "Refactor",
+      "hidden": true
+    },
+    {
+      "type": "test",
+      "section": "Tests",
+      "hidden": true
+    },
+    {
+      "type": "build",
+      "section": "Build",
+      "hidden": true
+    },
+    {
+      "type": "ci",
+      "section": "CI",
+      "hidden": true
+    }
+  ],
+  "commitUrlFormat": "https://github.com/noodlecore/noodlecore/commits/{{hash}}",
+  "compareUrlFormat": "https://github.com/noodlecore/noodlecore/compare/{{previousTag}}...{{currentTag}}",
+  "issueUrlFormat": "https://github.com/noodlecore/noodlecore/issues/{{id}}",
+  "userUrlFormat": "https://github.com/{{user}}"
+}

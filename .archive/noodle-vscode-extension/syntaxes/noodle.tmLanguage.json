@@ -1,0 +1,168 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "version": "1.0.0",
+    "name": "NoodleCore",
+    "scopeName": "source.noodle",
+    "information_for_contributors": [
+        "NoodleCore is an AI-native programming language that combines Python-like syntax with advanced AI capabilities."
+    ],
+    "fileTypes": [
+        {
+            "name": "NoodleCore",
+            "extensions": [
+                ".nc",
+                ".noodle"
+            ]
+        }
+    ],
+    "foldingStart": "^\\s*\\b.*\\{\\s*$",
+    "foldingStop": "^\\s*\\}",
+    "patterns": [
+        {
+            "include": "#begin",
+            "name": "comment.line.double-slash"
+        },
+        {
+            "begin": "(?i)^\\s*\\b.*\\{\\s*$",
+            "beginCaptures": [
+                "1"
+            ],
+            "end": "\\s*\\}",
+            "endCaptures": [
+                "2"
+            ],
+            "name": "comment.block.documentation",
+            "patterns": [
+                {
+                    "begin": "\\b(ai|agent|model|train|predict|transform|validate|compile|run|debug|test|optimize|refactor)\\b",
+                    "beginCaptures": [
+                        "3"
+                    ],
+                    "end": "\\b",
+                    "name": "keyword.control.ai"
+                },
+                {
+                    "match": "\\b(func|function|return|if|else|elif|for|while|do|break|continue|switch|case|default)\\b",
+                    "name": "keyword.control"
+                },
+                {
+                    "match": "\\b(let|const|var|type|interface|class|enum|struct|implements|extends|import|export|module|package)\\b",
+                    "name": "keyword.declaration"
+                },
+                {
+                    "match": "\\b(int|float|string|bool|char|byte|array|list|map|set|void|null|true|false)\\b",
+                    "name": "keyword.type"
+                },
+                {
+                    "match": "\\b(public|private|protected|static|final|abstract|virtual|override|async|await|yield)\\b",
+                    "name": "keyword.modifier"
+                },
+                {
+                    "match": "\\b(print|println|input|read|write|open|close|len|size|append|push|pop|sort|filter|map|String|Number|Boolean|Array|Map|Set|List|Dictionary|Function|Promise|Stream|Buffer|Tensor|Matrix|Vector|AIModel|NeuralNetwork|Dataset|Pipeline|Agent|Workspace)\\b",
+                    "name": "keyword.builtin"
+                },
+                {
+                    "match": "\\b(try|catch|finally|throw|error|exception)\\b",
+                    "name": "keyword.exception"
+                },
+                {
+                    "begin": "\"",
+                    "end": "\"",
+                    "name": "string.quoted.double"
+                },
+                {
+                    "begin": "'",
+                    "end": "'",
+                    "name": "string.quoted.single"
+                },
+                {
+                    "match": "\\b\\d+(\\.\\d+)?",
+                    "name": "constant.numeric"
+                },
+                {
+                    "match": "[a-zA-Z_][a-zA-Z0-9_]*\\b",
+                    "name": "variable.other"
+                }
+            ]
+        },
+        {
+            "include": "\\b((0[xX])?[0-9a-fA-F]+)",
+            "name": "constant.numeric.hex"
+        },
+        {
+            "include": "\\b(\\d+(\\.\\d+)?[fFlL])",
+            "name": "constant.numeric.float"
+        },
+        {
+            "begin": "\"",
+            "end": "\"",
+            "beginCaptures": [
+                "1"
+            ],
+            "patterns": [
+                {
+                    "match": "\\\\(\\\\.|[^\"])*\\\\\"",
+                    "name": "constant.character.escape"
+                },
+                {
+                    "match": "[^\"\\\\]*",
+                    "name": "constant.character"
+                }
+            ],
+            "name": "string.quoted.double"
+        },
+        {
+            "begin": "'",
+            "end": "'",
+            "beginCaptures": [
+                "1"
+            ],
+            "patterns": [
+                {
+                    "match": "\\\\(\\\\.|[^'])*\\\\'",
+                    "name": "constant.character.escape"
+                },
+                {
+                    "match": "[^'\\\\]*",
+                    "name": "constant.character"
+                }
+            ],
+            "name": "string.quoted.single"
+        },
+        {
+            "begin": "/\\*",
+            "end": "\\*/",
+            "captures": {
+                "1": {
+                    "name": "comment.block.documentation"
+                }
+            },
+            "name": "comment.block.star"
+        },
+        {
+            "begin": "//",
+            "end": "\\n",
+            "name": "comment.line.double-slash"
+        },
+        {
+            "match": "\\b\\d+(\\.\\d+)?\\b",
+            "name": "constant.numeric"
+        },
+        {
+            "match": "\\+|-|\\*|/|%|\\*\\*|=|==|!=|<|>|<=|&&|\\|\\||!|&|\\||\\^|~|<<|>>|\\+=|-=|\\*=|/=|\\*=",
+            "name": "keyword.operator"
+        },
+        {
+            "match": "\\(|\\)|\\[|\\]|\\{|\\}",
+            "name": "punctuation.bracket"
+        },
+        {
+            "match": "\\.",
+            "name": "punctuation.separator"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/noodle/noodle-vscode-extension"
+    }
+}

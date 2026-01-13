@@ -1,0 +1,67 @@
+name: Publish Extension to VS Code Marketplace
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Compile TypeScript
+        run: npm run compile
+
+      - name: Package extension
+        run: npm run package
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to VS Code Marketplace
+        run: npx vsce publish --packagePath *.vsix --pat ${{ secrets.VSCE_PAT }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v4
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## Changes in this Release
+            - AI-powered code completion and generation
+            - Enhanced debugging capabilities
+            - Improved syntax highlighting
+            - Performance optimizations
+            - Bug fixes and stability improvements
+            
+            ## Installation
+            ```bash
+            code --install-extension noodle.noodle-ide
+            ```
+            
+            ## Verification
+            - [ ] All tests pass
+            - [ ] Extension loads correctly
+            - [ ] Features work as expected
+            - [ ] Performance is acceptable
+          files: |
+            *.vsix
+          draft: false
+          prerelease: false

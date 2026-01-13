@@ -1,0 +1,164 @@
+# Snyk configuration for Noodle project
+
+# Language and project type
+language: python
+
+# Project name for Snyk dashboard
+project-name: noodle
+
+# Organization name (if using Snyk Enterprise)
+# organization: my-org
+
+# Vulnerability severity thresholds
+severity-threshold: high
+
+# Policy file location
+policy-path: .snyk
+
+# Exclude specific files or directories from scanning
+exclude:
+  - node_modules/
+  - vendor/
+  - .git/
+  - .venv/
+  - venv/
+  - __pycache__/
+  - "*.egg-info/"
+  - .pytest_cache/
+  - .mypy_cache/
+  - .tox/
+  - build/
+  - dist/
+  - htmlcov/
+  - .benchmarks/
+
+# Ignore specific vulnerabilities (use with caution)
+# Format: package-name@version: vulnerability-id
+# Example:
+# ignore:
+#   - SNYK-PYTHON-REQUESTS-575050
+
+# Enable or disable specific features
+features:
+  # Monitor dependencies for vulnerabilities
+  monitor-dependencies: true
+
+  # Monitor code for vulnerabilities (SAST)
+  monitor-code: false
+
+  # Monitor license compliance
+  monitor-licenses: true
+
+  # Enable IaC scanning
+  iac: true
+
+  # Enable container scanning
+  container: true
+
+# License policy
+license-policy:
+  # Allow licenses
+  allow:
+    - MIT
+    - Apache-2.0
+    - BSD-2-Clause
+    - BSD-3-Clause
+    - ISC
+    - PSF-2.0
+    - LGPL-2.1
+    - LGPL-3.0
+
+  # Deny licenses
+  deny:
+    - GPL-2.0
+    - GPL-3.0
+    - AGPL-3.0
+    - MPL-1.1
+    - MPL-2.0-no-copyleft-exception
+
+# Patch rules for known vulnerabilities
+# patches:
+#   - package-name:
+#       version: ">=1.0.0 <2.0.0"
+#       patch: |
+#         diff --git a/file.py b/file.py
+#         index 1234567..abcdefg 100644
+#         --- a/file.py
+#         +++ b/file.py
+#         @@ -1,3 +1,4 @@
+#          def vulnerable_function():
+#         -    return insecure_value
+#         +    return secure_value
+
+# Custom rules for Snyk Code
+# rules:
+#   - id: custom-rule-1
+#     severity: high
+#     category: security
+#     title: Custom Security Rule
+#     description: Description of the custom rule
+#     patterns:
+#       - pattern: |
+#           $FUNC($INPUT)
+#         where:
+#           $FUNC: eval
+#           $INPUT: user_input
+
+# Reporting configuration
+reporting:
+  # Enable SARIF reports for CI/CD integration
+  sarif: true
+
+  # Enable JSON reports
+  json: true
+
+  # Enable HTML reports
+  html: true
+
+  # Report output directory
+  output-dir: .snyk-reports
+
+# CI/CD integration settings
+ci:
+  # Fail the build if vulnerabilities are found
+  fail-on: high
+
+  # Number of vulnerabilities to allow before failing
+  threshold: 0
+
+  # Display summary in CI logs
+  display-summary: true
+
+  # Show dependency tree
+  show-dependency-tree: true
+
+# Remediation settings
+remediation:
+  # Enable automatic remediation suggestions
+  auto-remediate: true
+
+  # Prefer upgrades over patches
+  prefer-upgrade: true
+
+  # Allow major version upgrades
+  allow-major: false
+
+  # Allow minor version upgrades
+  allow-minor: true
+
+  # Allow patch version upgrades
+  allow-patch: true
+
+# Environment-specific settings
+environments:
+  development:
+    severity-threshold: medium
+    fail-on: high
+
+  production:
+    severity-threshold: high
+    fail-on: medium
+
+  staging:
+    severity-threshold: high
+    fail-on: high

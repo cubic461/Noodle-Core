@@ -1,0 +1,298 @@
+{
+  "test_suite_name": "simple_file_processor_tests",
+  "format_version": "1.0.0",
+  "description": "Golden tests for simple_file_processor.py CLI utility",
+  "test_runners": [
+    {
+      "language": "python",
+      "command_template": "python {script} {args}"
+    }
+  ],
+  "tests": [
+    {
+      "test_id": "basic_processing_success",
+      "description": "Basic CSV processing with default behavior",
+      "enabled": true,
+      "priority": "high",
+      "tags": ["functional", "basic"],
+      "setup": {
+        "create_files": [
+          {
+            "path": "input_basic.csv",
+            "content": "name,email,age\nalice,alice@example.com,25\nbob,bob@example.com,30\ncharlie,charlie@example.com,35\ndiana,diana@example.com,28\nevan,evan@example.com,42"
+          }
+        ],
+        "delete_files": ["output_basic.csv"],
+        "environment": {}
+      },
+      "input": {
+        "command": ["python", "simple_file_processor.py", "input_basic.csv", "output_basic.csv"],
+        "working_dir": ".",
+        "stdin": null,
+        "timeout_seconds": 10
+      },
+      "expected_output": {
+        "exit_code": 0,
+        "stdout": "Processed 5 lines\n",
+        "stderr": "",
+        "stdout_regex": null,
+        "stderr_regex": null,
+        "partial_match": true
+      },
+      "expected_files": [
+        {
+          "path": "output_basic.csv",
+          "should_exist": true,
+          "content_match": "NAME,EMAIL,AGE\nALICE,ALICE@EXAMPLE.COM,25\nBOB,BOB@EXAMPLE.COM,30\nCHARLIE,CHARLIE@EXAMPLE.COM,35\nDIANA,DIANA@EXAMPLE.COM,28\nEVAN,EVAN@EXAMPLE.COM,42",
+          "content_regex": "NAME.*ALICE.*BOB.*CHARLIE.*DIANA.*EVAN",
+          "encoding": "utf-8"
+        }
+      ],
+      "assertions": [
+        {
+          "type": "file_content_equals",
+          "file_path": "output_basic.csv",
+          "expected_content": "NAME,EMAIL,AGE\nALICE,ALICE@EXAMPLE.COM,25\nBOB,BOB@EXAMPLE.COM,30\nCHARLIE,CHARLIE@EXAMPLE.COM,35\nDIANA,DIANA@EXAMPLE.COM,28\nEVAN,EVAN@EXAMPLE.COM,42"
+        },
+        {
+          "type": "stdout_contains",
+          "expected_substring": "Processed"
+        },
+        {
+          "type": "exit_code",
+          "expected_code": 0
+        },
+        {
+          "type": "file_count_in_dir",
+          "directory": ".",
+          "pattern": "output_basic.csv",
+          "expected_count": 1
+        }
+      ],
+      "cleanup": {
+        "delete_files": ["input_basic.csv", "output_basic.csv"],
+        "delete_dirs": []
+      }
+    },
+    {
+      "test_id": "verbose_mode_test",
+      "description": "Test verbose mode output with detailed status",
+      "enabled": true,
+      "priority": "medium",
+      "tags": ["functional", "verbose"],
+      "setup": {
+        "create_files": [
+          {
+            "path": "input_verbose.csv",
+            "content": "name,value\ntest1,100\ntest2,200"
+          }
+        ],
+        "delete_files": ["output_verbose.csv"],
+        "environment": {}
+      },
+      "input": {
+        "command": ["python", "simple_file_processor.py", "input_verbose.csv", "output_verbose.csv", "--verbose"],
+        "working_dir": ".",
+        "stdin": null,
+        "timeout_seconds": 10
+      },
+      "expected_output": {
+        "exit_code": 0,
+        "stdout": "Successfully processed 2 lines\nInput:  input_verbose.csv\nOutput: output_verbose.csv\n",
+        "stderr": "",
+        "stdout_regex": null,
+        "stderr_regex": null,
+        "partial_match": false
+      },
+      "expected_files": [
+        {
+          "path": "output_verbose.csv",
+          "should_exist": true,
+          "content_match": "NAME,VALUE\nTEST1,100\nTEST2,200",
+          "content_regex": null,
+          "encoding": "utf-8"
+        }
+      ],
+      "assertions": [
+        {
+          "type": "stdout_contains_substrings",
+          "substrings": ["Successfully processed", "2 lines", "Input:", "Output:"]
+        },
+        {
+          "type": "file_content_equals",
+          "file_path": "output_verbose.csv",
+          "expected_content": "NAME,VALUE\nTEST1,100\nTEST2,200"
+        }
+      ],
+      "cleanup": {
+        "delete_files": ["input_verbose.csv", "output_verbose.csv"],
+        "delete_dirs": []
+      }
+    },
+    {
+      "test_id": "missing_input_file_error",
+      "description": "Test error handling when input file does not exist",
+      "enabled": true,
+      "priority": "high",
+      "tags": ["error_handling", "functional"],
+      "setup": {
+        "create_files": [],
+        "delete_files": ["nonexistent.csv"],
+        "environment": {}
+      },
+      "input": {
+        "command": ["python", "simple_file_processor.py", "nonexistent.csv", "output.csv"],
+        "working_dir": ".",
+        "stdin": null,
+        "timeout_seconds": 10
+      },
+      "expected_output": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Input file 'nonexistent.csv' not found\n",
+        "stdout_regex": null,
+        "stderr_regex": "Error.*not found",
+        "partial_match": false
+      },
+      "expected_files": [
+        {
+          "path": "output.csv",
+          "should_exist": false,
+          "content_match": null,
+          "content_regex": null,
+          "encoding": "utf-8"
+        }
+      ],
+      "assertions": [
+        {
+          "type": "exit_code",
+          "expected_code": 1
+        },
+        {
+          "type": "stderr_contains",
+          "expected_substring": "not found"
+        },
+        {
+          "type": "file_not_exists",
+          "file_path": "output.csv"
+        }
+      ],
+      "cleanup": {
+        "delete_files": [],
+        "delete_dirs": []
+      }
+    },
+    {
+      "test_id": "empty_file_processing",
+      "description": "Handle empty CSV file gracefully",
+      "enabled": true,
+      "priority": "medium",
+      "tags": ["edge_cases"],
+      "setup": {
+        "create_files": [
+          {
+            "path": "empty_input.csv",
+            "content": ""
+          }
+        ],
+        "delete_files": ["empty_output.csv"],
+        "environment": {}
+      },
+      "input": {
+        "command": ["python", "simple_file_processor.py", "empty_input.csv", "empty_output.csv"],
+        "working_dir": ".",
+        "stdin": null,
+        "timeout_seconds": 10
+      },
+      "expected_output": {
+        "exit_code": 0,
+        "stdout": "Processed 0 lines\n",
+        "stderr": "",
+        "stdout_regex": null,
+        "stderr_regex": null,
+        "partial_match": false
+      },
+      "expected_files": [
+        {
+          "path": "empty_output.csv",
+          "should_exist": true,
+          "content_match": "",
+          "content_regex": null,
+          "encoding": "utf-8"
+        }
+      ],
+      "assertions": [
+        {
+          "type": "exit_code",
+          "expected_code": 0
+        },
+        {
+          "type": "file_empty",
+          "file_path": "empty_output.csv"
+        }
+      ],
+      "cleanup": {
+        "delete_files": ["empty_input.csv", "empty_output.csv"],
+        "delete_dirs": []
+      }
+    },
+    {
+      "test_id": "single_line_csv",
+      "description": "Process single line CSV (header only)",
+      "enabled": true,
+      "priority": "medium",
+      "tags": ["edge_cases"],
+      "setup": {
+        "create_files": [
+          {
+            "path": "single_line.csv",
+            "content": "col1,col2,col3"
+          }
+        ],
+        "delete_files": ["single_line_out.csv"],
+        "environment": {}
+      },
+      "input": {
+        "command": ["python", "simple_file_processor.py", "single_line.csv", "single_line_out.csv"],
+        "working_dir": ".",
+        "stdin": null,
+        "timeout_seconds": 10
+      },
+      "expected_output": {
+        "exit_code": 0,
+        "stdout": "Processed 1 lines\n",
+        "stderr": "",
+        "stdout_regex": null,
+        "stderr_regex": null,
+        "partial_match": false
+      },
+      "expected_files": [
+        {
+          "path": "single_line_out.csv",
+          "should_exist": true,
+          "content_match": "COL1,COL2,COL3",
+          "content_regex": null,
+          "encoding": "utf-8"
+        }
+      ],
+      "assertions": [
+        {
+          "type": "file_content_equals",
+          "file_path": "single_line_out.csv",
+          "expected_content": "COL1,COL2,COL3"
+        }
+      ],
+      "cleanup": {
+        "delete_files": ["single_line.csv", "single_line_out.csv"],
+        "delete_dirs": []
+      }
+    }
+  ],
+  "metadata": {
+    "created_by": "System",
+    "created_date": "2025-12-14",
+    "last_modified": "2025-12-14",
+    "target_script": "simple_file_processor.py",
+    "notes": "Generated golden tests for file processor CLI utility"
+  }
+}

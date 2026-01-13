@@ -1,0 +1,70 @@
+source "https://rubygems.org"
+
+gem "fastlane"
+gem "cocoapods"
+
+# Optional: If you're using match for code signing
+# gem "match"
+
+# Optional: If you're using sigh for provisioning profiles
+# gem "sigh"
+
+# Optional: If you're using cert for certificates
+# gem "cert"
+
+# Optional: If you're using deliver for App Store uploads
+# gem "deliver"
+
+# Optional: If you're using snapshot for screenshots
+# gem "snapshot"
+
+# Optional: If you're using frameit for framing screenshots
+# gem "frameit"
+
+# Optional: If you're using pem for push notifications
+# gem "pem"
+
+# Optional: If you're using produce for creating apps
+# gem "produce"
+
+# Optional: If you're using spaceship for Apple Developer Portal API
+# gem "spaceship"
+
+# Optional: If you're using pilot for TestFlight
+# gem "pilot"
+
+# Optional: If you're using boarding for boarding passes
+# gem "boarding"
+
+# Optional: If you're using screengrab for screenshots
+# gem "screengrab"
+
+# Optional: If you're using supply for Google Play Store
+# gem "supply"
+
+# Optional: If you're using scan for running tests
+# gem "scan"
+
+# Optional: If you're using gym for building
+# gem "gym"
+
+# Optional: If you're using scan for running tests
+# gem "scan"
+
+# Optional: If you're using slather for code coverage
+# gem "slather"
+
+# Optional: If you're using trainer for generating documentation
+# gem "trainer"
+
+# Optional: If you're using watchbuild for watching builds
+# gem "watchbuild"
+
+# Optional: If you're using badge for adding badges to screenshots
+# gem "badge"
+
+# Optional: If you're using swiftformat for formatting Swift code
+# gem "swiftformat"
+
+# Optional: If you're using swiftlint for linting Swift code
+# gem "swiftlint"

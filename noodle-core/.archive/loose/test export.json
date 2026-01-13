@@ -1,0 +1,57 @@
+{
+  "overview": {
+    "session_duration": 2.612407922744751,
+    "current_productivity_score": 0,
+    "active_ai_role": "NoodleCore Manager"
+  },
+  "project_activity": {
+    "files_opened": 8,
+    "code_runs": 0,
+    "ai_assist_requests": 0,
+    "conversions_made": 0,
+    "errors_fixed": 0
+  },
+  "ai_learning": {
+    "total_interactions": 0,
+    "role_effectiveness": {}
+  },
+  "achievements": [
+    {
+      "id": "first_file",
+      "name": "First Steps",
+      "description": "Opened your first file",
+      "timestamp": "2025-11-09 00:50:50.923506",
+      "progress_category": "achievement"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "first_project",
+      "name": "Complete First Project",
+      "description": "Create and run your first complete project",
+      "progress": 0,
+      "category": "project_completion"
+    },
+    {
+      "id": "ai_mastery",
+      "name": "AI Mastery",
+      "description": "Reach expert level with AI roles",
+      "progress": 0,
+      "category": "ai_skills"
+    },
+    {
+      "id": "quality_focus",
+      "name": "Quality Champion",
+      "description": "Maintain high code quality",
+      "progress": 0,
+      "category": "code_quality"
+    }
+  ],
+  "quality_metrics": {
+    "code_completion_rate": 0.0,
+    "error_reduction_rate": 0.0,
+    "ai_reliability_score": 0.0,
+    "efficiency_improvement": 0.0,
+    "learning_curve": 0.0
+  }
+}

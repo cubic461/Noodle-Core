@@ -1,0 +1,86 @@
+{
+  "files_moved": [
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\community_setup.py",
+      "to": "noodle-core\\src\\noodlecore\\community_setup.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\dev_workflow.py",
+      "to": "noodle-core\\src\\noodlecore\\dev_workflow.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\migration_tracker.py",
+      "to": "noodle-core\\src\\noodlecore\\migration_tracker.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\noodle_vector_automation.py",
+      "to": "noodle-core\\src\\noodlecore\\noodle_vector_automation.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\organize_repo.py",
+      "to": "noodle-core\\src\\noodlecore\\organize_repo.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\performance_benchmark_suite.py",
+      "to": "noodle-core\\src\\noodlecore\\performance_benchmark_suite.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\setup_vector_db.py",
+      "to": "noodle-core\\src\\noodlecore\\database\\setup_vector_db.py",
+      "status": "dry_run"
+    },
+    {
+      "from": "C:\\Users\\micha\\Noodle\\scripts\\vector_watch.py",
+      "to": "noodle-core\\src\\noodlecore\\vector_watch.py",
+      "status": "dry_run"
+    }
+  ],
+  "files_skipped": [
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\advanced_fix.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\core-http-server.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\dependency_analyzer.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\file_classifier.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\fix_imports_and_typing.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\resume_vector_indexing.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\scan_import_failures.py",
+      "reason": "Already in correct location"
+    },
+    {
+      "path": "C:\\Users\\micha\\Noodle\\scripts\\split_nbc_runtime.py",
+      "reason": "Already in correct location"
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "files_scanned": 16,
+    "files_moved": 8,
+    "files_skipped": 8,
+    "errors": 0,
+    "dry_run": true
+  }
+}

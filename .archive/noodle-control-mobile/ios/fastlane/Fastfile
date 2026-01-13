@@ -1,0 +1,140 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      scheme: "Runner",
+      device: "iPhone 14"
+    )
+  end
+
+  desc "Build debug version"
+  lane :build_debug do
+    build_app(
+      scheme: "Runner",
+      configuration: "Debug",
+      export_method: "development"
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    setup_ci if ENV['CI']
+    
+    build_app(
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store"
+    )
+    
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Build and upload to App Store"
+  lane :release do
+    setup_ci if ENV['CI']
+    
+    # Ensure the git status is clean
+    ensure_git_status_clean
+    
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    # Build the app
+    build_app(
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store"
+    )
+    
+    # Upload to App Store
+    upload_to_app_store(
+      force: true,
+      reject_if_possible: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      skip_binary_upload: false,
+      precheck_include_in_app_purchases: false
+    )
+    
+    # Commit the version bump
+    commit_version_bump(
+      xcodeproj: "Runner.xcodeproj",
+      message: "Deploy version #{get_version_number} (#{get_build_number}) to App Store"
+    )
+    
+    # Add a git tag for this release
+    add_git_tag(
+      tag: "v#{get_version_number}-#{get_build_number}"
+    )
+    
+    # Push the commit and tag to remote
+    push_to_git_remote
+  end
+
+  desc "Install provisioning profiles"
+  lane :install_profiles do
+    install_provisioning_profile(path: "./profiles/development.mobileprovision")
+    install_provisioning_profile(path: "./profiles/distribution.mobileprovision")
+  end
+
+  desc "Update certificates and provisioning profiles"
+  lane :update_certificates do
+    match(
+      type: "development",
+      readonly: true,
+      keychain_name: "fastlane_tmp_keychain"
+    )
+    
+    match(
+      type: "appstore",
+      readonly: true,
+      keychain_name: "fastlane_tmp_keychain"
+    )
+  end
+
+  # Helper lanes
+  private_lane :run_tests do |options|
+    scan(
+      scheme: options[:scheme],
+      device: options[:device],
+      clean: true
+    )
+  end
+
+  private_lane :setup_ci do
+    create_keychain(
+      name: "fastlane_tmp_keychain",
+      password: SecureRandom.uuid,
+      default_keychain: true,
+      unlock: true,
+      timeout: 1800
+    )
+  end
+
+  # Error Handlers
+  error do |lane, exception|
+    UI.error("Lane #{lane} crashed with exception: #{exception}")
+  end
+end

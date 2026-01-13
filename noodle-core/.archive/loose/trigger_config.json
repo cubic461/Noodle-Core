@@ -1,0 +1,106 @@
+{
+  "triggers": [
+    {
+      "trigger_id": "default_performance_degradation",
+      "name": "Default Performance Degradation",
+      "description": "Triggers when performance degrades significantly",
+      "trigger_type": "performance_degradation",
+      "priority": "TriggerPriority.HIGH",
+      "enabled": true,
+      "created_at": 1764711794.7586522,
+      "updated_at": 1764711794.7586522,
+      "conditions": [
+        {
+          "metric_name": "execution_time",
+          "operator": ">",
+          "threshold_value": 500.0,
+          "duration_seconds": 60.0,
+          "evaluation_window": null
+        }
+      ],
+      "schedule": null,
+      "target_components": [
+        "compiler",
+        "optimizer",
+        "runtime"
+      ],
+      "max_executions_per_hour": null,
+      "cooldown_period_seconds": 300.0,
+      "timeout_seconds": 60.0,
+      "retry_count": 3,
+      "metadata": {},
+      "execution_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "last_executed": null
+    },
+    {
+      "trigger_id": "default_daily_optimization",
+      "name": "Daily Optimization",
+      "description": "Runs daily optimization at 2 AM UTC",
+      "trigger_type": "time_based",
+      "priority": "TriggerPriority.MEDIUM",
+      "enabled": true,
+      "created_at": 1764711794.7586522,
+      "updated_at": 1764711794.7586522,
+      "conditions": [],
+      "schedule": {
+        "schedule_type": "ScheduleType.RECURRING",
+        "start_time": null,
+        "end_time": null,
+        "interval_seconds": 86400.0,
+        "cron_expression": null,
+        "timezone": "UTC",
+        "blackout_periods": [
+          {
+            "start": "2024-01-01T08:00:00",
+            "end": "2024-01-01T18:00:00"
+          }
+        ]
+      },
+      "target_components": [
+        "compiler",
+        "optimizer"
+      ],
+      "max_executions_per_hour": null,
+      "cooldown_period_seconds": 3600.0,
+      "timeout_seconds": 300.0,
+      "retry_count": 2,
+      "metadata": {},
+      "execution_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "last_executed": null
+    },
+    {
+      "trigger_id": "test_trigger",
+      "name": "Test Runtime Upgrade Trigger",
+      "description": "Test trigger for runtime upgrades",
+      "trigger_type": "event_driven",
+      "priority": "TriggerPriority.MEDIUM",
+      "enabled": true,
+      "created_at": 1764711794.7586522,
+      "updated_at": 1764711794.7586522,
+      "conditions": null,
+      "schedule": null,
+      "target_components": [
+        "compiler",
+        "optimizer"
+      ],
+      "max_executions_per_hour": 5,
+      "cooldown_period_seconds": 300,
+      "timeout_seconds": 60,
+      "retry_count": 3,
+      "metadata": {
+        "runtime_upgrade_trigger": true,
+        "auto_upgrade": true,
+        "check_version_availability": false,
+        "trigger_rollback": false
+      },
+      "execution_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "last_executed": null
+    }
+  ]
+}

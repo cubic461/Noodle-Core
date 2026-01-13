@@ -1,0 +1,159 @@
+{
+    "production": {
+        "deployment": {
+            "enabled": true,
+            "mode": "gradual",
+            "initial_rollout_percentage": 5.0,
+            "increment_rollout_percentage": 10.0,
+            "stabilization_period": 300,
+            "validation_threshold": 0.8,
+            "rollback_threshold": 0.2,
+            "max_rollback_attempts": 3,
+            "health_check_interval": 30,
+            "monitoring_window": 1800,
+            "circuit_breaker_threshold": 0.3
+        },
+        "monitoring": {
+            "enabled": true,
+            "dashboard_enabled": true,
+            "host": "0.0.0.0",
+            "port": 8081,
+            "anomaly_detection": {
+                "enabled": true,
+                "window_size": 20,
+                "z_score_threshold": 2.5,
+                "min_data_points": 10,
+                "trend_change_threshold": 0.3,
+                "error_spike_threshold": 3.0,
+                "performance_degradation_threshold": 0.2
+            },
+            "alerts": {
+                "enabled": true,
+                "channels": [
+                    "email",
+                    "slack",
+                    "webhook"
+                ],
+                "severity_thresholds": {
+                    "critical": 0,
+                    "high": 1,
+                    "medium": 5,
+                    "low": 10
+                }
+            }
+        },
+        "model_management": {
+            "enabled": true,
+            "ab_testing": {
+                "enabled": true,
+                "default_traffic_split": 50.0,
+                "min_duration": 3600,
+                "max_duration": 604800,
+                "success_criteria": {
+                    "performance_improvement": 0.05,
+                    "error_rate_reduction": 0.02,
+                    "min_samples": 100
+                }
+            },
+            "auto_retraining": {
+                "enabled": true,
+                "performance_degradation_threshold": 0.1,
+                "error_rate_threshold": 0.05,
+                "min_samples_before_retrain": 100,
+                "retrain_interval": 86400
+            },
+            "versioning": {
+                "max_versions_per_model": 10,
+                "retention_days": 90,
+                "backup_enabled": true
+            }
+        },
+        "safety": {
+            "circuit_breaker": {
+                "enabled": true,
+                "failure_threshold": 5,
+                "recovery_timeout": 300,
+                "half_open_timeout": 60
+            },
+            "resource_quotas": {
+                "max_cpu": 80.0,
+                "max_memory": 70.0,
+                "max_requests_per_second": 100.0,
+                "max_connections": 50
+            },
+            "rate_limits": {
+                "api_requests_per_minute": 1000,
+                "optimizations_per_hour": 10,
+                "rollbacks_per_day": 3
+            },
+            "emergency_rollback": {
+                "enabled": true,
+                "triggers": {
+                    "error_rate_threshold": 0.2,
+                    "response_time_threshold": 1000,
+                    "circuit_breaker_open": true,
+                    "manual_trigger": true
+                }
+            }
+        },
+        "integration": {
+            "existing_systems": {
+                "logging": {
+                    "enabled": true,
+                    "level": "INFO",
+                    "format": "json",
+                    "endpoint": "tcp://localhost:5140"
+                },
+                "monitoring": {
+                    "enabled": true,
+                    "metrics_endpoint": "http://prometheus:9090/metrics",
+                    "alert_endpoint": "http://alertmanager:9093/api/v1/alerts"
+                },
+                "deployment": {
+                    "enabled": true,
+                    "pipeline_integration": true,
+                    "kubernetes_enabled": true
+                }
+            }
+        },
+        "api": {
+            "host": "0.0.0.0",
+            "port": 8080,
+            "timeout": 30,
+            "request_id_format": "uuid_v4",
+            "rate_limiting": {
+                "enabled": true,
+                "requests_per_minute": 1000,
+                "burst_size": 100
+            },
+            "authentication": {
+                "enabled": true,
+                "jwt_expiry": 7200,
+                "refresh_threshold": 300
+            }
+        },
+        "database": {
+            "connection_pool": {
+                "max_connections": 20,
+                "connection_timeout": 30,
+                "idle_timeout": 300
+            },
+            "query_timeout": 3,
+            "retry_policy": {
+                "max_attempts": 3,
+                "backoff_multiplier": 2,
+                "max_delay": 30
+            }
+        },
+        "logging": {
+            "level": "INFO",
+            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            "file": "self_improvement.log",
+            "rotation": {
+                "enabled": true,
+                "max_size_mb": 100,
+                "backup_count": 5
+            }
+        }
+    }
+}

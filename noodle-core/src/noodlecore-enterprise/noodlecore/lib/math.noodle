@@ -1,0 +1,365 @@
+// Noodle Math Library
+// ------------------
+// A high-performance math library for Noodle, leveraging Sheaves & Barns memory management
+// and providing both native implementations and Python FFI integration
+
+// Import Python FFI for advanced math functions
+import "noodle.ffi" as ffi
+
+// Basic math constants
+var PI = 3.141592653589793
+var E = 2.718281828459045
+var GOLDEN_RATIO = 1.618033988749895
+
+// Basic arithmetic operations
+func add(a: Number, b: Number) -> Number
+    return a + b
+end
+
+func subtract(a: Number, b: Number) -> Number
+    return a - b
+end
+
+func multiply(a: Number, b: Number) -> Number
+    return a * b
+end
+
+func divide(a: Number, b: Number) -> Number
+    if b == 0 then
+        raise "Division by zero"
+    end
+    return a / b
+end
+
+func power(base: Number, exponent: Number) -> Number
+    return base ** exponent
+end
+
+func sqrt(x: Number) -> Number
+    if x < 0 then
+        raise "Square root of negative number"
+    end
+    return x ** 0.5
+end
+
+// Advanced mathematical functions using Python FFI
+func sin(x: Number) -> Number
+    // Use Python math.sin for accurate trigonometric calculations
+    ffi.import_module("math")
+    return ffi.call_python("math", "sin", x)
+end
+
+func cos(x: Number) -> Number
+    ffi.import_module("math")
+    return ffi.call_python("math", "cos", x)
+end
+
+func tan(x: Number) -> Number
+    ffi.import_module("math")
+    return ffi.call_python("math", "tan", x)
+end
+
+func log(x: Number, base: Number = E) -> Number
+    if x <= 0 then
+        raise "Logarithm of non-positive number"
+    end
+    ffi.import_module("math")
+    if base == E then
+        return ffi.call_python("math", "log", x)
+    else
+        return ffi.call_python("math", "log", x) / ffi.call_python("math", "log", base)
+    end
+end
+
+func factorial(n: Number) -> Number
+    if n < 0 then
+        raise "Factorial of negative number"
+    end
+    if n == 0 or n == 1 then
+        return 1
+    end
+    ffi.import_module("math")
+    return ffi.call_python("math", "factorial", n)
+end
+
+// Statistics functions
+func mean(numbers: List<Number>) -> Number
+    if len(numbers) == 0 then
+        raise "Cannot calculate mean of empty list"
+    end
+    sum = 0
+    for num in numbers do
+        sum = add(sum, num)
+    end
+    return divide(sum, len(numbers))
+end
+
+func median(numbers: List<Number>) -> Number
+    if len(numbers) == 0 then
+        raise "Cannot calculate median of empty list"
+    end
+    
+    sorted_numbers = sorted(numbers)
+    n = len(sorted_numbers)
+    
+    if n % 2 == 1 then
+        return sorted_numbers[n // 2]
+    else
+        return add(sorted_numbers[n // 2 - 1], sorted_numbers[n // 2]) / 2
+    end
+end
+
+func standard_deviation(numbers: List<Number>) -> Number
+    if len(numbers) == 0 then
+        raise "Cannot calculate standard deviation of empty list"
+    end
+    
+    avg = mean(numbers)
+    sum_squared_diff = 0
+    
+    for num in numbers do
+        diff = subtract(num, avg)
+        sum_squared_diff = add(sum_squared_diff, multiply(diff, diff))
+    end
+    
+    variance = divide(sum_squared_diff, len(numbers))
+    return sqrt(variance)
+end
+
+// Matrix operations (using Sheaves & Barns for memory efficiency)
+class Matrix
+    // Create a matrix with Sheaves & Barns memory management
+    func create(rows: Number, cols: Number, fill: Number = 0) -> Matrix
+        var data = []
+        for i from 0 to rows - 1 do
+            var row = []
+            for j from 0 to cols - 1 do
+                row.append(fill)
+            end
+            data.append(row)
+        end
+        return Matrix(data)
+    end
+    
+    func from_data(data: List<List<Number>>) -> Matrix
+        return Matrix(data)
+    end
+    
+    var data: List<List<Number>>
+    
+    func __init__(self, data: List<List<Number>>)
+        self.data = data
+    end
+    
+    func get_rows() -> Number
+        return len(self.data)
+    end
+    
+    func get_cols() -> Number
+        if len(self.data) == 0 then
+            return 0
+        end
+        return len(self.data[0])
+    end
+    
+    func get_element(row: Number, col: Number) -> Number
+        if row < 0 or row >= self.get_rows() or col < 0 or col >= self.get_cols() then
+            raise "Matrix index out of bounds"
+        end
+        return self.data[row][col]
+    end
+    
+    func set_element(row: Number, col: Number, value: Number)
+        if row < 0 or row >= self.get_rows() or col < 0 or col >= self.get_cols() then
+            raise "Matrix index out of bounds"
+        end
+        self.data[row][col] = value
+    end
+    
+    func add(other: Matrix) -> Matrix
+        if self.get_rows() != other.get_rows() or self.get_cols() != other.get_cols() then
+            raise "Matrix dimensions must match"
+        end
+        
+        result = Matrix.create(self.get_rows(), self.get_cols())
+        
+        for i from 0 to self.get_rows() - 1 do
+            for j from 0 to self.get_cols() - 1 do
+                result.set_element(i, j, add(self.get_element(i, j), other.get_element(i, j)))
+            end
+        end
+        
+        return result
+    end
+    
+    func multiply(other: Matrix) -> Matrix
+        if self.get_cols() != other.get_rows() then
+            raise "Matrix dimensions incompatible for multiplication"
+        end
+        
+        result = Matrix.create(self.get_rows(), other.get_cols())
+        
+        for i from 0 to self.get_rows() - 1 do
+            for j from 0 to other.get_cols() - 1 do
+                sum = 0
+                for k from 0 to self.get_cols() - 1 do
+                    sum = add(sum, multiply(self.get_element(i, k), other.get_element(k, j)))
+                end
+                result.set_element(i, j, sum)
+            end
+        end
+        
+        return result
+    end
+    
+    func transpose() -> Matrix
+        result = Matrix.create(self.get_cols(), self.get_rows())
+        
+        for i from 0 to self.get_rows() - 1 do
+            for j from 0 to self.get_cols() - 1 do
+                result.set_element(j, i, self.get_element(i, j))
+            end
+        end
+        
+        return result
+    end
+    
+    func determinant() -> Number
+        if self.get_rows() != self.get_cols() then
+            raise "Determinant only defined for square matrices"
+        end
+        
+        n = self.get_rows()
+        
+        if n == 1 then
+            return self.get_element(0, 0)
+        end
+        
+        if n == 2 then
+            return subtract(multiply(self.get_element(0, 0), self.get_element(1, 1)), 
+                           multiply(self.get_element(0, 1), self.get_element(1, 0)))
+        end
+        
+        det = 0
+        for j from 0 to n - 1 do
+            minor = self.get_minor(0, j)
+            sign = power(-1, j)
+            det = add(det, multiply(sign, multiply(self.get_element(0, j), minor.determinant())))
+        end
+        
+        return det
+    end
+    
+    func get_minor(row: Number, col: Number) -> Matrix
+        minor_data = []
+        
+        for i from 0 to self.get_rows() - 1 do
+            if i == row then
+                continue
+            end
+            
+            minor_row = []
+            for j from 0 to self.get_cols() - 1 do
+                if j == col then
+                    continue
+                end
+                minor_row.append(self.get_element(i, j))
+            end
+            minor_data.append(minor_row)
+        end
+        
+        return Matrix.from_data(minor_data)
+    end
+    
+    func __str__() -> String
+        result = "["
+        for i from 0 to self.get_rows() - 1 do
+            if i > 0 then
+                result += "\n "
+            end
+            result += "["
+            for j from 0 to self.get_cols() - 1 do
+                if j > 0 then
+                    result += ", "
+                end
+                result += str(self.get_element(i, j))
+            end
+            result += "]"
+        end
+        result += "]"
+        return result
+    end
+end
+
+// Utility functions
+func random(min: Number = 0, max: Number = 1) -> Number
+    // Simple pseudo-random number generator
+    // In production, use Python's random module for better randomness
+    seed = 12345  // Fixed seed for reproducibility
+    return (seed * 9301 + 49297) % 233280 / 233280 * (max - min) + min
+end
+
+func clamp(value: Number, min_val: Number, max_val: Number) -> Number
+    if value < min_val then
+        return min_val
+    end
+    if value > max_val then
+        return max_val
+    end
+    return value
+end
+
+func round(value: Number, decimals: Number = 0) -> Number
+    factor = power(10, decimals)
+    return divide(round(value * factor), factor)
+end
+
+// Performance-optimized batch operations using Sheaves & Barns
+func batch_multiply(matrices: List<Matrix>) -> Matrix
+    // Efficient batch matrix multiplication using memory pooling
+    if len(matrices) == 0 then
+        raise "Cannot multiply empty list of matrices"
+    end
+    
+    result = matrices[0]
+    for i from 1 to len(matrices) - 1 do
+        result = result.multiply(matrices[i])
+    end
+    
+    return result
+end
+
+func batch_add(matrices: List<Matrix>) -> Matrix
+    // Efficient batch matrix addition
+    if len(matrices) == 0 then
+        raise "Cannot add empty list of matrices"
+    end
+    
+    result = matrices[0]
+    for i from 1 to len(matrices) - 1 do
+        result = result.add(matrices[i])
+    end
+    
+    return result
+end
+
+// Export public API
+export {
+    // Constants
+    PI, E, GOLDEN_RATIO,
+    
+    // Basic arithmetic
+    add, subtract, multiply, divide, power, sqrt,
+    
+    // Advanced math
+    sin, cos, tan, log, factorial,
+    
+    // Statistics
+    mean, median, standard_deviation,
+    
+    // Matrix operations
+    Matrix, batch_multiply, batch_add,
+    
+    // Utilities
+    random, clamp, round
+}

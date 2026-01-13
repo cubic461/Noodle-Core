@@ -1,0 +1,432 @@
+{
+    "demo_configuration": {
+        "version": "1.0.0",
+        "description": "NoodleCore Desktop GUI IDE Demo Configuration",
+        "created": "2025-10-31T23:05:00Z",
+        "demo_scenarios": {
+            "basic_ide": {
+                "name": "Basic IDE Functionality",
+                "description": "Core IDE features demonstration",
+                "duration_minutes": 5,
+                "features": [
+                    "file_explorer",
+                    "code_editor",
+                    "syntax_highlighting"
+                ],
+                "auto_open_files": [
+                    "welcome.py",
+                    "example.js",
+                    "demo.css"
+                ],
+                "guided_steps": [
+                    "Open the File Explorer",
+                    "Browse demo projects",
+                    "Open a Python file",
+                    "Try syntax highlighting",
+                    "Make code changes"
+                ]
+            },
+            "ai_integration": {
+                "name": "AI Integration Demo",
+                "description": "Real-time AI assistance demonstration",
+                "duration_minutes": 7,
+                "features": [
+                    "ai_analysis",
+                    "code_suggestions",
+                    "real_time_review"
+                ],
+                "demo_files": [
+                    "fibonacci_example.py",
+                    "optimization_demo.js"
+                ],
+                "ai_scenarios": [
+                    {
+                        "file": "fibonacci_example.py",
+                        "code": "def fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)",
+                        "expected_suggestions": [
+                            "Consider using memoization for performance",
+                            "Add input validation",
+                            "Add type hints",
+                            "Implement iterative version for large numbers"
+                        ]
+                    }
+                ]
+            },
+            "terminal_demo": {
+                "name": "Terminal Console Demo",
+                "description": "Command execution and shell integration",
+                "duration_minutes": 4,
+                "features": [
+                    "command_execution",
+                    "output_display",
+                    "shell_commands"
+                ],
+                "demo_commands": [
+                    {
+                        "command": "python --version",
+                        "description": "Display Python version",
+                        "expected_output": "Python 3.x.x"
+                    },
+                    {
+                        "command": "echo 'NoodleCore IDE Terminal Demo'",
+                        "description": "Display demo message",
+                        "expected_output": "NoodleCore IDE Terminal Demo"
+                    },
+                    {
+                        "command": "ls -la demo_projects",
+                        "description": "List demo project files",
+                        "expected_output": "Directory listing"
+                    },
+                    {
+                        "command": "python demo_projects/welcome.py",
+                        "description": "Run the welcome demo script",
+                        "expected_output": "Welcome to NoodleCore IDE demo output"
+                    }
+                ]
+            },
+            "file_management": {
+                "name": "File Management Demo",
+                "description": "Advanced file operations and search",
+                "duration_minutes": 6,
+                "features": [
+                    "file_operations",
+                    "search",
+                    "project_management"
+                ],
+                "search_demo": {
+                    "queries": [
+                        {
+                            "query": "fibonacci",
+                            "description": "Search for fibonacci algorithm",
+                            "expected_matches": 2
+                        },
+                        {
+                            "query": "class NoodleCore",
+                            "description": "Search for class definitions",
+                            "expected_matches": 1
+                        },
+                        {
+                            "query": "demo",
+                            "description": "Search for demo content",
+                            "expected_matches": 5
+                        }
+                    ]
+                }
+            },
+            "learning_system": {
+                "name": "Learning System Demo",
+                "description": "AI learning progress and optimization",
+                "duration_minutes": 8,
+                "features": [
+                    "learning_progress",
+                    "optimization_suggestions",
+                    "performance_tracking"
+                ],
+                "learning_metrics": {
+                    "code_analysis_accuracy": 0.95,
+                    "suggestion_relevance": 0.88,
+                    "learning_sessions_completed": 247,
+                    "total_code_analyzed": 15420
+                }
+            },
+            "performance_monitoring": {
+                "name": "Performance Monitoring Demo",
+                "description": "Real-time system performance tracking",
+                "duration_minutes": 3,
+                "features": [
+                    "real_time_metrics",
+                    "performance_alerts",
+                    "resource_monitoring"
+                ],
+                "performance_targets": {
+                    "response_time_ms": 100,
+                    "memory_usage_mb": 2048,
+                    "cpu_usage_percent": 50,
+                    "file_operation_time_ms": 50
+                },
+                "demo_metrics": {
+                    "average_response_time": 85,
+                    "current_memory_usage": 1200,
+                    "current_cpu_usage": 25,
+                    "active_operations": 3
+                }
+            }
+        },
+        "sample_projects": {
+            "web_application": {
+                "name": "NoodleCore Web App",
+                "description": "Modern web application demonstration",
+                "technologies": [
+                    "HTML5",
+                    "CSS3",
+                    "JavaScript"
+                ],
+                "files": {
+                    "index.html": {
+                        "description": "Main application page",
+                        "size_lines": 25,
+                        "features": [
+                            "semantic_html",
+                            "responsive_design"
+                        ]
+                    },
+                    "app.js": {
+                        "description": "Application logic",
+                        "size_lines": 45,
+                        "features": [
+                            "es6_syntax",
+                            "async_operations"
+                        ]
+                    },
+                    "styles.css": {
+                        "description": "Application styles",
+                        "size_lines": 80,
+                        "features": [
+                            "css_grid",
+                            "flexbox",
+                            "animations"
+                        ]
+                    }
+                }
+            },
+            "api_service": {
+                "name": "REST API Service",
+                "description": "Backend API demonstration",
+                "technologies": [
+                    "Python",
+                    "Flask",
+                    "JSON"
+                ],
+                "files": {
+                    "main.py": {
+                        "description": "API server implementation",
+                        "size_lines": 60,
+                        "features": [
+                            "rest_endpoints",
+                            "error_handling",
+                            "validation"
+                        ]
+                    },
+                    "models.py": {
+                        "description": "Data models",
+                        "size_lines": 35,
+                        "features": [
+                            "data_validation",
+                            "serialization"
+                        ]
+                    },
+                    "config.py": {
+                        "description": "Configuration management",
+                        "size_lines": 20,
+                        "features": [
+                            "environment_config",
+                            "settings"
+                        ]
+                    }
+                }
+            },
+            "data_analysis": {
+                "name": "Data Analysis Toolkit",
+                "description": "Python data processing demonstration",
+                "technologies": [
+                    "Python",
+                    "NumPy",
+                    "Pandas",
+                    "Matplotlib"
+                ],
+                "files": {
+                    "analysis.py": {
+                        "description": "Data analysis functions",
+                        "size_lines": 90,
+                        "features": [
+                            "data_processing",
+                            "statistical_analysis"
+                        ]
+                    },
+                    "visualization.py": {
+                        "description": "Data visualization",
+                        "size_lines": 55,
+                        "features": [
+                            "matplotlib_plots",
+                            "interactive_charts"
+                        ]
+                    },
+                    "utils.py": {
+                        "description": "Utility functions",
+                        "size_lines": 40,
+                        "features": [
+                            "data_cleaning",
+                            "validation"
+                        ]
+                    }
+                }
+            }
+        },
+        "feature_examples": {
+            "code_analysis": {
+                "title": "AI Code Analysis Example",
+                "description": "Demonstrates real-time code analysis",
+                "sample_code": "def calculate_fibonacci(n):\n    if n <= 1:\n        return n\n    return calculate_fibonacci(n-1) + calculate_fibonacci(n-2)\n\n# This can be optimized with memoization\n# AI suggestions will appear in the panel",
+                "analysis_categories": {
+                    "performance": [
+                        "O(2^n) complexity",
+                        "Consider memoization"
+                    ],
+                    "style": [
+                        "Add docstring",
+                        "Add type hints"
+                    ],
+                    "best_practices": [
+                        "Input validation",
+                        "Error handling"
+                    ]
+                }
+            },
+            "intelligent_completion": {
+                "title": "Intelligent Code Completion",
+                "description": "AI-powered code suggestions",
+                "demo_scenarios": [
+                    {
+                        "context": "def process_data(data",
+                        "expected_completion": "data: List[str]) -> Dict[str, Any]:"
+                    },
+                    {
+                        "context": "import json\ndata =",
+                        "expected_completion": "json.load(file) or {}"
+                    }
+                ]
+            },
+            "real_time_review": {
+                "title": "Real-time Code Review",
+                "description": "Live code quality assessment",
+                "quality_metrics": {
+                    "readability": 0.85,
+                    "maintainability": 0.92,
+                    "performance": 0.78,
+                    "security": 0.95
+                },
+                "suggestions": [
+                    "Consider breaking this function into smaller parts",
+                    "Add input validation for edge cases",
+                    "Use type hints for better code clarity"
+                ]
+            }
+        },
+        "ui_configuration": {
+            "themes": {
+                "dark": {
+                    "name": "Dark Theme",
+                    "description": "Default dark theme for IDE",
+                    "colors": {
+                        "background": "#1e1e1e",
+                        "foreground": "#d4d4d4",
+                        "accent": "#007acc",
+                        "error": "#f48771",
+                        "warning": "#dcdcaa"
+                    }
+                },
+                "light": {
+                    "name": "Light Theme",
+                    "description": "Light theme option",
+                    "colors": {
+                        "background": "#ffffff",
+                        "foreground": "#000000",
+                        "accent": "#007acc",
+                        "error": "#d73a49",
+                        "warning": "#ff8c00"
+                    }
+                }
+            },
+            "layout": {
+                "default_panel_sizes": {
+                    "file_explorer": 280,
+                    "editor": 800,
+                    "ai_panel": 300,
+                    "terminal": 200
+                },
+                "panel_positions": {
+                    "file_explorer": "left",
+                    "ai_panel": "right",
+                    "terminal": "bottom"
+                }
+            }
+        },
+        "integration_settings": {
+            "backend": {
+                "api_base_url": "http://localhost:8080",
+                "timeout_seconds": 30,
+                "retry_attempts": 3,
+                "enable_websocket": true
+            },
+            "ai_system": {
+                "analysis_interval_seconds": 10,
+                "suggestion_confidence_threshold": 0.7,
+                "enable_real_time_analysis": true,
+                "max_concurrent_analysis": 5
+            },
+            "terminal": {
+                "default_shell": "powershell.exe",
+                "max_output_lines": 1000,
+                "command_timeout_seconds": 30,
+                "enable_command_history": true
+            },
+            "performance_monitoring": {
+                "update_interval_seconds": 5,
+                "enable_alerts": true,
+                "memory_threshold_mb": 2048,
+                "cpu_threshold_percent": 80
+            }
+        },
+        "demo_content": {
+            "welcome_messages": {
+                "startup": "🎉 Welcome to NoodleCore Desktop GUI IDE!\n\nThis comprehensive demonstration showcases the full power of the NoodleCore development platform.",
+                "features": "🚀 Available Features:\n• Advanced Code Editor with Syntax Highlighting\n• Real-time AI Code Analysis and Suggestions\n• Integrated Terminal Console\n• Intelligent File Management\n• Performance Monitoring\n• Learning System Integration",
+                "getting_started": "💡 Quick Start:\n1. Explore the File Explorer\n2. Open sample files to see the editor\n3. Watch AI suggestions in real-time\n4. Try commands in the terminal\n5. Monitor performance metrics"
+            },
+            "guided_tour_steps": [
+                {
+                    "step": 1,
+                    "title": "Welcome to NoodleCore IDE",
+                    "description": "Explore the main interface",
+                    "action": "Look around the IDE interface",
+                    "duration_seconds": 30
+                },
+                {
+                    "step": 2,
+                    "title": "File Explorer",
+                    "description": "Browse and manage your projects",
+                    "action": "Click on different folders in the File Explorer",
+                    "duration_seconds": 45
+                },
+                {
+                    "step": 3,
+                    "title": "Code Editor",
+                    "description": "Advanced editing with syntax highlighting",
+                    "action": "Open welcome.py and make some changes",
+                    "duration_seconds": 60
+                },
+                {
+                    "step": 4,
+                    "title": "AI Assistant",
+                    "description": "Real-time code analysis and suggestions",
+                    "action": "Watch the AI Panel for suggestions",
+                    "duration_seconds": 45
+                },
+                {
+                    "step": 5,
+                    "title": "Terminal Console",
+                    "description": "Execute commands and run scripts",
+                    "action": "Try running 'python demo_projects/welcome.py'",
+                    "duration_seconds": 45
+                },
+                {
+                    "step": 6,
+                    "title": "Performance Monitor",
+                    "description": "Real-time system metrics",
+                    "action": "Check the performance metrics",
+                    "duration_seconds": 30
+                }
+            ]
+        }
+    }
+}

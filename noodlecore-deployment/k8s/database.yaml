@@ -1,0 +1,506 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: noodle-core-config
+  namespace: noodle-core
+data:
+  config.yaml: |
+    app:
+      name: "NoodleCore"
+      version: "1.0.0"
+      environment: "production"
+      debug: false
+      log_level: "info"
+    
+    database:
+      type: "postgresql"
+      host: "postgres-service"
+      port: 5432
+      database: "noodlecore"
+      username: "noodlecore"
+      password: "${DB_PASSWORD}"
+      pool_size: 20
+      max_overflow: 30
+      pool_timeout: 30
+      pool_recycle: 3600
+    
+    redis:
+      host: "redis-service"
+      port: 6379
+      password: "${REDIS_PASSWORD}"
+      db: 0
+      max_connections: 10
+      timeout: 5
+      retry_on_timeout: true
+    
+    security:
+      jwt_secret: "${JWT_SECRET}"
+      jwt_algorithm: "HS256"
+      jwt_expiration: 3600
+      bcrypt_rounds: 12
+      rate_limit:
+        enabled: true
+        requests_per_minute: 1000
+        burst_size: 100
+    
+    performance:
+      worker_processes: 4
+      max_workers: 8
+      task_timeout: 300
+      cache_ttl: 3600
+      compression: true
+    
+    monitoring:
+      enabled: true
+      metrics_port: 9090
+      health_check_interval: 30
+      tracing_enabled: true
+    
+    storage:
+      data_dir: "/app/data"
+      cache_dir: "/app/cache"
+      temp_dir: "/tmp"
+      backup_enabled: true
+      backup_interval: "0 2 * * *"
+      retention_days: 30
+    
+    network:
+      host: "0.0.0.0"
+      port: 8080
+      workers: 4
+      keepalive: 5
+      timeout: 30
+      max_connections: 1000
+    
+    distributed:
+      enabled: true
+      node_id: "${NODE_ID:-1}"
+      cluster_nodes: []
+      heartbeat_interval: 30
+      election_timeout: 120
+    
+    logging:
+      level: "info"
+      format: "json"
+      file: "/var/log/noodle-core/app.log"
+      max_size: "100MB"
+      max_backups: 5
+      max_age: 30
+      compress: true
+    
+    features:
+      gpu_acceleration: false
+      distributed_computing: true
+      real_time_processing: true
+      ml_integration: true
+      visualization: true
+    
+    limits:
+      max_memory: "2GB"
+      max_cpu_time: "300s"
+      max_file_size: "100MB"
+      max_concurrent_tasks: 100
+      max_task_duration: "3600s"
+    
+    quotas:
+      default_user_tasks: 10
+      default_user_memory: "1GB"
+      default_cpu_time: "300s"
+      storage_per_user: "10GB"
+    
+    backup:
+      enabled: true
+      schedule: "0 2 * * *"
+      retention: 30
+      compression: true
+      encryption: true
+      remote_backup: true
+      remote_storage: "s3://noodle-core-backups/"
+    
+    security:
+      tls:
+        enabled: true
+        cert_file: "/etc/noodle-core/certs/server.crt"
+        key_file: "/etc/noodle-core/certs/server.key"
+        ca_file: "/etc/noodle-core/certs/ca.crt"
+      cors:
+        enabled: true
+        origins: ["*"]
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        headers: ["*"]
+      rate_limit:
+        enabled: true
+        requests_per_minute: 1000
+        burst_size: 100
+      authentication:
+        enabled: true
+        jwt_secret: "${JWT_SECRET}"
+        jwt_algorithm: "HS256"
+        jwt_expiration: 3600
+        bcrypt_rounds: 12
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: noodle-core-secrets
+  namespace: noodle-core
+type: Opaque
+data:
+  database-url: cG9zdGdyZXNxbDovLm5vZWRsZWNyZUBwcm90b25tZW50czphYmMxMjM=
+  redis-url: cmVkaXM6LyJyZWRpczp0ZXN0MTIz
+  jwt-secret: MWYyZDFlMmU2N2Rm
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: noodle-core
+  labels:
+    app: postgres
+    component: database
+spec:
+  serviceName: postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: database
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - postgres
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+        - name: POSTGRES_DB
+          value: "noodlecore"
+        - name: POSTGRES_USER
+          value: "noodlecore"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: noodle-core-secrets
+              key: database-url
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: postgres-config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - noodlecore
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - noodlecore
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: postgres-config
+        configMap:
+          name: postgres-config
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: noodle-core
+  labels:
+    app: postgres
+    component: database
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+    name: postgres
+  clusterIP: None
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: noodle-core
+data:
+  postgresql.conf: |
+    # PostgreSQL configuration for NoodleCore
+    listen_addresses = '*'
+    port = 5432
+    max_connections = 200
+    shared_buffers = 256MB
+    effective_cache_size = 1GB
+    maintenance_work_mem = 64MB
+    checkpoint_completion_target = 0.9
+    wal_buffers = 16MB
+    default_statistics_target = 100
+    random_page_cost = 1.1
+    effective_io_concurrency = 200
+    work_mem = 4MB
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    checkpoint_timeout = 5min
+    max_worker_processes = 8
+    max_parallel_workers_per_gather = 4
+    max_parallel_workers = 8
+    max_parallel_maintenance_workers = 2
+    max_parallel_workers_gather = 4
+    log_destination = 'stderr'
+    logging_collector = on
+    log_directory = 'pg_log'
+    log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+    log_file_mode = 0600
+    log_statement = 'all'
+    log_duration = on
+    log_line_prefix = '%m [%p] %q%u@%d '
+    log_timezone = 'UTC'
+    timezone = 'UTC'
+    datestyle = 'iso, mdy'
+    lc_time = 'C'
+    lc_numeric = 'C'
+    lc_monetary = 'C'
+    lc_messages = 'C'
+    lc_collate = 'C'
+    lc_ctype = 'C'
+    default_text_search_config = 'pg_catalog.english'
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: noodle-core
+  labels:
+    app: redis
+    component: cache
+spec:
+  serviceName: redis-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        component: cache
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - redis
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: noodle-core-secrets
+              key: redis-url
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        - name: redis-config
+          mountPath: /etc/redis/redis.conf
+          subPath: redis.conf
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: noodle-core
+  labels:
+    app: redis
+    component: cache
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  clusterIP: None
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: noodle-core
+data:
+  redis.conf: |
+    # Redis configuration for NoodleCore
+    port 6379
+    bind 0.0.0.0
+    protected-mode no
+    tcp-keepalive 300
+    timeout 0
+    tcp-backlog 511
+    daemonize no
+    supervised no
+    pidfile /var/run/redis_6379.pid
+    loglevel notice
+    logfile ""
+    databases 16
+    save 900 1
+    save 300 10
+    save 60 10000
+    stop-writes-on-bgsave-error yes
+    rdbcompression yes
+    rdbchecksum yes
+    dbfilename dump.rdb
+    dir /data
+    slave-serve-stale-data yes
+    slave-read-only yes
+    repl-diskless-sync no
+    repl-diskless-sync-delay 5
+    repl-disable-tcp-nodelay no
+    repl-backlog-size 1mb
+    repl-backlog-ttl 3600
+    slave-priority 100
+    maxmemory-policy allkeys-lru
+    maxmemory-samples 5
+    lazyfree-lazy-eviction no
+    lazyfree-lazy-expire no
+    lazyfree-lazy-server-del no
+    slave-lazy-flush no
+    appendonly yes
+    appendfilename "appendonly.aof"
+    appendfsync everysec
+    no-appendfsync-on-rewrite no
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    aof-load-truncated yes
+    aof-use-rdb-preamble yes
+    lua-time-limit 5000
+    slowlog-log-slower-than 10000
+    slowlog-max-len 128
+    latency-monitor-threshold 0
+    notify-keyspace-events ""
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-size -2
+    list-compress-depth 0
+    set-max-intset-entries 512
+    zset-max-ziplist-entries 128
+    zset-max-ziplist-value 64
+    hll-sparse-max-bytes 3000
+    activerehashing yes
+    client-output-buffer-limit normal 0 0 0
+    client-output-buffer-limit replica 256mb 64mb 60
+    client-output-buffer-limit pubsub 32mb 8mb 60
+    hz 10
+    dynamic-hz yes
+    aof-rewrite-incremental-fsync yes

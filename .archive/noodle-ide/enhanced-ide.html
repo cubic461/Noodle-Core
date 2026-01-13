@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noodle IDE - Advanced Development Environment</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/editor/editor.main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #6366f1;
+            --brand-secondary: #8b5cf6;
+            --background-primary: #0f172a;
+            --background-secondary: #1e293b;
+            --background-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --sidebar-width: 300px;
+            --panel-width: 250px;
+            --header-height: 50px;
+            --status-height: 30px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--background-secondary);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            padding: 0 16px;
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--brand-primary);
+        }
+
+        .logo i {
+            font-size: 24px;
+        }
+
+        .search-container {
+            background: var(--background-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            width: 300px;
+            transition: all 0.2s ease;
+        }
+
+        .search-container:focus-within {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle,
+        .user-profile {
+            background: var(--background-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover,
+        .user-profile:hover {
+            background: var(--brand-primary);
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .connection-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .connected {
+            background-color: var(--success-color);
+        }
+
+        .disconnected {
+            background-color: var(--error-color);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--background-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 900;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .sidebar-tab {
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: var(--background-tertiary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-tab.active {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .file-tree {
+            list-style: none;
+        }
+
+        .file-tree-item {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 2px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .file-tree-item:hover {
+            background: var(--background-tertiary);
+        }
+
+        .file-tree-item.active {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .file-icon {
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Main Editor Area */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--background-primary);
+        }
+
+        /* Editor Tabs */
+        .editor-tabs {
+            background: var(--background-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .editor-tab {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: var(--background-secondary);
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            min-width: 120px;
+            transition: all 0.2s ease;
+        }
+
+        .editor-tab.active {
+            background: var(--background-primary);
+            border-bottom: 2px solid var(--brand-primary);
+        }
+
+        .tab-icon {
+            margin-right: 8px;
+        }
+
+        .tab-close {
+            margin-left: 8px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .tab-close:hover {
+            opacity: 1;
+            color: var(--error-color);
+        }
+
+        /* Monaco Editor */
+        #monaco-editor {
+            flex: 1;
+            height: calc(100vh - var(--header-height) - var(--status-height) - 40px);
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: var(--panel-width);
+            background: var(--background-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .right-panel.visible {
+            transform: translateX(0);
+        }
+
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--background-tertiary);
+        }
+
+        .panel-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .panel-tab {
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: var(--background-tertiary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .panel-tab.active {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .panel-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--background-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 4px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--status-height);
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .status-left,
+        .status-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--background-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            background: var(--background-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--brand-primary);
+        }
+
+        .toolbar-btn.primary {
+            background: var(--brand-primary);
+        }
+
+        .toolbar-btn.success {
+            background: var(--success-color);
+        }
+
+        /* Output Panel */
+        .output-panel {
+            height: 200px;
+            background: var(--background-primary);
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .output-panel.visible {
+            display: block;
+        }
+
+        .output-header {
+            background: var(--background-tertiary);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-content {
+            padding: 16px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 13px;
+            height: calc(100% - 40px);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+        }
+
+        .output-line {
+            margin: 2px 0;
+        }
+
+        .output-line.error {
+            color: var(--error-color);
+        }
+
+        .output-line.success {
+            color: var(--success-color);
+        }
+
+        .output-line.warning {
+            color: var(--warning-color);
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--brand-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Collapsible */
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible:hover {
+            background: var(--background-tertiary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .right-panel {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            .sidebar,
+            .right-panel {
+                position: absolute;
+                z-index: 1001;
+                height: 100%;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.visible {
+                transform: translateX(0);
+            }
+        }
+
+        /* Monaco Editor Theme Override */
+        .monaco-editor .margin {
+            background-color: var(--background-secondary) !important;
+        }
+
+        .monaco-editor .monaco-editor-background {
+            background-color: var(--background-primary) !important;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--brand-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <span>Noodle IDE</span>
+            </div>
+            <div class="search-container">
+                <i class="fas fa-search" style="margin-right: 8px; color: var(--text-secondary);"></i>
+                <input type="text" class="search-input" placeholder="Search files, commands..." id="global-search">
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="connection-status" id="connection-status">
+                <div class="connection-indicator" id="connection-indicator"></div>
+                <span id="connection-text">Connecting...</span>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+                <i class="fas fa-moon"></i>
+            </button>
+            <div class="user-profile" title="User Settings">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3 style="color: var(--text-primary);">Explorer</h3>
+                <div class="sidebar-tabs">
+                    <div class="sidebar-tab active" data-tab="files">Files</div>
+                    <div class="sidebar-tab" data-tab="search">Search</div>
+                    <div class="sidebar-tab" data-tab="git">Git</div>
+                </div>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-content" data-content="files">
+                    <ul class="file-tree" id="file-tree">
+                        <li class="file-tree-item active">
+                            <i class="fas fa-file-code file-icon"></i>
+                            <span>welcome.nc</span>
+                        </li>
+                        <li class="file-tree-item">
+                            <i class="fas fa-folder file-icon"></i>
+                            <span>src</span>
+                        </li>
+                        <li class="file-tree-item">
+                            <i class="fas fa-file-text file-icon"></i>
+                            <span>README.md</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="sidebar-content" data-content="search" style="display: none;">
+                    <div style="padding: 8px;">
+                        <input type="text" placeholder="Search in files..."
+                            style="width: 100%; padding: 8px; background: var(--background-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                </div>
+                <div class="sidebar-content" data-content="git" style="display: none;">
+                    <div style="padding: 8px;">
+                        <p style="color: var(--text-secondary); font-size: 12px;">Git integration coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Editor Container -->
+        <div class="editor-container">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="newFile()" title="New File (Ctrl+N)">
+                    <i class="fas fa-plus"></i> New
+                </button>
+                <button class="toolbar-btn" onclick="openFile()" title="Open File (Ctrl+O)">
+                    <i class="fas fa-folder-open"></i> Open
+                </button>
+                <button class="toolbar-btn" onclick="saveFile()" title="Save File (Ctrl+S)">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="toolbar-btn" onclick="saveAll()" title="Save All">
+                    <i class="fas fa-save"></i> Save All
+                </button>
+                <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
+                <button class="toolbar-btn" onclick="runCode()" title="Run Code (F5)">
+                    <i class="fas fa-play"></i> Run
+                </button>
+                <button class="toolbar-btn" onclick="debugCode()" title="Debug Code (F9)">
+                    <i class="fas fa-bug"></i> Debug
+                </button>
+                <button class="toolbar-btn" onclick="toggleOutput()" title="Toggle Output">
+                    <i class="fas fa-terminal"></i> Output
+                </button>
+                <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
+                <button class="toolbar-btn" onclick="toggleRightPanel()" title="Toggle Panel">
+                    <i class="fas fa-columns"></i> Panel
+                </button>
+            </div>
+
+            <!-- Editor Tabs -->
+            <div class="editor-tabs" id="editor-tabs">
+                <div class="editor-tab active" data-file="welcome" onclick="switchTab('welcome')">
+                    <i class="fas fa-file-code tab-icon"></i>
+                    <span>welcome.nc</span>
+                    <i class="fas fa-times tab-close" onclick="closeTab('welcome'); event.stopPropagation();"></i>
+                </div>
+            </div>
+
+            <!-- Monaco Editor -->
+            <div id="monaco-editor"></div>
+
+            <!-- Output Panel -->
+            <div class="output-panel" id="output-panel">
+                <div class="output-header">
+                    <span>Output</span>
+                    <button class="toolbar-btn" onclick="clearOutput()" style="font-size: 11px;">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                <div class="output-content" id="output-content">
+                    <div class="output-line success">Noodle IDE initialized successfully!</div>
+                    <div class="output-line">Ready to execute Noodle language code...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <aside class="right-panel" id="right-panel">
+            <div class="panel-header">
+                <h3 style="color: var(--text-primary);">Panel</h3>
+                <div class="panel-tabs">
+                    <div class="panel-tab active" data-tab="problems">Problems</div>
+                    <div class="panel-tab" data-tab="terminal">Terminal</div>
+                    <div class="panel-tab" data-tab="ai">AI Assistant</div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div data-content="problems">
+                    <div style="padding: 8px;">
+                        <p style="color: var(--text-secondary); font-size: 12px;">No problems found</p>
+                    </div>
+                </div>
+                <div data-content="terminal" style="display: none;">
+                    <div style="padding: 8px;">
+                        <p style="color: var(--text-secondary); font-size: 12px;">Terminal not implemented yet</p>
+                    </div>
+                </div>
+                <div data-content="ai" style="display: none;">
+                    <div style="padding: 8px;">
+                        <p style="color: var(--text-secondary); font-size: 12px;">AI Assistant not implemented yet</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+        <div class="status-left">
+            <span id="file-info">welcome.nc</span>
+            <span id="cursor-info">Ln 1, Col 1</span>
+            <span id="language-info">Noodle</span>
+        </div>
+        <div class="status-right">
+            <span id="encoding-info">UTF-8</span>
+            <span id="line-ending-info">LF</span>
+            <span id="ai-status">AI Ready</span>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.js"></script>
+    <script>
+        // Monaco Editor Configuration
+        require.config({
+            paths: {
+                'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs'
+            }
+        });
+
+        let editor;
+        let currentFile = 'welcome';
+        let openFiles = new Map();
+        let isConnected = false;
+
+        // Initialize Monaco Editor
+        require(['vs/editor/editor.main'], function () {
+            // Create Monaco Editor
+            editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                value: `# Welcome to Noodle IDE
+
+# This is a language-independent development environment
+# All operations are handled through NoodleCore APIs
+# demonstrating true language independence
+
+def hello_world():
+    """A simple hello world function"""
+    print("Hello from Noodle IDE!")
+    return "Language independence achieved"
+
+# Try executing this code!
+if __name__ == "__main__":
+    hello_world()`,
+                language: 'python', // Will be updated based on file type
+                theme: 'vs-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                fontFamily: 'JetBrains Mono, Monaco, Menlo, "Ubuntu Mono", monospace',
+                minimap: { enabled: true },
+                wordWrap: 'on',
+                lineNumbers: 'on',
+                rulers: [80, 120],
+                scrollBeyondLastLine: false,
+                renderWhitespace: 'selection',
+                bracketPairColorization: { enabled: true },
+                guides: {
+                    bracketPairs: true,
+                    indentation: true
+                },
+                suggest: {
+                    showKeywords: true,
+                    showSnippets: true,
+                    showFunctions: true,
+                    showConstructors: true,
+                    showFields: true,
+                    showVariables: true,
+                    showClasses: true,
+                    showStructs: true,
+                    showInterfaces: true,
+                    showModules: true,
+                    showProperties: true,
+                    showEvents: true,
+                    showOperators: true,
+                    showUnits: true,
+                    showValues: true,
+                    showConstants: true,
+                    showEnums: true,
+                    showEnumMembers: true,
+                    showTypeParameters: true,
+                    showIssues: true,
+                    showUsers: true,
+                    showColors: true,
+                    showFiles: true,
+                    showReferences: true,
+                    showFolders: true
+                },
+                quickSuggestions: {
+                    other: true,
+                    comments: true,
+                    strings: true
+                }
+            });
+
+            // Set up editor event listeners
+            setupEditorEventListeners();
+
+            // Initialize the IDE
+            initializeIDE();
+        });
+
+        function setupEditorEventListeners() {
+            // Cursor position tracking
+            editor.onDidChangeCursorPosition(function (e) {
+                const position = editor.getPosition();
+                document.getElementById('cursor-info').textContent =
+                    `Ln ${position.lineNumber}, Col ${position.column}`;
+            });
+
+            // Content change tracking
+            editor.onDidChangeModelContent(function () {
+                markUnsaved();
+                updateFileContent();
+            });
+
+            // Model change tracking
+            editor.onDidChangeModel(function () {
+                const model = editor.getModel();
+                if (model) {
+                    const language = getLanguageFromFilename(model.uri.path);
+                    document.getElementById('language-info').textContent =
+                        language.charAt(0).toUpperCase() + language.slice(1);
+                    updateFileInfo();
+                }
+            });
+        }
+
+        function initializeIDE() {
+            // Set up global state
+            openFiles.set('welcome', editor.getValue());
+
+            // Update connection status
+            updateConnectionStatus('connecting');
+
+            // Test NoodleCore connection
+            testNoodleCoreConnection();
+
+            // Set up keyboard shortcuts
+            setupKeyboardShortcuts();
+
+            // Set up file system
+            setupFileSystem();
+
+            logToOutput('Noodle IDE initialized successfully!');
+        }
+
+        async function testNoodleCoreConnection() {
+            try {
+                const response = await fetch('http://localhost:8080/api/v1/health');
+                const data = await response.json();
+
+                if (data.success) {
+                    isConnected = true;
+                    updateConnectionStatus('connected');
+                    logToOutput('✅ Connected to NoodleCore successfully!', 'success');
+                    logToOutput(`📊 API Response Time: ${data.data?.response_time || 'N/A'}ms`, 'success');
+                } else {
+                    throw new Error('Health check failed');
+                }
+            } catch (error) {
+                isConnected = false;
+                updateConnectionStatus('disconnected');
+                logToOutput(`❌ Failed to connect to NoodleCore: ${error.message}`, 'error');
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('connection-indicator');
+            const text = document.getElementById('connection-text');
+
+            indicator.className = `connection-indicator ${status === 'connected' ? 'connected' : 'disconnected'}`;
+            text.textContent = status === 'connected' ? 'Connected to NoodleCore' :
+                status === 'connecting' ? 'Connecting...' : 'Disconnected';
+        }
+
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function (e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 'n':
+                            e.preventDefault();
+                            newFile();
+                            break;
+                        case 'o':
+                            e.preventDefault();
+                            openFile();
+                            break;
+                        case 's':
+                            e.preventDefault();
+                            if (e.shiftKey) {
+                                saveAll();
+                            } else {
+                                saveFile();
+                            }
+                            break;
+                        case 'f':
+                            e.preventDefault();
+                            // Focus search
+                            document.getElementById('global-search').focus();
+                            break;
+                        case '`':
+                            e.preventDefault();
+                            toggleOutput();
+                            break;
+                    }
+                } else {
+                    switch (e.key) {
+                        case 'F5':
+                            e.preventDefault();
+                            runCode();
+                            break;
+                        case 'F9':
+                            e.preventDefault();
+                            debugCode();
+                            break;
+                        case 'F12':
+                            e.preventDefault();
+                            toggleRightPanel();
+                            break;
+                    }
+                }
+            });
+        }
+
+        function setupFileSystem() {
+            // Load recent files
+            loadRecentFiles();
+
+            // Set up file tree
+            setupFileTree();
+        }
+
+        function loadRecentFiles() {
+            // This would typically load from localStorage or an API
+            const recentFiles = JSON.parse(localStorage.getItem('noodle-ide-recent-files') || '[]');
+            // Implement recent files display
+        }
+
+        function setupFileTree() {
+            const fileTree = document.getElementById('file-tree');
+
+            fileTree.addEventListener('click', function (e) {
+                if (e.target.closest('.file-tree-item')) {
+                    const item = e.target.closest('.file-tree-item');
+                    const fileName = item.querySelector('span').textContent;
+
+                    // Remove active class from all items
+                    fileTree.querySelectorAll('.file-tree-item').forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    item.classList.add('active');
+
+                    // Open file if not welcome file
+                    if (fileName !== 'welcome.nc') {
+                        openFileByName(fileName);
+                    }
+                }
+            });
+        }
+
+        function getLanguageFromFilename(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const languageMap = {
+                'nc': 'noodle',
+                'py': 'python',
+                'js': 'javascript',
+                'ts': 'typescript',
+                'html': 'html',
+                'css': 'css',
+                'md': 'markdown',
+                'json': 'json',
+                'xml': 'xml',
+                'yml': 'yaml',
+                'yaml': 'yaml'
+            };
+            return languageMap[ext] || 'plaintext';
+        }
+
+        function updateFileContent() {
+            if (editor && currentFile) {
+                openFiles.set(currentFile, editor.getValue());
+            }
+        }
+
+        function updateFileInfo() {
+            document.getElementById('file-info').textContent = currentFile;
+        }
+
+        function markUnsaved() {
+            const tab = document.querySelector(`[data-file="${currentFile}"]`);
+            if (tab) {
+                const span = tab.querySelector('span');
+                if (!span.textContent.includes('*')) {
+                    span.textContent = span.textContent + '*';
+                }
+            }
+        }
+
+        function markSaved() {
+            const tab = document.querySelector(`[data-file="${currentFile}"]`);
+            if (tab) {
+                const span = tab.querySelector('span');
+                span.textContent = currentFile;
+            }
+        }
+
+        // File Operations
+        function newFile() {
+            const fileName = prompt('Enter file name (e.g., newfile.py):');
+            if (!fileName) return;
+
+            currentFile = fileName;
+            const language = getLanguageFromFilename(fileName);
+
+            // Set language for Monaco
+            const model = monaco.editor.createModel('', language);
+            editor.setModel(model);
+
+            // Add to open files
+            openFiles.set(fileName, '');
+
+            // Create tab
+            createTab(fileName);
+
+            logToOutput(`📄 Created new file: ${fileName}`, 'success');
+            updateFileInfo();
+        }
+
+        function createTab(fileName) {
+            const tabsContainer = document.getElementById('editor-tabs');
+
+            // Check if tab already exists
+            if (document.querySelector(`[data-file="${fileName}"]`)) {
+                switchTab(fileName);
+                return;
+            }
+
+            const tab = document.createElement('div');
+            tab.className = 'editor-tab';
+            tab.dataset.file = fileName;
+            tab.innerHTML = `
+                <i class="fas fa-file-code tab-icon"></i>
+                <span>${fileName}</span>
+                <i class="fas fa-times tab-close" onclick="closeTab('${fileName}'); event.stopPropagation();"></i>
+            `;
+            tab.onclick = () => switchTab(fileName);
+
+            tabsContainer.appendChild(tab);
+
+            // Switch to new tab
+            switchTab(fileName);
+        }
+
+        function switchTab(fileName) {
+            // Update tab selection
+            document.querySelectorAll('.editor-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-file="${fileName}"]`).classList.add('active');
+
+            // Update current file
+            currentFile = fileName;
+
+            // Load content
+            const content = openFiles.get(fileName) || '';
+            const language = getLanguageFromFilename(fileName);
+
+            // Create or update model
+            const model = monaco.editor.createModel(content, language);
+            editor.setModel(model);
+
+            // Update UI
+            updateFileInfo();
+
+            logToOutput(`📝 Switched to: ${fileName}`);
+        }
+
+        function closeTab(fileName) {
+            if (fileName === 'welcome') return; // Don't close welcome tab
+
+            const tab = document.querySelector(`[data-file="${fileName}"]`);
+            if (tab) tab.remove();
+
+            // Remove from open files
+            openFiles.delete(fileName);
+
+            // Switch to welcome tab if closed file was active
+            if (currentFile === fileName) {
+                switchTab('welcome');
+            }
+        }
+
+        function saveFile() {
+            if (!isConnected) {
+                logToOutput('❌ Cannot save: Not connected to NoodleCore', 'error');
+                return;
+            }
+
+            updateFileContent();
+
+            const content = openFiles.get(currentFile);
+            const fileName = currentFile;
+
+            fetch('http://localhost:8080/api/v1/ide/files/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    file_path: fileName,
+                    content: content,
+                    file_type: getLanguageFromFilename(fileName)
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        markSaved();
+                        logToOutput(`💾 Saved file: ${fileName}`, 'success');
+                    } else {
+                        logToOutput(`❌ Save failed: ${result.error?.message}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    logToOutput(`❌ Save error: ${error.message}`, 'error');
+                });
+        }
+
+        function saveAll() {
+            const fileNames = Array.from(openFiles.keys());
+            if (fileNames.length === 0) return;
+
+            logToOutput('💾 Saving all files...', 'success');
+
+            // Save each file
+            for (const fileName of fileNames) {
+                if (fileName !== 'welcome') {
+                    // This is a simplified version - in reality you'd save each one
+                }
+            }
+
+            logToOutput('💾 All files saved', 'success');
+        }
+
+        function runCode() {
+            if (!isConnected) {
+                logToOutput('❌ Cannot run: Not connected to NoodleCore', 'error');
+                return;
+            }
+
+            const content = editor.getValue();
+            const fileName = currentFile;
+            const language = getLanguageFromFilename(fileName);
+
+            logToOutput('🚀 Executing code via NoodleCore API...', 'success');
+
+            fetch('http://localhost:8080/api/v1/ide/code/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    content: content,
+                    file_type: language,
+                    file_name: fileName
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        logToOutput('✅ Execution successful!', 'success');
+                        if (result.data.output) {
+                            logToOutput('📤 Output:', 'success');
+                            logToOutput(result.data.output);
+                        }
+                        if (result.data.error) {
+                            logToOutput('⚠️ Error:', 'error');
+                            logToOutput(result.data.error, 'error');
+                        }
+                    } else {
+                        logToOutput(`❌ Execution failed: ${result.error?.message}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    logToOutput(`❌ Execution error: ${error.message}`, 'error');
+                });
+        }
+
+        function debugCode() {
+            logToOutput('🔍 Debug mode not implemented yet', 'warning');
+        }
+
+        function toggleOutput() {
+            const panel = document.getElementById('output-panel');
+            panel.classList.toggle('visible');
+        }
+
+        function toggleRightPanel() {
+            const panel = document.getElementById('right-panel');
+            panel.classList.toggle('visible');
+        }
+
+        function clearOutput() {
+            document.getElementById('output-content').innerHTML = '';
+        }
+
+        function logToOutput(message, type = 'info') {
+            const output = document.getElementById('output-content');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Sidebar Tab Management
+        document.querySelectorAll('.sidebar-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                const tabName = this.dataset.tab;
+
+                // Update tab selection
+                this.parentElement.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show corresponding content
+                document.querySelectorAll('.sidebar-content').forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.querySelector(`[data-content="${tabName}"]`).style.display = 'block';
+            });
+        });
+
+        // Right Panel Tab Management
+        document.querySelectorAll('.panel-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                const tabName = this.dataset.tab;
+
+                // Update tab selection
+                this.parentElement.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show corresponding content
+                document.querySelectorAll('.panel-content > div').forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.querySelector(`[data-content="${tabName}"]`).style.display = 'block';
+            });
+        });
+
+        // Theme Toggle
+        document.getElementById('theme-toggle').addEventListener('click', function () {
+            const body = document.body;
+            const icon = this.querySelector('i');
+
+            if (body.style.backgroundColor === 'white' || body.classList.contains('light-theme')) {
+                // Switch to dark theme
+                body.style.backgroundColor = '';
+                body.classList.remove('light-theme');
+                icon.className = 'fas fa-moon';
+                monaco.editor.setTheme('vs-dark');
+            } else {
+                // Switch to light theme
+                body.style.backgroundColor = 'white';
+                body.classList.add('light-theme');
+                icon.className = 'fas fa-sun';
+                monaco.editor.setTheme('vs');
+            }
+        });
+
+        // Global Search
+        document.getElementById('global-search').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query) {
+                    logToOutput(`🔍 Searching for: ${query}`, 'info');
+                    // Implement global search logic here
+                }
+            }
+        });
+
+        // Mobile responsive sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('visible');
+        }
+
+        // Periodic connection check
+        setInterval(() => {
+            if (isConnected) {
+                fetch('http://localhost:8080/api/v1/health')
+                    .catch(() => {
+                        isConnected = false;
+                        updateConnectionStatus('disconnected');
+                        logToOutput('⚠️ Connection to NoodleCore lost', 'warning');
+                    });
+            }
+        }, 30000);
+    </script>
+</body>
+
+</html>

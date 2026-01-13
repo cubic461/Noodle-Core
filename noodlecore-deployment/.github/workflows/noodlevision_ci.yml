@@ -1,0 +1,385 @@
+name: NoodleVision CI
+
+on:
+  push:
+    branches: [ main, develop, noodlevision ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: '3.9'
+  CUDA_VERSION: '11.8'
+
+jobs:
+  # Linting & Code Quality
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort mypy flake8 pre-commit
+    
+    - name: Run Black formatter
+      run: black --check --diff src/ tests/ examples/
+    
+    - name: Run isort import sorter
+      run: isort --check-only --diff src/ tests/ examples/
+    
+    - name: Run MyPy type checker
+      run: mypy src/ --ignore-missing-imports
+    
+    - name: Run Flake8 linter
+      run: flake8 src/ tests/ examples/ --count --select=E9,F63,F7,F82 --show-source --statistics
+      continue-on-error: true
+    
+    - name: Run pre-commit hooks
+      run: pre-commit run --all-files
+      continue-on-error: true
+
+  # Unit Tests
+  test:
+    name: Unit Tests
+    runs-on: ${{ matrix.os }}
+    needs: lint
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        include:
+          # GPU test on Ubuntu
+          - os: ubuntu-latest
+            python-version: '3.9'
+            use-gpu: true
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Set up CUDA (Ubuntu GPU)
+      if: matrix.use-gpu == true
+      uses: actions/setup-cuda@v2
+      with:
+        cuda-version: ${{ env.CUDA_VERSION }}
+    
+    - name: Cache pip packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev,noodlevision${{ matrix.use-gpu == true && ',gpu' || '' }}]
+    
+    - name: Run unit tests
+      run: |
+        # Skip GPU tests if not using GPU
+        TEST_SUFFIX=""
+        if [ "${{ matrix.use-gpu }}" != "true" ]; then
+          TEST_SUFFIX="-k 'not gpu'"
+        fi
+        python -m pytest tests/ $TEST_SUFFIX -v --cov=src/noodle --cov-report=xml --cov-report=term-missing
+    
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Integration Tests
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Set up CUDA
+      uses: actions/setup-cuda@v2
+      with:
+        cuda-version: ${{ env.CUDA_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev,noodlevision,gpu]
+    
+    - name: Create test video file
+      run: |
+        # Create a dummy video file for testing
+        ffmpeg -f lavfi -i testsrc=duration=10:size=320x240:rate=1 -f rawvideo -pix_fmt rgb24 test_video.rgb
+        ffmpeg -f rawvideo -s 320x240 -r 1 -pix_fmt rgb24 -i test_video.rgb -c:v libx264 -crf 23 -preset fast test_video.mp4
+    
+    - name: Run integration tests
+      run: |
+        python -m pytest tests/integration/ -v --tb=short
+    
+    - name: Run NoodleVision demo
+      run: |
+        cd examples
+        python video_filter_realtime.noodle
+
+  # Performance Tests
+  performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Set up CUDA
+      uses: actions/setup-cuda@v2
+      with:
+        cuda-version: ${{ env.CUDA_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev,noodlevision,gpu]
+        pip install matplotlib seaborn psutil
+    
+    - name: Create test data
+      run: |
+        # Create test video and audio files
+        ffmpeg -f lavfi -i testsrc=duration=30:size=1920x1080:rate=30 -f rawvideo -pix_fmt rgb24 test_video.rgb
+        ffmpeg -f rawvideo -s 1920x1080 -r 30 -pix_fmt rgb24 -i test_video.rgb -c:v libx264 -crf 23 -preset fast test_video.mp4
+        
+        ffmpeg -f lavfi -i sine=frequency=1000:duration=30 -c:a pcm_s16le test_audio.wav
+    
+    - name: Run benchmark suite
+      run: |
+        python benchmarks/noodlevision_benchmark.py \
+          --iterations 20 \
+          --output benchmark_results.json \
+          --report-dir benchmark_report \
+          --verbose
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: |
+          benchmark_results.json
+          benchmark_report/
+    
+    - name: Generate performance report
+      run: |
+        # Generate a simple performance summary
+        python -c "
+        import json
+        with open('benchmark_results.json') as f:
+            results = json.load(f)
+        
+        # Extract performance metrics
+        video_fps = [r['value'] for r in results if r['metric'] == 'fps' and 'VideoIO' in r['name']]
+        operator_times = [r['value'] for r in results if 'Operator' in r['name'] and r['metric'] == 'average_processing_time']
+        
+        print('=== NoodleVision Performance Report ===')
+        if video_fps:
+            print(f'Video I/O Performance:')
+            print(f'  Average FPS: {sum(video_fps)/len(video_fps):.2f}')
+            print(f'  Min FPS: {min(video_fps):.2f}')
+            print(f'  Max FPS: {max(video_fps):.2f}')
+        
+        if operator_times:
+            print(f'Operator Performance:')
+            print(f'  Average processing time: {sum(operator_times)/len(operator_times)*1000:.2f} ms')
+            print(f'  Fastest operator: {min(operator_times)*1000:.2f} ms')
+            print(f'  Slowest operator: {max(operator_times)*1000:.2f} ms')
+        "
+
+  # Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit
+    
+    - name: Run safety check
+      run: safety check --json || true
+    
+    - name: Run bandit security linter
+      run: bandit -r src/ -f json || true
+    
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-scan-results
+        path: |
+          safety-report.json
+          bandit-report.json
+
+  # Build & Package
+  build:
+    name: Build & Package
+    runs-on: ubuntu-latest
+    needs: [lint, test, integration, performance, security]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Set up CUDA
+      uses: actions/setup-cuda@v2
+      with:
+        cuda-version: ${{ env.CUDA_VERSION }}
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Check package
+      run: |
+        python -m twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  # Documentation Build
+  docs:
+    name: Documentation Build
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[docs,noodlevision]
+        pip install sphinx sphinx-rtd-theme
+    
+    - name: Build documentation
+      run: |
+        cd docs
+        make html
+    
+    - name: Upload documentation
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/_build/html/
+
+  # Release
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [lint, test, integration, performance, security, build, docs]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: python-package-distributions
+    
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        packages_dir: dist/
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+  # Notify
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [lint, test, integration, performance, security, build, docs]
+    if: always() && (github.event_name == 'push' || github.event_name == 'pull_request')
+    
+    steps:
+    - name: Notify on failure
+      if: needs.*.result == 'failure'
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+        text: 'NoodleVision CI pipeline failed!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
