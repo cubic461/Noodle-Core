@@ -100,18 +100,24 @@ export class AIProviderService {
                 };
             }
 
-            this.outputChannel.appendLine(`ðŸ“¤ Sending request to ${this.config.provider}`);
+            this.outputChannel.appendLine(`📤 Sending request to ${this.config.provider}`);
             this.outputChannel.appendLine(`   Model: ${this.config.model}`);
             this.outputChannel.appendLine(`   Messages: ${messages.length}`);
+            this.outputChannel.appendLine(`   Endpoint: ${endpoint}`);
 
             const response = await this.makeProviderRequest(endpoint, messages);
             
-            this.outputChannel.appendLine(`âœ… Response received`);
+            if (!response.success) {
+                this.outputChannel.appendLine(`❌ Request failed: ${response.error}`);
+            } else {
+                this.outputChannel.appendLine(`✅ Response received successfully`);
+                this.outputChannel.appendLine(`   Content length: ${response.content?.length || 0} chars`);
+            }
             
             return response;
 
         } catch (error) {
-            this.outputChannel.appendLine(`âŒ Error: ${error.message}`);
+            this.outputChannel.appendLine(`❌ Error: ${error.message}`);
             return {
                 success: false,
                 error: error.message
@@ -147,13 +153,18 @@ export class AIProviderService {
                 res.on('data', chunk => data += chunk);
                 res.on('end', () => {
                     if (res.statusCode === 200) {
+                        this.outputChannel.appendLine(`📥 Raw response (${data.length} chars):`);
+                        this.outputChannel.appendLine(data.substring(0, 500) + (data.length > 500 ? '...' : ''));
+                        
                         try {
                             const json = JSON.parse(data);
+                            this.outputChannel.appendLine(`📋 Parsed JSON keys: ${Object.keys(json).join(', ')}`);
                             resolve(this.parseResponse(json));
                         } catch (e) {
+                            this.outputChannel.appendLine(`❌ JSON parse error: ${e.message}`);
                             resolve({
                                 success: false,
-                                error: `Failed to parse response: ${e.message}`
+                                error: `Failed to parse response: ${e.message}. Raw response: ${data.substring(0, 200)}`
                             });
                         }
                     } else {
@@ -198,11 +209,11 @@ export class AIProviderService {
 
         return headers;
     }
-
     private parseResponse(json: any): AIResponse {
         // Handle different response formats
+        
+        // OpenAI-compatible format (most providers use this)
         if (json.choices) {
-            // OpenAI format
             return {
                 success: true,
                 content: json.choices[0]?.message?.content || '',
@@ -212,17 +223,76 @@ export class AIProviderService {
                     totalTokens: json.usage.total_tokens
                 } : undefined
             };
-        } else if (json.content) {
-            // Anthropic format
+        } else if (json.data && json.data.choices) {
+            // Some providers wrap in 'data' object
             return {
                 success: true,
-                content: json.content,
+                content: json.data.choices[0]?.message?.content || json.data.choices[0]?.text || '',
+                usage: json.data.usage
+            };
+        } else if (json.content) {
+            // Direct content (Anthropic, some simplified APIs)
+            return {
+                success: true,
+                content: Array.isArray(json.content) 
+                    ? json.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join('')
+                    : json.content,
+                usage: json.usage
+            };
+        } else if (json.message) {
+            // Simple message format
+            return {
+                success: true,
+                content: json.message,
+                usage: json.usage
+            };
+        } else if (json.reply) {
+            // Reply format
+            return {
+                success: true,
+                content: json.reply,
+                usage: json.usage
+            };
+        } else if (json.output) {
+            // Output format
+            return {
+                success: true,
+                content: json.output,
+                usage: json.usage
+            };
+        } else if (json.text) {
+            // Direct text format
+            return {
+                success: true,
+                content: json.text,
+                usage: json.usage
+            };
+        } else if (typeof json === 'string') {
+            // Plain string response
+            return {
+                success: true,
+                content: json
+            };
+        } else if (json.result) {
+            // Generic result format
+            return {
+                success: true,
+                content: json.result,
                 usage: json.usage
             };
         } else {
+            // Try to find any text content in common fields
+            const possibleText = 
+                json.response || 
+                json.answer || 
+                json.completion || 
+                json.generated_text ||
+                JSON.stringify(json, null, 2);
+            
             return {
                 success: false,
-                error: 'Unknown response format'
+                error: `Unknown response format. Available keys: ${Object.keys(json).join(', ')}. 
+                        Tried to extract: ${possibleText.substring(0, 100)}`
             };
         }
     }
