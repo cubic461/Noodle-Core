@@ -1,0 +1,21 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "src/extension.ts",
+        "src/services/aiProviderService.ts",
+        "src/services/backendService.ts",
+        "src/lsp/lspManager.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        ".vscode-test",
+        "src/test",
+        "src/infrastructure",
+        "src/providers",
+        "src/ui",
+        "src/services/aiService.ts",
+        "src/services/enhancedBackendService.ts",
+        "src/services/roleBasedAIService.ts",
+        "src/services/runtimeService.ts"
+    ]
+}

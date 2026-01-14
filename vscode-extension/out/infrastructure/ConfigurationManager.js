@@ -458,4 +458,4 @@ class ConfigurationManager extends events_1.EventEmitter {
     }
 }
 exports.ConfigurationManager = ConfigurationManager;
-//# sourceMappingURL=ConfigurationManager.js.map
+//# sourceMappingURL=configurationManager.js.map

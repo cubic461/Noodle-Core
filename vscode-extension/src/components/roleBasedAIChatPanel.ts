@@ -1012,8 +1012,8 @@ export class RoleBasedAIChatPanel {
         }
 
         function extractCodeFromMessage(content) {
-            const start = content.indexOf('```');
-            const end = content.lastIndexOf('```');
+            const start = content.indexOf('\`\`\`');
+            const end = content.lastIndexOf('\`\`\`');
             if (start !== -1 && end !== -1 && start < end) {
                 return content.substring(start, end + 3);
             }

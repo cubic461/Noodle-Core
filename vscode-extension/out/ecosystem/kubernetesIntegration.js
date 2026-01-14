@@ -37,8 +37,6 @@ const fs = __importStar(require("fs"));
 const child_process_1 = require("child_process");
 const util_1 = require("util");
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
- > ;
-;
 class KubernetesIntegration extends events_1.EventEmitter {
     constructor(context, serviceManager, configManager, eventBus, cacheManager, logger) {
         this.serviceManager = serviceManager;

@@ -433,4 +433,4 @@ class CacheManager extends events_1.EventEmitter {
     }
 }
 exports.CacheManager = CacheManager;
-//# sourceMappingURL=CacheManager.js.map
+//# sourceMappingURL=cacheManager.js.map

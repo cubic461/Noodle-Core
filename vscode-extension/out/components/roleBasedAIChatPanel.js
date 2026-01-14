@@ -946,11 +946,12 @@ class RoleBasedAIChatPanel {
         }
 
         function extractCodeFromMessage(content) {
-            const codeBlockMatch = content.match(/` ``[];
-        s;
-        S;
-         *  ? `` `/g);
-            return codeBlockMatch ? codeBlockMatch[0] : content;
+            const start = content.indexOf('\`\`\`');
+            const end = content.lastIndexOf('\`\`\`');
+            if (start !== -1 && end !== -1 && start < end) {
+                return content.substring(start, end + 3);
+            }
+            return content;
         }
 
         function showRoleDocument(roleId, content) {
@@ -981,7 +982,7 @@ class RoleBasedAIChatPanel {
         vscode.postMessage({ type: 'getState' });
     </script>
 </body>
-</html>` : ;
+</html>`;
     }
     /**
      * Dispose the panel

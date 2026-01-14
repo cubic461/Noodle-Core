@@ -104,14 +104,14 @@ export interface Ingress extends KubernetesResource {
                             name: string;
                             port?: {
                                 number: number;
-                                name?: string
+                                name?: string;
                             };
                         };
                     };
-                };
-            }
-        }
-    }
+                }>;
+            };
+        }>;
+    };
 }
 
 export class KubernetesIntegration extends EventEmitter {

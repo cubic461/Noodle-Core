@@ -1,9 +1,9 @@
 "use strict";
 /**
- * LSP Manager for Noodle VS Code Extension
+ * Minimal LSP Manager for Noodle VS Code Extension
  *
- * Manages Language Server Protocol (LSP) connections and provides
- * language intelligence features.
+ * Simplified version without infrastructure dependencies
+ * Properly handles server lifecycle to prevent zombie processes
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -31,367 +31,152 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LSPManager = void 0;
 const vscode = __importStar(require("vscode"));
+const child_process_1 = require("child_process");
 const events_1 = require("events");
 class LSPManager extends events_1.EventEmitter {
     constructor(context, serviceManager, configManager, eventBus, cacheManager, logger) {
         super();
         this.servers = new Map();
+        this.serverProcesses = new Map();
         this.serverStatuses = new Map();
         this.isInitialized = false;
         this.context = context;
-        this.serviceManager = serviceManager;
-        this.configManager = configManager;
-        this.eventBus = eventBus;
-        this.cacheManager = cacheManager;
-        this.logger = logger;
         this.outputChannel = vscode.window.createOutputChannel('Noodle LSP');
-        this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-        this.statusBarItem.text = '$(server) LSP';
-        this.statusBarItem.tooltip = 'Noodle Language Servers';
-        this.statusBarItem.command = 'noodle.lsp.status';
+        this.outputChannel.appendLine('LSP Manager created (Minimal Mode)');
     }
     /**
      * Initialize the LSP Manager
      */
     async initialize() {
         try {
-            this.logger.info('Initializing LSP Manager...');
-            // Load server configurations
-            await this.loadServerConfigurations();
-            // Register event listeners
-            this.registerEventListeners();
-            // Register commands
-            this.registerCommands();
-            // Update status
-            this.statusBarItem.show();
-            this.updateStatus();
+            this.outputChannel.appendLine('Initializing LSP Manager...');
+            // In minimal mode, we don't auto-start any servers
+            // Servers will only start when explicitly needed
             this.isInitialized = true;
-            this.logger.info('LSP Manager initialized successfully');
+            this.outputChannel.appendLine('LSP Manager initialized (Minimal Mode)');
             this.emit('initialized');
         }
         catch (error) {
-            this.logger.error(`Failed to initialize LSP Manager: ${error.message}`);
-            this.updateStatus();
+            this.outputChannel.appendLine(`LSP Manager initialization error: ${error.message}`);
             throw error;
         }
     }
     /**
-     * Load server configurations
-     */
-    async loadServerConfigurations() {
-        try {
-            // Load default configurations
-            this.loadDefaultConfigurations();
-            // Load custom configurations from settings
-            await this.loadCustomConfigurations();
-            this.logger.info(`Loaded ${this.servers.size} LSP server configurations`);
-        }
-        catch (error) {
-            this.logger.error(`Failed to load server configurations: ${error.message}`);
-            throw error;
-        }
-    }
-    /**
-     * Load default server configurations
-     */
-    loadDefaultConfigurations() {
-        // Noodle Language Server (primary focus)
-        this.servers.set('noodle', {
-            name: 'NoodleCore Language Server',
-            language: 'noodle',
-            command: 'python',
-            args: ['-m', 'noodlecore.lsp.noodle_lsp_server'],
-            enabled: true
-        });
-        // TypeScript/JavaScript (for web development)
-        this.servers.set('typescript', {
-            name: 'TypeScript Language Server',
-            language: 'typescript',
-            command: 'typescript-language-server',
-            args: ['--stdio'],
-            enabled: false // Disabled by default to focus on NoodleCore
-        });
-        // Python (for general Python files)
-        this.servers.set('python', {
-            name: 'Python Language Server',
-            language: 'python',
-            command: 'pylsp',
-            args: ['--stdio'],
-            enabled: false // Disabled by default to focus on NoodleCore
-        });
-        // JSON
-        this.servers.set('json', {
-            name: 'JSON Language Server',
-            language: 'json',
-            command: 'vscode-json-languageserver',
-            args: ['--stdio'],
-            enabled: false // Disabled by default to focus on NoodleCore
-        });
-        // HTML/CSS
-        this.servers.set('html', {
-            name: 'HTML/CSS Language Server',
-            language: 'html',
-            command: 'vscode-html-languageserver',
-            args: ['--stdio'],
-            enabled: false // Disabled by default to focus on NoodleCore
-        });
-    }
-    /**
-     * Load custom configurations from settings
-     */
-    async loadCustomConfigurations() {
-        try {
-            const config = vscode.workspace.getConfiguration('noodle.lsp');
-            const customServers = config.get('servers') || {};
-            for (const [serverId, serverConfig] of Object.entries(customServers)) {
-                if (serverConfig && typeof serverConfig === 'object') {
-                    this.servers.set(serverId, {
-                        name: serverConfig.name || serverId,
-                        language: serverConfig.language || 'unknown',
-                        command: serverConfig.command || '',
-                        args: serverConfig.args || [],
-                        cwd: serverConfig.cwd,
-                        env: serverConfig.env,
-                        settings: serverConfig.settings,
-                        enabled: serverConfig.enabled !== false
-                    });
-                }
-            }
-        }
-        catch (error) {
-            this.logger.error(`Failed to load custom configurations: ${error.message}`);
-        }
-    }
-    /**
-     * Register event listeners
-     */
-    registerEventListeners() {
-        // Configuration changes
-        vscode.workspace.onDidChangeConfiguration(async (event) => {
-            if (event.affectsConfiguration('noodle.lsp')) {
-                this.logger.info('LSP configuration changed, reloading...');
-                await this.reloadConfigurations();
-            }
-        });
-        // Workspace folder changes
-        vscode.workspace.onDidChangeWorkspaceFolders(async () => {
-            this.logger.info('Workspace changed, restarting LSP servers...');
-            await this.restartAllServers();
-        });
-    }
-    /**
-     * Register commands
-     */
-    registerCommands() {
-        const commands = [
-            vscode.commands.registerCommand('noodle.lsp.status', () => {
-                this.showStatus();
-            }),
-            vscode.commands.registerCommand('noodle.lsp.restart', async () => {
-                await this.restartAllServers();
-            }),
-            vscode.commands.registerCommand('noodle.lsp.restartServer', async (serverId) => {
-                await this.restartServer(serverId);
-            })
-        ];
-        commands.forEach(command => {
-            this.context.subscriptions.push(command);
-        });
-    }
-    /**
-     * Start all enabled servers
-     */
-    async startAllServers() {
-        const startPromises = [];
-        for (const [serverId, config] of this.servers) {
-            if (config.enabled) {
-                startPromises.push(this.startServer(serverId));
-            }
-        }
-        await Promise.all(startPromises);
-        this.updateStatus();
-    }
-    /**
-     * Start a specific server
+     * Start a language server
      */
     async startServer(serverId) {
+        if (this.serverProcesses.has(serverId)) {
+            this.outputChannel.appendLine(`Server ${serverId} is already running`);
+            return;
+        }
         const config = this.servers.get(serverId);
         if (!config) {
-            throw new Error(`Unknown server: ${serverId}`);
+            throw new Error(`Server configuration not found: ${serverId}`);
         }
         if (!config.enabled) {
-            this.logger.info(`Server ${serverId} is disabled`);
-            return;
-        }
-        const status = this.serverStatuses.get(serverId);
-        if (status && (status.status === 'starting' || status.status === 'running')) {
-            this.logger.info(`Server ${serverId} is already running`);
+            this.outputChannel.appendLine(`Server ${serverId} is disabled`);
             return;
         }
         try {
-            this.logger.info(`Starting LSP server: ${serverId}`);
-            this.updateServerStatus(serverId, 'starting');
-            // Create client options
-            const clientOptions = {
-                documentSelector: [{ scheme: 'file', language: config.language }],
-                outputChannel: this.outputChannel,
-                initializationOptions: config.settings,
-                workspaceFolder: vscode.workspace.workspaceFolders?.[0]
-            };
-            // Create server options
-            const serverOptions = {
-                command: config.command,
-                args: config.args,
-                options: {
-                    cwd: config.cwd || vscode.workspace.workspaceFolders?.[0]?.uri.fsPath,
-                    env: { ...process.env, ...config.env }
-                }
-            };
-            // Create and start the language client
-            const languageClient = new vscode.LanguageClient(serverId, config.name, serverOptions, clientOptions);
-            // Start the client
-            await languageClient.start();
+            this.outputChannel.appendLine(`Starting server: ${serverId}`);
             // Update status
-            this.updateServerStatus(serverId, 'running', {
-                pid: languageClient._serverProcess?.pid
+            this.serverStatuses.set(serverId, {
+                serverId,
+                status: 'starting',
+                startTime: Date.now()
             });
-            this.logger.info(`LSP server ${serverId} started successfully`);
-            this.emit('serverStarted', { serverId, config });
+            // Spawn the server process
+            const serverProcess = (0, child_process_1.spawn)(config.command, config.args, {
+                cwd: config.cwd || process.cwd(),
+                env: { ...process.env, ...config.env }
+            });
+            // Store the process
+            this.serverProcesses.set(serverId, serverProcess);
+            // Handle process output
+            serverProcess.stdout?.on('data', (data) => {
+                this.outputChannel.appendLine(`[${serverId}] ${data.toString().trim()}`);
+            });
+            serverProcess.stderr?.on('data', (data) => {
+                this.outputChannel.appendLine(`[${serverId}] ERROR: ${data.toString().trim()}`);
+            });
+            // Handle process exit
+            serverProcess.on('exit', (code, signal) => {
+                this.outputChannel.appendLine(`[${serverId}] Process exited with code ${code}, signal ${signal}`);
+                this.serverProcesses.delete(serverId);
+                this.serverStatuses.set(serverId, {
+                    serverId,
+                    status: 'stopped',
+                    pid: serverProcess.pid,
+                    startTime: this.serverStatuses.get(serverId)?.startTime
+                });
+            });
+            // Handle process error
+            serverProcess.on('error', (error) => {
+                this.outputChannel.appendLine(`[${serverId}] Process error: ${error.message}`);
+                this.serverStatuses.set(serverId, {
+                    serverId,
+                    status: 'error',
+                    lastError: error.message,
+                    startTime: this.serverStatuses.get(serverId)?.startTime
+                });
+            });
+            // Update status to running
+            this.serverStatuses.set(serverId, {
+                serverId,
+                status: 'running',
+                pid: serverProcess.pid,
+                startTime: Date.now()
+            });
+            this.outputChannel.appendLine(`Server ${serverId} started (PID: ${serverProcess.pid})`);
+            this.emit('serverStarted', { serverId, pid: serverProcess.pid });
         }
         catch (error) {
-            this.logger.error(`Failed to start LSP server ${serverId}: ${error.message}`);
-            this.updateServerStatus(serverId, 'error', { lastError: error.message });
-            this.emit('serverError', { serverId, error });
+            this.outputChannel.appendLine(`Failed to start server ${serverId}: ${error.message}`);
+            this.serverStatuses.set(serverId, {
+                serverId,
+                status: 'error',
+                lastError: error.message
+            });
+            throw error;
         }
-        this.updateStatus();
     }
     /**
-     * Stop a specific server
+     * Stop a language server
      */
     async stopServer(serverId) {
-        const status = this.serverStatuses.get(serverId);
-        if (!status || status.status === 'stopped') {
+        const serverProcess = this.serverProcesses.get(serverId);
+        if (!serverProcess) {
+            this.outputChannel.appendLine(`Server ${serverId} is not running`);
             return;
         }
         try {
-            this.logger.info(`Stopping LSP server: ${serverId}`);
-            // Stop the language client
-            // Note: In a real implementation, we would store the language client instance
-            // and stop it here. For now, we'll just update the status.
-            this.updateServerStatus(serverId, 'stopped');
-            this.logger.info(`LSP server ${serverId} stopped`);
+            this.outputChannel.appendLine(`Stopping server: ${serverId}`);
+            // Kill the process
+            serverProcess.kill('SIGTERM');
+            // Wait for process to exit
+            await new Promise((resolve) => {
+                const timeout = setTimeout(() => {
+                    this.outputChannel.appendLine(`Server ${serverId} did not exit gracefully, forcing...`);
+                    serverProcess.kill('SIGKILL');
+                    resolve();
+                }, 5000);
+                serverProcess.once('exit', () => {
+                    clearTimeout(timeout);
+                    resolve();
+                });
+            });
+            this.serverProcesses.delete(serverId);
+            this.serverStatuses.set(serverId, {
+                serverId,
+                status: 'stopped'
+            });
+            this.outputChannel.appendLine(`Server ${serverId} stopped`);
             this.emit('serverStopped', { serverId });
         }
         catch (error) {
-            this.logger.error(`Failed to stop LSP server ${serverId}: ${error.message}`);
-            this.updateServerStatus(serverId, 'error', { lastError: error.message });
+            this.outputChannel.appendLine(`Failed to stop server ${serverId}: ${error.message}`);
+            throw error;
         }
-        this.updateStatus();
-    }
-    /**
-     * Restart all servers
-     */
-    async restartAllServers() {
-        const stopPromises = [];
-        for (const serverId of this.servers.keys()) {
-            stopPromises.push(this.stopServer(serverId));
-        }
-        await Promise.all(stopPromises);
-        await this.startAllServers();
-    }
-    /**
-     * Restart a specific server
-     */
-    async restartServer(serverId) {
-        await this.stopServer(serverId);
-        await this.startServer(serverId);
-    }
-    /**
-     * Reload configurations
-     */
-    async reloadConfigurations() {
-        // Clear existing configurations
-        this.servers.clear();
-        // Reload configurations
-        await this.loadServerConfigurations();
-        // Restart servers with new configurations
-        await this.restartAllServers();
-    }
-    /**
-     * Update server status
-     */
-    updateServerStatus(serverId, status, extra) {
-        const current = this.serverStatuses.get(serverId) || { serverId, status: 'stopped' };
-        this.serverStatuses.set(serverId, {
-            ...current,
-            status,
-            ...extra,
-            startTime: status === 'running' ? Date.now() : current.startTime
-        });
-        this.emit('serverStatusChanged', { serverId, status });
-    }
-    /**
-     * Update status bar
-     */
-    updateStatus() {
-        const runningServers = Array.from(this.serverStatuses.values())
-            .filter(s => s.status === 'running').length;
-        const totalServers = this.servers.size;
-        let text = '$(server) LSP';
-        if (runningServers > 0) {
-            text += ` 🟢${runningServers}`;
-        }
-        this.statusBarItem.text = text;
-        this.statusBarItem.tooltip = `Language Servers: ${runningServers}/${totalServers} running`;
-    }
-    /**
-     * Show status
-     */
-    async showStatus() {
-        try {
-            let output = 'LSP Server Status\n';
-            output += '=================\n\n';
-            for (const [serverId, config] of this.servers) {
-                const status = this.serverStatuses.get(serverId);
-                const statusIcon = status?.status === 'running' ? '🟢' :
-                    status?.status === 'starting' ? '🟡' :
-                        status?.status === 'error' ? '🔴' : '⚪';
-                output += `${statusIcon} ${config.name} (${serverId})\n`;
-                output += `  Language: ${config.language}\n`;
-                output += `  Status: ${status?.status || 'stopped'}\n`;
-                output += `  Command: ${config.command} ${config.args.join(' ')}\n`;
-                if (status?.pid) {
-                    output += `  PID: ${status.pid}\n`;
-                }
-                if (status?.startTime) {
-                    const uptime = Date.now() - status.startTime;
-                    output += `  Uptime: ${Math.round(uptime / 1000)}s\n`;
-                }
-                if (status?.lastError) {
-                    output += `  Error: ${status.lastError}\n`;
-                }
-                output += '\n';
-            }
-            this.outputChannel.clear();
-            this.outputChannel.appendLine(output);
-            this.outputChannel.show();
-        }
-        catch (error) {
-            this.logger.error(`Failed to show status: ${error.message}`);
-            vscode.window.showErrorMessage(`Failed to show LSP status: ${error.message}`);
-        }
-    }
-    /**
-     * Get server configurations
-     */
-    getServerConfigurations() {
-        return new Map(this.servers);
-    }
-    /**
-     * Get server statuses
-     */
-    getServerStatuses() {
-        return new Map(this.serverStatuses);
     }
     /**
      * Get server status
@@ -400,21 +185,36 @@ class LSPManager extends events_1.EventEmitter {
         return this.serverStatuses.get(serverId);
     }
     /**
-     * Dispose the LSP Manager
+     * Get all server statuses
      */
-    dispose() {
-        // Stop all servers
+    getAllServerStatuses() {
+        return Array.from(this.serverStatuses.values());
+    }
+    /**
+     * Register a server configuration
+     */
+    registerServer(config) {
+        this.servers.set(config.name, config);
+        this.outputChannel.appendLine(`Registered server: ${config.name}`);
+    }
+    /**
+     * Dispose of the LSP Manager
+     * CRITICAL: This must properly stop all servers to prevent zombie processes
+     */
+    async dispose() {
+        this.outputChannel.appendLine('Disposing LSP Manager...');
+        // Create stop promises for all running servers
         const stopPromises = [];
-        for (const serverId of this.servers.keys()) {
+        for (const serverId of this.serverProcesses.keys()) {
             stopPromises.push(this.stopServer(serverId));
         }
-        // Dispose UI components
-        this.statusBarItem.dispose();
+        // Wait for ALL servers to stop
+        if (stopPromises.length > 0) {
+            this.outputChannel.appendLine(`Waiting for ${stopPromises.length} server(s) to stop...`);
+            await Promise.all(stopPromises);
+        }
+        this.outputChannel.appendLine('LSP Manager disposed');
         this.outputChannel.dispose();
-        // Clear data
-        this.servers.clear();
-        this.serverStatuses.clear();
-        this.removeAllListeners();
     }
 }
 exports.LSPManager = LSPManager;

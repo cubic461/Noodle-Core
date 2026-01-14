@@ -1,9 +1,8 @@
 "use strict";
 /**
- * Noodle VS Code Extension
+ * MINIMAL VERSION - Noodle VS Code Extension
  *
- * Main entry point for the Noodle VS Code extension with AI-powered
- * development tools, ecosystem integration, and modern infrastructure.
+ * Simplified activation that focuses on core functionality only.
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -29,595 +28,533 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = exports.NoodleExtension = void 0;
+exports.deactivate = exports.activate = exports.NoodleExtensionMinimal = void 0;
 const vscode = __importStar(require("vscode"));
 const events_1 = require("events");
-// Import all infrastructure components
-const index_1 = require("./ecosystem/index");
-// Import AI and development tools
-const aiAssistantProvider_1 = require("./ai/aiAssistantProvider");
-const lspManager_1 = require("./lsp/lspManager");
-// Import UI components
-const welcomeProvider_1 = require("./ui/welcomeProvider");
-const treeProvider_1 = require("./ui/treeProvider");
-const statusBar_1 = require("./ui/statusBar");
-// Import chat panel
-const aiChatPanel_1 = require("./components/aiChatPanel");
-// Import backend service
+const path = __importStar(require("path"));
+// Import essential services
 const backendService_1 = require("./services/backendService");
-class NoodleExtension extends events_1.EventEmitter {
-    constructor() {
-        super(...arguments);
-        this.isInitialized = false;
+const lspManager_1 = require("./lsp/lspManager");
+const aiProviderService_1 = require("./services/aiProviderService");
+/**
+ * AI Chat Webview Panel
+ */
+class AIChatPanel {
+    static createOrShow(context, aiService) {
+        const column = vscode.window.activeTextEditor
+            ? vscode.window.activeTextEditor.viewColumn
+            : undefined;
+        if (AIChatPanel.currentPanel) {
+            AIChatPanel.currentPanel._panel.reveal(column);
+            return;
+        }
+        const panel = vscode.window.createWebviewPanel('noodleAIChat', 'Noodle AI Chat', column || vscode.ViewColumn.One, {
+            enableScripts: true,
+            localResourceRoots: [
+                vscode.Uri.file(path.join(context.extensionPath, 'assets'))
+            ]
+        });
+        AIChatPanel.currentPanel = new AIChatPanel(panel, context, aiService);
+    }
+    constructor(panel, context, aiService) {
+        this.context = context;
+        this.aiService = aiService;
+        this._disposables = [];
+        this._messages = [];
+        this._panel = panel;
+        this._panel.webview.html = this._getHtmlForWebview(this._panel.webview);
+        this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+        this._panel.webview.onDidReceiveMessage(async (message) => {
+            switch (message.command) {
+                case 'sendMessage':
+                    await this.handleSendMessage(message.text);
+                    break;
+            }
+        }, null, this._disposables);
+    }
+    async handleSendMessage(userMessage) {
+        if (!userMessage.trim()) {
+            return;
+        }
+        // Add user message to history
+        this._messages.push({ role: 'user', content: userMessage });
+        // Update UI with user message
+        this._panel.webview.postMessage({
+            command: 'addMessage',
+            role: 'user',
+            content: userMessage
+        });
+        // Show typing indicator
+        this._panel.webview.postMessage({ command: 'showTyping' });
+        try {
+            // Call AI Provider Service
+            const aiResponse = await this.aiService.chatCompletion(this._messages);
+            if (!aiResponse.success) {
+                throw new Error(aiResponse.error || 'AI request failed');
+            }
+            const response = aiResponse.content || 'No response from AI';
+            // Add assistant response to history
+            this._messages.push({ role: 'assistant', content: response });
+            // Update UI with assistant message
+            this._panel.webview.postMessage({
+                command: 'addMessage',
+                role: 'assistant',
+                content: response
+            });
+        }
+        catch (error) {
+            this._panel.webview.postMessage({
+                command: 'addError',
+                error: error.message
+            });
+        }
+    }
+    _getHtmlForWebview(webview) {
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noodle AI Chat</title>
+    <style>
+        body {
+            font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
+            font-weight: var(--vscode-font-weight);
+            background-color: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background-color: var(--vscode-editor-selectionBackground);
+            color: var(--vscode-editor-foreground);
+            margin-right: auto;
+        }
+
+        .message.error {
+            background-color: var(--vscode-errorBackground);
+            color: var(--vscode-errorForeground);
+            border: 1px solid var(--vscode-errorBorder);
+        }
+
+        .message-label {
+            font-weight: bold;
+            margin-bottom: 4px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .typing {
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        #input-container {
+            padding: 16px;
+            border-top: 1px solid var(--vscode-panel-border);
+            display: flex;
+            gap: 8px;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--vscode-input-border);
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        #send-button {
+            padding: 8px 16px;
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #send-button:hover {
+            background-color: var(--vscode-button-hoverBackground);
+        }
+
+        #send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+    <div id="input-container">
+        <input type="text" id="message-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+        const vscode = acquireVsCodeApi();
+        const chatContainer = document.getElementById('chat-container');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        function addMessage(role, content, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message' + (isError ? ' error' : ' ' + role);
+
+            const label = document.createElement('div');
+            label.className = 'message-label';
+            label.textContent = isError ? 'Error' : (role === 'user' ? 'You' : 'Noodle AI');
+
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+
+            messageDiv.appendChild(label);
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'message assistant typing';
+            typingDiv.textContent = 'AI is thinking...';
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            messageInput.value = '';
+            sendButton.disabled = true;
+
+            vscode.postMessage({
+                command: 'sendMessage',
+                text: text
+            });
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        window.addEventListener('message', event => {
+            const message = event.data;
+
+            switch (message.command) {
+                case 'addMessage':
+                    hideTyping();
+                    addMessage(message.role, message.content);
+                    sendButton.disabled = false;
+                    break;
+
+                case 'addError':
+                    hideTyping();
+                    addMessage('assistant', message.error, true);
+                    sendButton.disabled = false;
+                    break;
+
+                case 'showTyping':
+                    showTyping();
+                    break;
+            }
+        });
+
+        // Focus input on load
+        messageInput.focus();
+    </script>
+</body>
+</html>`;
+    }
+    dispose() {
+        AIChatPanel.currentPanel = undefined;
+        this._panel.dispose();
+        while (this._disposables.length) {
+            const disposable = this._disposables.pop();
+            if (disposable) {
+                disposable.dispose();
+            }
+        }
+    }
+}
+class NoodleExtensionMinimal extends events_1.EventEmitter {
+    constructor(context) {
+        super();
         this.isActivated = false;
+        this.context = context;
+        this.outputChannel = vscode.window.createOutputChannel('Noodle Extension');
     }
     /**
-     * Activate the extension
+     * Activate the extension - MINIMAL VERSION
      */
     async activate() {
         try {
             if (this.isActivated) {
                 return;
             }
-            // Initialize output channel
-            this.outputChannel = vscode.window.createOutputChannel('Noodle Extension');
-            // Initialize infrastructure
-            await this.initializeInfrastructure();
-            // Activate core services
-            await this.activateCoreServices();
-            // Activate UI components
-            await this.activateUIComponents();
-            // Register commands and event listeners
-            await this.registerCommands();
-            await this.registerEventListeners();
-            // Set activation completion
+            this.outputChannel.appendLine('=== Noodle Extension Activation Started ===');
+            // Step 1: Create Status Bar
+            this.outputChannel.appendLine('Creating status bar...');
+            this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+            this.statusBarItem.text = '$(server) Noodle';
+            this.statusBarItem.tooltip = 'Noodle Extension';
+            this.statusBarItem.command = 'noodle.showStatus';
+            this.statusBarItem.show();
+            this.outputChannel.appendLine('✓ Status bar created');
+            // Step 2: Initialize AI Provider Service
+            this.outputChannel.appendLine('Initializing AI provider service...');
+            try {
+                this.aiProviderService = new aiProviderService_1.AIProviderService();
+                this.outputChannel.appendLine('✓ AI provider service initialized');
+            }
+            catch (error) {
+                this.outputChannel.appendLine(`⚠ AI provider service failed: ${error.message}`);
+            }
+            // Step 3: Initialize Backend Service
+            this.outputChannel.appendLine('Initializing backend service...');
+            try {
+                this.backendService = new backendService_1.NoodleBackendService();
+                await this.backendService.initialize();
+                this.outputChannel.appendLine('✓ Backend service initialized');
+            }
+            catch (error) {
+                this.outputChannel.appendLine(`⚠ Backend service failed: ${error.message}`);
+                this.outputChannel.appendLine('  Continuing without backend...');
+            }
+            // Step 4: Initialize LSP Manager
+            this.outputChannel.appendLine('Initializing LSP manager...');
+            try {
+                this.lspManager = new lspManager_1.LSPManager(this.context, null, // serviceManager
+                null, // configManager
+                null, // eventBus
+                null, // cacheManager
+                null // logger
+                );
+                await this.lspManager.initialize();
+                this.outputChannel.appendLine('✓ LSP manager initialized');
+            }
+            catch (error) {
+                this.outputChannel.appendLine(`⚠ LSP manager failed: ${error.message}`);
+                this.outputChannel.appendLine('  Continuing without LSP...');
+            }
+            // Step 5: Register Commands
+            this.outputChannel.appendLine('Registering commands...');
+            this.registerCommands();
+            this.outputChannel.appendLine('✓ Commands registered');
+            // Step 6: Show Success Message
             this.isActivated = true;
-            this.outputChannel.appendLine('Noodle extension activated successfully');
-            this.emit('activated');
+            this.outputChannel.appendLine('=== Noodle Extension Activated Successfully ===');
+            void vscode.window.showInformationMessage('🍜 Noodle Extension Active! Use noodle.ai.chat to start chatting.');
         }
         catch (error) {
-            this.outputChannel.appendLine(`Failed to activate extension: ${error.message}`);
+            this.outputChannel.appendLine(`❌ CRITICAL ERROR: ${error.message}`);
+            this.outputChannel.show();
             throw error;
         }
-    }
-    /**
-     * Initialize infrastructure
-     */
-    async initializeInfrastructure() {
-        try {
-            this.outputChannel.appendLine('Initializing infrastructure...');
-            // Initialize ecosystem integration
-            this.ecosystemIntegration = new index_1.EcosystemIntegration(this.context);
-            await this.ecosystemIntegration.initialize();
-            // Initialize service manager
-            this.serviceManager = this.ecosystemIntegration.getServiceManager();
-            this.outputChannel.appendLine('Infrastructure initialized');
-        }
-        catch (error) {
-            this.outputChannel.appendLine(`Infrastructure initialization failed: ${error.message}`);
-            throw error;
-        }
-    }
-    /**
-     * Activate core services
-     */
-    async activateCoreServices() {
-        this.outputChannel.appendLine('Activating core services...');
-        // Get services from ecosystem integration
-        const serviceManager = this.ecosystemIntegration.getServiceManager();
-        const configManager = this.ecosystemIntegration.getConfigurationManager();
-        const eventBus = this.ecosystemIntegration.getEventBus();
-        const cacheManager = this.ecosystemIntegration.getCacheManager();
-        const logger = this.ecosystemIntegration.getLogger();
-        // Initialize Backend Service
-        this.backendService = new backendService_1.NoodleBackendService(serviceManager, configManager, eventBus, cacheManager, logger);
-        await this.backendService.initialize();
-        // Initialize AI Assistant
-        this.aiAssistant = new aiAssistantProvider_1.AIAssistantProvider(this.context, serviceManager, configManager, eventBus, cacheManager, logger);
-        await this.aiAssistant.initialize();
-        // Initialize LSP Manager
-        this.lspManager = new lspManager_1.LSPManager(this.context, serviceManager, configManager, eventBus, cacheManager, logger);
-        await this.lspManager.initialize();
-        this.outputChannel.appendLine('Core services activated');
-    }
-    /**
-     * Activate ecosystem integration
-     */
-    // Remove this method as ecosystem integration is already initialized in initializeInfrastructure
-    /**
-     * Activate UI components
-     */
-    async activateUIComponents() {
-        this.outputChannel.appendLine('Activating UI components...');
-        // Initialize welcome provider
-        this.welcomeProvider = new welcomeProvider_1.NoodleWelcomeProvider(this.context);
-        await this.welcomeProvider.initialize();
-        // Initialize tree provider
-        this.treeProvider = new treeProvider_1.NoodleTreeProvider(this.context);
-        await this.treeProvider.initialize();
-        // Initialize status bar
-        this.statusBar = new statusBar_1.NoodleStatusBar(this.context);
-        await this.statusBar.initialize();
-        this.outputChannel.appendLine('UI components activated');
     }
     /**
      * Register commands
      */
-    async registerCommands() {
-        this.outputChannel.appendLine('Registering commands...');
-        // Core commands
-        const disposables = [
-            vscode.commands.registerCommand('noodle.showWelcome', () => {
-                this.welcomeProvider.showWelcome();
+    registerCommands() {
+        const commands = [
+            // Status & Info
+            vscode.commands.registerCommand('noodle.showStatus', () => {
+                this.showStatus();
             }),
+            // LSP Commands
+            vscode.commands.registerCommand('noodle.lsp.status', () => {
+                this.showLSPStatus();
+            }),
+            vscode.commands.registerCommand('noodle.lsp.restart', async () => {
+                await this.restartLSP();
+            }),
+            // AI Commands
             vscode.commands.registerCommand('noodle.ai.chat', () => {
-                this.showChatPanel();
+                AIChatPanel.createOrShow(this.context, this.aiProviderService);
             }),
             vscode.commands.registerCommand('noodle.ai.assist', () => {
-                this.aiAssistant.showAssist();
+                AIChatPanel.createOrShow(this.context, this.aiProviderService);
             }),
-            vscode.commands.registerCommand('noodle.lsp.status', () => {
-                this.lspManager.showStatus();
+            vscode.commands.registerCommand('noodle.ai.testConnection', async () => {
+                await this.testAIConnection();
             }),
-            vscode.commands.registerCommand('noodle.ecosystem.showStatus', () => {
-                this.ecosystemIntegration.showStatus();
+            vscode.commands.registerCommand('noodle.ai.showConfig', () => {
+                this.showAIConfig();
             }),
-            // Git commands
-            vscode.commands.registerCommand('noodle.git.status', () => {
-                this.ecosystemIntegration.getGitIntegration().showStatus();
+            // Settings
+            vscode.commands.registerCommand('noodle.settings', () => {
+                vscode.commands.executeCommand('workbench.action.openSettings', '@ext:noodle');
             }),
-            vscode.commands.registerCommand('noodle.git.showStatus', () => {
-                this.ecosystemIntegration.getGitIntegration().showDetailedStatus();
+            // Development
+            vscode.commands.registerCommand('noodle.development.restart', () => {
+                vscode.commands.executeCommand('workbench.action.reloadWindow');
             }),
-            vscode.commands.registerCommand('noodle.git.createBranch', async () => {
-                const branchName = await vscode.window.showInputBox({
-                    prompt: 'Enter branch name',
-                    placeHolder: 'feature/new-feature'
-                });
-                if (branchName) {
-                    await this.ecosystemIntegration.getGitIntegration().createBranch(branchName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.git.checkoutBranch', async () => {
-                const branches = await this.ecosystemIntegration.getGitIntegration().getBranches();
-                const branchName = await vscode.window.showQuickPick(branches, {
-                    placeHolder: 'Select branch to checkout'
-                });
-                if (branchName) {
-                    await this.ecosystemIntegration.getGitIntegration().checkoutBranch(branchName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.git.deleteBranch', async () => {
-                const branches = await this.ecosystemIntegration.getGitIntegration().getBranches();
-                const branchName = await vscode.window.showQuickPick(branches, {
-                    placeHolder: 'Select branch to delete'
-                });
-                if (branchName) {
-                    await this.ecosystemIntegration.getGitIntegration().deleteBranch(branchName);
-                }
-            }),
-            // GitHub commands
-            vscode.commands.registerCommand('noodle.github.showStatus', () => {
-                this.ecosystemIntegration.getGitHubApiConnectors().showStatus();
-            }),
-            vscode.commands.registerCommand('noodle.github.createIssue', async () => {
-                const title = await vscode.window.showInputBox({
-                    prompt: 'Enter issue title',
-                    placeHolder: 'Issue title'
-                });
-                if (title) {
-                    const body = await vscode.window.showInputBox({
-                        prompt: 'Enter issue description',
-                        placeHolder: 'Issue description'
-                    });
-                    await this.ecosystemIntegration.getGitHubApiConnectors().createIssue(title, body || '');
-                }
-            }),
-            // CI/CD commands
-            vscode.commands.registerCommand('noodle.cicd.showStatus', () => {
-                this.ecosystemIntegration.getCICDIntegration().showStatus();
-            }),
-            vscode.commands.registerCommand('noodle.cicd.createConfig', async () => {
-                const platform = await vscode.window.showQuickPick([
-                    'GitHub Actions',
-                    'GitLab CI',
-                    'Jenkins',
-                    'Azure DevOps'
-                ], {
-                    placeHolder: 'Select CI/CD platform'
-                });
-                if (platform) {
-                    await this.ecosystemIntegration.getCICDIntegration().createConfig(platform);
-                }
-            }),
-            // Deployment automation commands
-            vscode.commands.registerCommand('noodle.deployment.showStatus', () => {
-                this.ecosystemIntegration.getDeploymentAutomationScripts().showStatus();
-            }),
-            vscode.commands.registerCommand('noodle.deployment.createK8sEnvironment', async () => {
-                const name = await vscode.window.showInputBox({
-                    prompt: 'Enter environment name',
-                    placeHolder: 'production'
-                });
-                if (name) {
-                    const namespace = await vscode.window.showInputBox({
-                        prompt: 'Enter Kubernetes namespace',
-                        placeHolder: 'default'
-                    });
-                    if (namespace) {
-                        await this.ecosystemIntegration.getDeploymentAutomationScripts().createKubernetesEnvironment(name, namespace);
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.deployToK8s', async () => {
-                const manifestPath = await vscode.window.showInputBox({
-                    prompt: 'Enter manifest file path',
-                    placeHolder: './k8s/deployment.yaml'
-                });
-                if (manifestPath) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().deployToKubernetes(manifestPath);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.scaleK8sDeployment', async () => {
-                const deploymentName = await vscode.window.showInputBox({
-                    prompt: 'Enter deployment name',
-                    placeHolder: 'my-app'
-                });
-                if (deploymentName) {
-                    const replicas = await vscode.window.showInputBox({
-                        prompt: 'Enter number of replicas',
-                        placeHolder: '3'
-                    });
-                    if (replicas) {
-                        await this.ecosystemIntegration.getDeploymentAutomationScripts().scaleKubernetesDeployment(deploymentName, parseInt(replicas));
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.getK8sPodLogs', async () => {
-                const podName = await vscode.window.showInputBox({
-                    prompt: 'Enter pod name',
-                    placeHolder: 'my-app-pod-12345'
-                });
-                if (podName) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().getKubernetesPodLogs(podName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.deleteK8sResource', async () => {
-                const resourceType = await vscode.window.showQuickPick([
-                    'pod',
-                    'deployment',
-                    'service',
-                    'ingress'
-                ], {
-                    placeHolder: 'Select resource type'
-                });
-                if (resourceType) {
-                    const resourceName = await vscode.window.showInputBox({
-                        prompt: `Enter ${resourceType} name`,
-                        placeHolder: 'my-resource'
-                    });
-                    if (resourceName) {
-                        await this.ecosystemIntegration.getDeploymentAutomationScripts().deleteKubernetesResource(resourceType, resourceName);
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.setupK8sPortForward', async () => {
-                const podName = await vscode.window.showInputBox({
-                    prompt: 'Enter pod name',
-                    placeHolder: 'my-app-pod-12345'
-                });
-                if (podName) {
-                    const localPort = await vscode.window.showInputBox({
-                        prompt: 'Enter local port',
-                        placeHolder: '8080'
-                    });
-                    if (localPort) {
-                        const remotePort = await vscode.window.showInputBox({
-                            prompt: 'Enter remote port',
-                            placeHolder: '80'
-                        });
-                        if (remotePort) {
-                            await this.ecosystemIntegration.getDeploymentAutomationScripts().setupKubernetesPortForward(podName, parseInt(localPort), parseInt(remotePort));
-                        }
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.deployment.createK8sManifest', async () => {
-                const resourceType = await vscode.window.showQuickPick([
-                    'deployment',
-                    'service',
-                    'ingress',
-                    'configmap',
-                    'secret'
-                ], {
-                    placeHolder: 'Select resource type'
-                });
-                if (resourceType) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().createKubernetesManifest(resourceType);
-                }
-            }),
-            // Monitoring commands
-            vscode.commands.registerCommand('noodle.monitoring.showStatus', () => {
-                this.ecosystemIntegration.getMonitoringSystemAdapters().showStatus();
-            }),
-            // Docker commands
-            vscode.commands.registerCommand('noodle.docker.showStatus', () => {
-                this.ecosystemIntegration.getDeploymentAutomationScripts().showDockerStatus();
-            }),
-            vscode.commands.registerCommand('noodle.docker.buildImage', async () => {
-                const imageName = await vscode.window.showInputBox({
-                    prompt: 'Enter image name',
-                    placeHolder: 'my-app:latest'
-                });
-                if (imageName) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().buildDockerImage(imageName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.docker.runContainer', async () => {
-                const imageName = await vscode.window.showInputBox({
-                    prompt: 'Enter image name',
-                    placeHolder: 'my-app:latest'
-                });
-                if (imageName) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().runDockerContainer(imageName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.docker.stopContainer', async () => {
-                const containerId = await vscode.window.showInputBox({
-                    prompt: 'Enter container ID or name',
-                    placeHolder: 'container-id'
-                });
-                if (containerId) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().stopDockerContainer(containerId);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.docker.startContainer', async () => {
-                const containerId = await vscode.window.showInputBox({
-                    prompt: 'Enter container ID or name',
-                    placeHolder: 'container-id'
-                });
-                if (containerId) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().startDockerContainer(containerId);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.docker.removeContainer', async () => {
-                const containerId = await vscode.window.showInputBox({
-                    prompt: 'Enter container ID or name',
-                    placeHolder: 'container-id'
-                });
-                if (containerId) {
-                    await this.ecosystemIntegration.getDeploymentAutomationScripts().removeDockerContainer(containerId);
-                }
-            }),
-            // Kubernetes commands
-            vscode.commands.registerCommand('noodle.kubernetes.showStatus', () => {
-                this.ecosystemIntegration.getKubernetesIntegration().showStatus();
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.deploy', async () => {
-                const manifestPath = await vscode.window.showInputBox({
-                    prompt: 'Enter manifest file path',
-                    placeHolder: './k8s/deployment.yaml'
-                });
-                if (manifestPath) {
-                    await this.ecosystemIntegration.getKubernetesIntegration().deploy(manifestPath);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.scale', async () => {
-                const deploymentName = await vscode.window.showInputBox({
-                    prompt: 'Enter deployment name',
-                    placeHolder: 'my-app'
-                });
-                if (deploymentName) {
-                    const replicas = await vscode.window.showInputBox({
-                        prompt: 'Enter number of replicas',
-                        placeHolder: '3'
-                    });
-                    if (replicas) {
-                        await this.ecosystemIntegration.getKubernetesIntegration().scale(deploymentName, parseInt(replicas));
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.getLogs', async () => {
-                const podName = await vscode.window.showInputBox({
-                    prompt: 'Enter pod name',
-                    placeHolder: 'my-app-pod-12345'
-                });
-                if (podName) {
-                    await this.ecosystemIntegration.getKubernetesIntegration().getLogs(podName);
-                }
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.deleteResource', async () => {
-                const resourceType = await vscode.window.showQuickPick([
-                    'pod',
-                    'deployment',
-                    'service',
-                    'ingress'
-                ], {
-                    placeHolder: 'Select resource type'
-                });
-                if (resourceType) {
-                    const resourceName = await vscode.window.showInputBox({
-                        prompt: `Enter ${resourceType} name`,
-                        placeHolder: 'my-resource'
-                    });
-                    if (resourceName) {
-                        await this.ecosystemIntegration.getKubernetesIntegration().deleteResource(resourceType, resourceName);
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.portForward', async () => {
-                const podName = await vscode.window.showInputBox({
-                    prompt: 'Enter pod name',
-                    placeHolder: 'my-app-pod-12345'
-                });
-                if (podName) {
-                    const localPort = await vscode.window.showInputBox({
-                        prompt: 'Enter local port',
-                        placeHolder: '8080'
-                    });
-                    if (localPort) {
-                        const remotePort = await vscode.window.showInputBox({
-                            prompt: 'Enter remote port',
-                            placeHolder: '80'
-                        });
-                        if (remotePort) {
-                            await this.ecosystemIntegration.getKubernetesIntegration().portForward(podName, parseInt(localPort), parseInt(remotePort));
-                        }
-                    }
-                }
-            }),
-            vscode.commands.registerCommand('noodle.kubernetes.createManifest', async () => {
-                const resourceType = await vscode.window.showQuickPick([
-                    'deployment',
-                    'service',
-                    'ingress',
-                    'configmap',
-                    'secret'
-                ], {
-                    placeHolder: 'Select resource type'
-                });
-                if (resourceType) {
-                    await this.ecosystemIntegration.getKubernetesIntegration().createManifest(resourceType);
-                }
+            vscode.commands.registerCommand('noodle.development.showOutput', () => {
+                this.outputChannel.show();
             })
         ];
-        // Register all commands
-        disposables.forEach(disposable => {
-            this.context.subscriptions.push(disposable);
+        commands.forEach(cmd => {
+            this.context.subscriptions.push(cmd);
         });
-        this.outputChannel.appendLine(`Registered ${disposables.length} commands`);
+        this.outputChannel.appendLine(`  Registered ${commands.length} commands`);
     }
     /**
-     * Show the AI chat panel
+     * Show extension status
      */
-    async showChatPanel() {
-        try {
-            if (!this.chatPanel) {
-                this.chatPanel = new aiChatPanel_1.AIChatPanel(this.context, this.backendService);
+    showStatus() {
+        this.outputChannel.clear();
+        this.outputChannel.appendLine('=== Noodle Extension Status ===\n');
+        this.outputChannel.appendLine(`Extension: ${this.isActivated ? '✓ Active' : '✗ Inactive'}`);
+        this.outputChannel.appendLine(`AI Provider: ${this.aiProviderService ? '✓ Initialized' : '✗ Not initialized'}`);
+        this.outputChannel.appendLine(`Backend: ${this.backendService ? '✓ Initialized' : '✗ Not initialized'}`);
+        this.outputChannel.appendLine(`LSP Manager: ${this.lspManager ? '✓ Initialized' : '✗ Not initialized'}`);
+        this.outputChannel.appendLine(`\n=== Commands ===`);
+        this.outputChannel.appendLine('• noodle.ai.chat - Open AI chat');
+        this.outputChannel.appendLine('• noodle.ai.testConnection - Test AI provider');
+        this.outputChannel.appendLine('• noodle.ai.showConfig - Show AI configuration');
+        this.outputChannel.appendLine('• noodle.lsp.status - Show LSP status');
+        this.outputChannel.appendLine('• noodle.development.showOutput - Show this log');
+        this.outputChannel.show();
+    }
+    /**
+     * Show LSP status
+     */
+    showLSPStatus() {
+        if (this.lspManager) {
+            void vscode.commands.executeCommand('noodle.lsp.status');
+        }
+        else {
+            void vscode.window.showWarningMessage('LSP Manager is not initialized');
+        }
+    }
+    /**
+     * Restart LSP
+     */
+    async restartLSP() {
+        if (this.lspManager) {
+            try {
+                await this.lspManager.initialize();
+                void vscode.window.showInformationMessage('LSP Manager restarted');
             }
-            await this.chatPanel.show();
+            catch (error) {
+                void vscode.window.showErrorMessage(`Failed to restart LSP: ${error.message}`);
+            }
         }
-        catch (error) {
-            this.outputChannel.appendLine(`Failed to show chat panel: ${error.message}`);
-            vscode.window.showErrorMessage(`Failed to show chat panel: ${error.message}`);
+        else {
+            void vscode.window.showWarningMessage('LSP Manager is not initialized');
         }
     }
     /**
-     * Register event listeners
+     * Test AI provider connection
      */
-    async registerEventListeners() {
-        this.outputChannel.appendLine('Registering event listeners...');
-        // Configuration changes
-        vscode.workspace.onDidChangeConfiguration(async (event) => {
-            if (event.affectsConfiguration('noodle')) {
-                this.outputChannel.appendLine('Configuration changed, reloading...');
-                // Handle configuration changes
+    async testAIConnection() {
+        if (!this.aiProviderService) {
+            vscode.window.showWarningMessage('AI Provider Service is not initialized');
+            return;
+        }
+        const result = await this.aiProviderService.testConnection();
+        if (result.success) {
+            vscode.window.showInformationMessage(result.message);
+        }
+        else {
+            vscode.window.showErrorMessage(result.message);
+        }
+    }
+    /**
+     * Show current AI configuration
+     */
+    showAIConfig() {
+        if (!this.aiProviderService) {
+            vscode.window.showWarningMessage('AI Provider Service is not initialized');
+            return;
+        }
+        const config = vscode.workspace.getConfiguration('noodle.ai');
+        const provider = config.get('provider', 'openai');
+        const model = config.get('model', 'gpt-4');
+        const apiKey = config.get('apiKey', '');
+        const endpoint = config.get('endpoint', '');
+        const message = `
+Provider: ${provider}
+Model: ${model}
+API Key: ${apiKey ? '✓ Configured' : '⚠ Not configured'}
+Endpoint: ${endpoint || 'Default'}
+        `.trim();
+        vscode.window.showInformationMessage(message, 'Open Settings').then(selection => {
+            if (selection === 'Open Settings') {
+                vscode.commands.executeCommand('workbench.action.openSettings', '@ext:noodle');
             }
         });
-        // Document changes
-        vscode.workspace.onDidChangeTextDocument((event) => {
-            // Handle document changes
-        });
-        // Active editor changes
-        vscode.window.onDidChangeActiveTextEditor((event) => {
-            // Handle editor changes
-        });
-        // Workspace changes
-        vscode.workspace.onDidChangeWorkspaceFolders(() => {
-            // Handle workspace changes
-        });
-        this.outputChannel.appendLine('Event listeners registered');
     }
     /**
-     * Update status bar
+     * Deactivate the extension
      */
-    updateStatusBar() {
-        const services = this.ecosystemIntegration.getServiceManager().getServices();
-        const activeServices = services.filter(s => s.status === 'running').length;
-        let text = `$(plug) Ecosystem`;
-        if (activeServices > 0) {
-            text += ` 🟢${activeServices}`;
+    async deactivate() {
+        this.outputChannel.appendLine('Deactivating Noodle extension...');
+        if (AIChatPanel.currentPanel) {
+            AIChatPanel.currentPanel.dispose();
         }
-        if (!this.statusBarItem) {
-            this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-        }
-        this.statusBarItem.text = text;
-        this.statusBarItem.tooltip = `Ecosystem: ${activeServices} active services`;
-        this.statusBarItem.show();
-    }
-    /**
-     * Show status
-     */
-    async showStatus() {
-        try {
-            const services = this.ecosystemIntegration.getServiceManager().getServices();
-            const activeServices = services.filter(s => s.status === 'running').length;
-            let output = `Ecosystem Status\n`;
-            output += `================================\n\n`;
-            output += `Services (${services.length} total)\n`;
-            output += `Active: ${activeServices} / ${services.length}\n`;
-            output += `================================\n\n`;
-            // Service details
-            for (const service of services) {
-                const statusIcon = service.status === 'running' ? '🟢' :
-                    service.status === 'starting' ? '🟡' : '🔴';
-                output += `  ${statusIcon} ${service.config.name}: ${service.status}\n`;
-                output += `    Status: ${service.status}\n`;
-                if (service.status.startTime) {
-                    const uptime = Date.now() - service.status.startTime;
-                    output += `    Uptime: ${Math.round(uptime / 1000)}s\n`;
-                }
-                if (service.status.lastError) {
-                    output += `    Last Error: ${service.status.lastError}\n`;
-                }
-                output += '\n';
-            }
-            this.outputChannel.clear();
-            this.outputChannel.appendLine(output);
-            this.outputChannel.show();
-        }
-        catch (error) {
-            this.outputChannel.appendLine(`Failed to show status: ${error.message}`);
-            throw error;
-        }
-    }
-    /**
-     * Dispose extension
-     */
-    dispose() {
-        // Dispose UI components
-        if (this.welcomeProvider)
-            this.welcomeProvider.dispose();
-        if (this.treeProvider)
-            this.treeProvider.dispose();
-        if (this.statusBar)
-            this.statusBar.dispose();
-        if (this.statusBarItem)
+        if (this.statusBarItem) {
             this.statusBarItem.dispose();
-        // Dispose infrastructure
-        if (this.ecosystemIntegration)
-            this.ecosystemIntegration.dispose();
-        // Dispose core services
-        if (this.aiAssistant)
-            this.aiAssistant.dispose();
-        if (this.lspManager)
-            this.lspManager.dispose();
-        // Dispose output channel
-        if (this.outputChannel)
-            this.outputChannel.dispose();
-        this.removeAllListeners();
+        }
+        if (this.lspManager) {
+            await this.lspManager.dispose();
+        }
+        this.outputChannel.appendLine('Noodle extension deactivated');
     }
 }
-exports.NoodleExtension = NoodleExtension;
-// Export extension
+exports.NoodleExtensionMinimal = NoodleExtensionMinimal;
+/**
+ * Extension activation entry point
+ */
 async function activate(context) {
-    const extension = new NoodleExtension();
-    extension.context = context;
+    const extension = new NoodleExtensionMinimal(context);
     await extension.activate();
 }
 exports.activate = activate;
-function deactivate() {
-    // Cleanup will be handled by the extension's dispose method
+/**
+ * Extension deactivation entry point
+ */
+async function deactivate() {
+    // Cleanup is handled by the extension class
 }
 exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map
