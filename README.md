@@ -73,6 +73,78 @@ See the `LICENSE` file for the full license text.
 
 ---
 
+## Security & API Keys
+
+### ⚠️ IMPORTANT: Never Commit API Keys!
+
+This repository has multiple security measures in place to prevent accidental upload of sensitive information:
+
+#### 🔒 Automated Protection
+- **`.gitignore`** - Prevents sensitive files from being tracked
+- **Pre-commit hook** - Automatically scans for API keys before commits
+- **`.vscode/settings.json`** - Ignored (may contain API keys)
+
+#### 📝 How to Configure AI Providers
+
+When using the Noodle VSCode extension with AI providers (OpenAI, Anthropic, z.ai, etc.), **NEVER** hardcode API keys in your code or commit them to the repository.
+
+**Safe Methods:**
+
+1. **Environment Variable (Recommended):**
+   ```bash
+   # PowerShell
+   $env:NOODLE_AI_API_KEY = "your-api-key-here"
+   
+   # Windows System Environment Variables:
+   # Name: NOODLE_AI_API_KEY
+   # Value: your-api-key-here
+   ```
+
+2. **VSCode Settings (Local Only):**
+   - Settings are stored in `.vscode/settings.json` (ignored by Git)
+   - These settings stay on your machine only
+
+3. **Temporary Environment:**
+   ```bash
+   # For current session only
+   set NOODLE_AI_API_KEY=your-api-key-here
+   ```
+
+**❌ NEVER DO THIS:**
+```typescript
+// DON'T: Hardcoded API keys
+const apiKey = "sk-1234567890abcdefghijklmnopqrstuvwxyz";
+
+// DON'T: Commit .env files with real keys
+// .env files are ignored for a reason!
+```
+
+**✅ INSTEAD DO THIS:**
+```typescript
+// DO: Use environment variables
+const apiKey = process.env.NOODLE_AI_API_KEY;
+
+// DO: Use VSCode settings (not committed)
+const config = vscode.workspace.getConfiguration('noodle.ai');
+const apiKey = config.get('apiKey', '');
+```
+
+#### 🛡️ If You Accidentally Committed a Key
+
+If you accidentally commit an API key:
+1. **Immediately rotate the key** - Generate a new API key from your provider
+2. **Remove from Git history:**
+   ```bash
+   git filter-branch --tree-filter 'git rm -f path/to/file' HEAD
+   ```
+3. **Force push:**
+   ```bash
+   git push origin --force --all
+   ```
+4. **Contact support** of the API provider to invalidate the old key
+
+---
+
 ## Contributing
 
 Contributions are welcome for non-commercial purposes.

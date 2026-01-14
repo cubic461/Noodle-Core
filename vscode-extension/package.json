@@ -1,458 +1,453 @@
 {
-  "name": "noodle",
-  "displayName": "Noodle AI Development Environment",
-  "description": "AI-powered development environment with ecosystem integration and modern infrastructure",
-  "version": "1.0.0",
-  "engines": {
-    "vscode": "^1.74.0"
-  },
-  "categories": [
-    "Other",
-    "Programming Languages",
-    "Snippets",
-    "Linters",
-    "Debuggers",
-    "Formatters",
-    "SCM Providers"
-  ],
-  "keywords": [
-    "ai",
-    "development",
-    "assistant",
-    "code generation",
-    "lsp",
-    "debugger",
-    "ecosystem",
-    "noodle"
-  ],
-  "homepage": "https://github.com/noodle/noodle-vscode-extension",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/noodle/noodle-vscode-extension.git"
-  },
-  "bugs": {
-    "url": "https://github.com/noodle/noodle-vscode-extension/issues"
-  },
-  "license": "MIT",
-  "publisher": "Noodle",
-  "icon": "resources/noodle-icon.png",
-  "galleryBanner": {
-    "color": "#1e1e1e",
-    "theme": "dark"
-  },
-  "activationEvents": [
-    "onCommand:noodle.showWelcome",
-    "onCommand:noodle.ai.chat",
-    "onCommand:noodle.ai.assist",
-    "onCommand:noodle.analyze.code",
-    "onCommand:noodle.generate.code",
-    "onCommand:noodle.debug.start",
-    "onCommand:noodle.test.run",
-    "onCommand:noodle.performance.showMetrics",
-    "onCommand:noodle.health.showStatus",
-    "onCommand:noodle.config.showStatus",
-    "onLanguage:noodle",
-    "onLanguage:typescript",
-    "onLanguage:javascript",
-    "onLanguage:python",
-    "onLanguage:json",
-    "onLanguage:html",
-    "onLanguage:css",
-    "onLanguage:markdown",
-    "workspaceContains:**/*.nc",
-    "workspaceContains:**/*.noodle"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "noodle.showWelcome",
-        "title": "Show Welcome",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.ai.chat",
-        "title": "Open AI Chat",
-        "category": "Noodle AI"
-      },
-      {
-        "command": "noodle.ai.assist",
-        "title": "AI Assist",
-        "category": "Noodle AI"
-      },
-      {
-        "command": "noodle.analyze.code",
-        "title": "Analyze Code",
-        "category": "Noodle Tools"
-      },
-      {
-        "command": "noodle.generate.code",
-        "title": "Generate Code",
-        "category": "Noodle Tools"
-      },
-      {
-        "command": "noodle.debug.start",
-        "title": "Start Debugging",
-        "category": "Noodle Tools"
-      },
-      {
-        "command": "noodle.test.run",
-        "title": "Run Tests",
-        "category": "Noodle Tools"
-      },
-      {
-        "command": "noodle.performance.showMetrics",
-        "title": "Show Performance Metrics",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.health.showStatus",
-        "title": "Show Health Status",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.config.showStatus",
-        "title": "Show Configuration",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.settings",
-        "title": "Settings",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.theme",
-        "title": "Theme",
-        "category": "Noodle"
-      },
-      {
-        "command": "noodle.development.restart",
-        "title": "Restart Extension",
-        "category": "Noodle Development"
-      },
-      {
-        "command": "noodle.development.reload",
-        "title": "Reload Extension",
-        "category": "Noodle Development"
-      }
-    ],
-    "views": {
-      "explorer": [
-        {
-          "id": "noodleExplorer",
-          "name": "Noodle",
-          "when": "workspaceContains:**/*.nc || workspaceContains:**/*.noodle"
-        }
-      ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "noodle",
-          "title": "Noodle",
-          "icon": "resources/noodle-icon.svg"
-        }
-      ]
-    },
-    "configuration": {
-      "title": "Noodle",
-      "properties": {
-        "noodle.ai.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable AI assistance features"
-        },
-        "noodle.ai.provider": {
-          "type": "string",
-          "enum": [
-            "openai",
-            "anthropic",
-            "local",
-            "custom"
-          ],
-          "default": "openai",
-          "description": "AI provider to use"
-        },
-        "noodle.ai.model": {
-          "type": "string",
-          "default": "gpt-4",
-          "description": "AI model to use"
-        },
-        "noodle.lsp.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable Language Server Protocol support"
-        },
-        "noodle.lsp.servers": {
-          "type": "object",
-          "description": "Custom LSP server configurations",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "name": {
-                "type": "string",
-                "description": "Server name"
-              },
-              "language": {
-                "type": "string",
-                "description": "Language identifier"
-              },
-              "command": {
-                "type": "string",
-                "description": "Server command"
-              },
-              "args": {
-                "type": "array",
-                "items": {
-                  "type": "string"
+    "name":  "noodle",
+    "displayName":  "Noodle AI Development Environment",
+    "description":  "AI-powered development environment with ecosystem integration and modern infrastructure",
+    "version":  "1.0.0",
+    "engines":  {
+                    "vscode":  "^1.74.0"
                 },
-                "description": "Server arguments"
-              },
-              "enabled": {
-                "type": "boolean",
-                "default": true,
-                "description": "Enable this server"
-              }
-            }
-          }
-        },
-        "noodle.ecosystem.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable ecosystem integration features"
-        },
-        "noodle.ecosystem.git.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable Git integration"
-        },
-        "noodle.ecosystem.github.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable GitHub integration"
-        },
-        "noodle.ecosystem.cicd.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable CI/CD integration"
-        },
-        "noodle.ecosystem.monitoring.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable monitoring integration"
-        },
-        "noodle.performance.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable performance monitoring"
-        },
-        "noodle.performance.thresholds.responseTime": {
-          "type": "number",
-          "default": 500,
-          "description": "Response time threshold in milliseconds"
-        },
-        "noodle.performance.thresholds.memoryUsage": {
-          "type": "number",
-          "default": 80,
-          "description": "Memory usage threshold in percentage"
-        },
-        "noodle.logging.level": {
-          "type": "string",
-          "enum": [
-            "DEBUG",
-            "INFO",
-            "WARNING",
-            "ERROR"
-          ],
-          "default": "INFO",
-          "description": "Logging level"
-        },
-        "noodle.logging.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable logging"
-        },
-        "noodle.cache.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable caching"
-        },
-        "noodle.cache.ttl": {
-          "type": "number",
-          "default": 300,
-          "description": "Cache time-to-live in seconds"
-        },
-        "noodle.cache.maxSize": {
-          "type": "number",
-          "default": 100,
-          "description": "Maximum cache size in MB"
-        }
-      }
-    },
-    "languages": [
-      {
-        "id": "noodle",
-        "aliases": [
-          "Noodle",
-          "noodle"
-        ],
-        "extensions": [
-          ".nc",
-          ".noodle"
-        ],
-        "configuration": "./language-configuration.json"
-      }
-    ],
-    "grammars": [
-      {
-        "language": "noodle",
-        "scopeName": "source.noodle",
-        "path": "./syntaxes/noodle.tmLanguage.json"
-      }
-    ],
-    "themes": [
-      {
-        "label": "Noodle Dark",
-        "uiTheme": "vs-dark",
-        "path": "./themes/noodle-dark.json"
-      },
-      {
-        "label": "Noodle Light",
-        "uiTheme": "vs",
-        "path": "./themes/noodle-light.json"
-      }
-    ],
-    "snippets": [
-      {
-        "language": "noodle",
-        "path": "./snippets/noodle.json"
-      }
-    ],
-    "keybindings": [
-      {
-        "command": "noodle.ai.chat",
-        "key": "ctrl+shift+n",
-        "mac": "cmd+shift+n"
-      },
-      {
-        "command": "noodle.ai.assist",
-        "key": "ctrl+shift+a",
-        "mac": "cmd+shift+a"
-      },
-      {
-        "command": "noodle.analyze.code",
-        "key": "ctrl+shift+c",
-        "mac": "cmd+shift+c"
-      },
-      {
-        "command": "noodle.generate.code",
-        "key": "ctrl+shift+g",
-        "mac": "cmd+shift+g"
-      },
-      {
-        "command": "noodle.test.run",
-        "key": "ctrl+shift+t",
-        "mac": "cmd+shift+t"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "command": "noodle.showWelcome",
-          "when": "true"
-        },
-        {
-          "command": "noodle.ai.chat",
-          "when": "noodle.ai.enabled"
-        },
-        {
-          "command": "noodle.ai.assist",
-          "when": "noodle.ai.enabled"
-        },
-        {
-          "command": "noodle.analyze.code",
-          "when": "true"
-        },
-        {
-          "command": "noodle.generate.code",
-          "when": "true"
-        },
-        {
-          "command": "noodle.debug.start",
-          "when": "true"
-        },
-        {
-          "command": "noodle.test.run",
-          "when": "true"
-        },
-        {
-          "command": "noodle.performance.showMetrics",
-          "when": "noodle.performance.enabled"
-        },
-        {
-          "command": "noodle.health.showStatus",
-          "when": "true"
-        },
-        {
-          "command": "noodle.config.showStatus",
-          "when": "true"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "noodle.ai.assist",
-          "when": "noodle.ai.enabled && editorHasSelection",
-          "group": "noodle"
-        },
-        {
-          "command": "noodle.analyze.code",
-          "when": "editorHasSelection",
-          "group": "noodle"
-        },
-        {
-          "command": "noodle.generate.code",
-          "when": "editorHasSelection",
-          "group": "noodle"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "noodle.showWelcome",
-          "when": "view == noodleExplorer",
-          "group": "navigation"
-        }
-      ]
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
-    "package": "vsce package",
-    "publish": "vsce publish"
-  },
-  "devDependencies": {
-    "@types/node": "16.x",
-    "@types/vscode": "^1.74.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "@vscode/test-electron": "^2.2.0",
-    "eslint": "^8.28.0",
-    "ts-loader": "^9.5.4",
-    "typescript": "^4.9.4",
-    "vsce": "^2.15.0",
-    "webpack": "^5.103.0",
-    "webpack-cli": "^6.0.1"
-  },
-  "dependencies": {
-    "@octokit/rest": "^22.0.1",
-    "eventemitter3": "^4.0.7",
-    "lodash": "^4.17.21",
-    "node-fetch": "^3.3.0",
-    "semver": "^7.3.8",
-    "vscode-languageclient": "^8.0.2"
-  }
+    "categories":  [
+                       "Other",
+                       "Programming Languages",
+                       "Snippets",
+                       "Linters",
+                       "Debuggers",
+                       "Formatters",
+                       "SCM Providers"
+                   ],
+    "keywords":  [
+                     "ai",
+                     "development",
+                     "assistant",
+                     "code generation",
+                     "lsp",
+                     "debugger",
+                     "ecosystem",
+                     "noodle"
+                 ],
+    "homepage":  "https://github.com/noodle/noodle-vscode-extension",
+    "repository":  {
+                       "type":  "git",
+                       "url":  "https://github.com/noodle/noodle-vscode-extension.git"
+                   },
+    "bugs":  {
+                 "url":  "https://github.com/noodle/noodle-vscode-extension/issues"
+             },
+    "license":  "MIT",
+    "publisher":  "Noodle",
+    "icon":  "resources/noodle-icon.png",
+    "galleryBanner":  {
+                          "color":  "#1e1e1e",
+                          "theme":  "dark"
+                      },
+    "activationEvents":  [
+                             "onCommand:noodle.showWelcome",
+                             "onLanguage:noodle",
+                             "workspaceContains:**/*.nc",
+                             "workspaceContains:**/*.noodle",
+                             "workspaceContains:**/noodle.json"
+                         ],
+    "main":  "./out/extension.js",
+    "contributes":  {
+                        "commands":  [
+                                         {
+                                             "command":  "noodle.showWelcome",
+                                             "title":  "Show Welcome",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.ai.chat",
+                                             "title":  "Open AI Chat",
+                                             "category":  "Noodle AI"
+                                         },
+                                         {
+                                             "command":  "noodle.ai.assist",
+                                             "title":  "AI Assist",
+                                             "category":  "Noodle AI"
+                                         },
+                                         {
+                                             "command":  "noodle.analyze.code",
+                                             "title":  "Analyze Code",
+                                             "category":  "Noodle Tools"
+                                         },
+                                         {
+                                             "command":  "noodle.generate.code",
+                                             "title":  "Generate Code",
+                                             "category":  "Noodle Tools"
+                                         },
+                                         {
+                                             "command":  "noodle.debug.start",
+                                             "title":  "Start Debugging",
+                                             "category":  "Noodle Tools"
+                                         },
+                                         {
+                                             "command":  "noodle.test.run",
+                                             "title":  "Run Tests",
+                                             "category":  "Noodle Tools"
+                                         },
+                                         {
+                                             "command":  "noodle.performance.showMetrics",
+                                             "title":  "Show Performance Metrics",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.health.showStatus",
+                                             "title":  "Show Health Status",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.config.showStatus",
+                                             "title":  "Show Configuration",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.settings",
+                                             "title":  "Settings",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.theme",
+                                             "title":  "Theme",
+                                             "category":  "Noodle"
+                                         },
+                                         {
+                                             "command":  "noodle.development.restart",
+                                             "title":  "Restart Extension",
+                                             "category":  "Noodle Development"
+                                         },
+                                         {
+                                             "command":  "noodle.development.reload",
+                                             "title":  "Reload Extension",
+                                             "category":  "Noodle Development"
+                                         },
+                                         {
+                                             "title":  "Test AI Connection",
+                                             "command":  "noodle.ai.testConnection",
+                                             "category":  "Noodle AI"
+                                         },
+                                         {
+                                             "title":  "Show AI Configuration",
+                                             "command":  "noodle.ai.showConfig",
+                                             "category":  "Noodle AI"
+                                         }
+                                     ],
+                        "views":  {
+                                      "explorer":  [
+                                                       {
+                                                           "id":  "noodleExplorer",
+                                                           "name":  "Noodle",
+                                                           "when":  "workspaceContains:**/*.nc || workspaceContains:**/*.noodle"
+                                                       }
+                                                   ]
+                                  },
+                        "viewsContainers":  {
+                                                "activitybar":  [
+                                                                    {
+                                                                        "id":  "noodle",
+                                                                        "title":  "Noodle",
+                                                                        "icon":  "resources/noodle-icon.svg"
+                                                                    }
+                                                                ]
+                                            },
+                        "configuration":  {
+                                              "title":  "Noodle",
+                                              "properties":  {
+                                                                 "noodle.ai.enabled":  {
+                                                                                           "type":  "boolean",
+                                                                                           "default":  true,
+                                                                                           "description":  "Enable AI assistance features"
+                                                                                       },
+                                                                 "noodle.ai.provider":  {
+                                                                                            "type":  "string",
+                                                                                            "enum":  [
+                                                                                                         "openai",
+                                                                                                         "anthropic",
+                                                                                                         "local",
+                                                                                                         "custom"
+                                                                                                     ],
+                                                                                            "default":  "openai",
+                                                                                            "description":  "AI provider to use"
+                                                                                        },
+                                                                 "noodle.ai.model":  {
+                                                                                         "type":  "string",
+                                                                                         "default":  "gpt-4",
+                                                                                         "description":  "AI model to use"
+                                                                                     },
+                                                                 "noodle.lsp.enabled":  {
+                                                                                            "type":  "boolean",
+                                                                                            "default":  true,
+                                                                                            "description":  "Enable Language Server Protocol support"
+                                                                                        },
+                                                                 "noodle.lsp.servers":  {
+                                                                                            "type":  "object",
+                                                                                            "description":  "Custom LSP server configurations",
+                                                                                            "additionalProperties":  {
+                                                                                                                         "type":  "object",
+                                                                                                                         "properties":  {
+                                                                                                                                            "name":  {
+                                                                                                                                                         "type":  "string",
+                                                                                                                                                         "description":  "Server name"
+                                                                                                                                                     },
+                                                                                                                                            "language":  {
+                                                                                                                                                             "type":  "string",
+                                                                                                                                                             "description":  "Language identifier"
+                                                                                                                                                         },
+                                                                                                                                            "command":  {
+                                                                                                                                                            "type":  "string",
+                                                                                                                                                            "description":  "Server command"
+                                                                                                                                                        },
+                                                                                                                                            "args":  {
+                                                                                                                                                         "type":  "array",
+                                                                                                                                                         "items":  {
+                                                                                                                                                                       "type":  "string"
+                                                                                                                                                                   },
+                                                                                                                                                         "description":  "Server arguments"
+                                                                                                                                                     },
+                                                                                                                                            "enabled":  {
+                                                                                                                                                            "type":  "boolean",
+                                                                                                                                                            "default":  true,
+                                                                                                                                                            "description":  "Enable this server"
+                                                                                                                                                        }
+                                                                                                                                        }
+                                                                                                                     }
+                                                                                        },
+                                                                 "noodle.ecosystem.enabled":  {
+                                                                                                  "type":  "boolean",
+                                                                                                  "default":  true,
+                                                                                                  "description":  "Enable ecosystem integration features"
+                                                                                              },
+                                                                 "noodle.ecosystem.git.enabled":  {
+                                                                                                      "type":  "boolean",
+                                                                                                      "default":  true,
+                                                                                                      "description":  "Enable Git integration"
+                                                                                                  },
+                                                                 "noodle.ecosystem.github.enabled":  {
+                                                                                                         "type":  "boolean",
+                                                                                                         "default":  true,
+                                                                                                         "description":  "Enable GitHub integration"
+                                                                                                     },
+                                                                 "noodle.ecosystem.cicd.enabled":  {
+                                                                                                       "type":  "boolean",
+                                                                                                       "default":  true,
+                                                                                                       "description":  "Enable CI/CD integration"
+                                                                                                   },
+                                                                 "noodle.ecosystem.monitoring.enabled":  {
+                                                                                                             "type":  "boolean",
+                                                                                                             "default":  true,
+                                                                                                             "description":  "Enable monitoring integration"
+                                                                                                         },
+                                                                 "noodle.performance.enabled":  {
+                                                                                                    "type":  "boolean",
+                                                                                                    "default":  true,
+                                                                                                    "description":  "Enable performance monitoring"
+                                                                                                },
+                                                                 "noodle.performance.thresholds.responseTime":  {
+                                                                                                                    "type":  "number",
+                                                                                                                    "default":  500,
+                                                                                                                    "description":  "Response time threshold in milliseconds"
+                                                                                                                },
+                                                                 "noodle.performance.thresholds.memoryUsage":  {
+                                                                                                                   "type":  "number",
+                                                                                                                   "default":  80,
+                                                                                                                   "description":  "Memory usage threshold in percentage"
+                                                                                                               },
+                                                                 "noodle.logging.level":  {
+                                                                                              "type":  "string",
+                                                                                              "enum":  [
+                                                                                                           "DEBUG",
+                                                                                                           "INFO",
+                                                                                                           "WARNING",
+                                                                                                           "ERROR"
+                                                                                                       ],
+                                                                                              "default":  "INFO",
+                                                                                              "description":  "Logging level"
+                                                                                          },
+                                                                 "noodle.logging.enabled":  {
+                                                                                                "type":  "boolean",
+                                                                                                "default":  true,
+                                                                                                "description":  "Enable logging"
+                                                                                            },
+                                                                 "noodle.cache.enabled":  {
+                                                                                              "type":  "boolean",
+                                                                                              "default":  true,
+                                                                                              "description":  "Enable caching"
+                                                                                          },
+                                                                 "noodle.cache.ttl":  {
+                                                                                          "type":  "number",
+                                                                                          "default":  300,
+                                                                                          "description":  "Cache time-to-live in seconds"
+                                                                                      },
+                                                                 "noodle.cache.maxSize":  {
+                                                                                              "type":  "number",
+                                                                                              "default":  100,
+                                                                                              "description":  "Maximum cache size in MB"
+                                                                                          }
+                                                             }
+                                          },
+                        "languages":  [
+                                          {
+                                              "id":  "noodle",
+                                              "aliases":  [
+                                                              "Noodle",
+                                                              "noodle"
+                                                          ],
+                                              "extensions":  [
+                                                                 ".nc",
+                                                                 ".noodle"
+                                                             ],
+                                              "configuration":  "./language-configuration.json"
+                                          }
+                                      ],
+                        "grammars":  [
+                                         {
+                                             "language":  "noodle",
+                                             "scopeName":  "source.noodle",
+                                             "path":  "./syntaxes/noodle.tmLanguage.json"
+                                         }
+                                     ],
+                        "themes":  [
+                                       {
+                                           "label":  "Noodle Dark",
+                                           "uiTheme":  "vs-dark",
+                                           "path":  "./themes/noodle-dark.json"
+                                       },
+                                       {
+                                           "label":  "Noodle Light",
+                                           "uiTheme":  "vs",
+                                           "path":  "./themes/noodle-light.json"
+                                       }
+                                   ],
+                        "snippets":  [
+                                         {
+                                             "language":  "noodle",
+                                             "path":  "./snippets/noodle.json"
+                                         }
+                                     ],
+                        "keybindings":  [
+                                            {
+                                                "command":  "noodle.ai.chat",
+                                                "key":  "ctrl+shift+n",
+                                                "mac":  "cmd+shift+n"
+                                            },
+                                            {
+                                                "command":  "noodle.ai.assist",
+                                                "key":  "ctrl+shift+a",
+                                                "mac":  "cmd+shift+a"
+                                            },
+                                            {
+                                                "command":  "noodle.analyze.code",
+                                                "key":  "ctrl+shift+c",
+                                                "mac":  "cmd+shift+c"
+                                            },
+                                            {
+                                                "command":  "noodle.generate.code",
+                                                "key":  "ctrl+shift+g",
+                                                "mac":  "cmd+shift+g"
+                                            },
+                                            {
+                                                "command":  "noodle.test.run",
+                                                "key":  "ctrl+shift+t",
+                                                "mac":  "cmd+shift+t"
+                                            }
+                                        ],
+                        "menus":  {
+                                      "commandPalette":  [
+                                                             {
+                                                                 "command":  "noodle.showWelcome",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.ai.chat",
+                                                                 "when":  "noodle.ai.enabled"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.ai.assist",
+                                                                 "when":  "noodle.ai.enabled"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.analyze.code",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.generate.code",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.debug.start",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.test.run",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.performance.showMetrics",
+                                                                 "when":  "noodle.performance.enabled"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.health.showStatus",
+                                                                 "when":  "true"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.config.showStatus",
+                                                                 "when":  "true"
+                                                             }
+                                                         ],
+                                      "editor/context":  [
+                                                             {
+                                                                 "command":  "noodle.ai.assist",
+                                                                 "when":  "noodle.ai.enabled \u0026\u0026 editorHasSelection",
+                                                                 "group":  "noodle"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.analyze.code",
+                                                                 "when":  "editorHasSelection",
+                                                                 "group":  "noodle"
+                                                             },
+                                                             {
+                                                                 "command":  "noodle.generate.code",
+                                                                 "when":  "editorHasSelection",
+                                                                 "group":  "noodle"
+                                                             }
+                                                         ],
+                                      "view/title":  [
+                                                         {
+                                                             "command":  "noodle.showWelcome",
+                                                             "when":  "view == noodleExplorer",
+                                                             "group":  "navigation"
+                                                         }
+                                                     ]
+                                  }
+                    },
+    "scripts":  {
+                    "vscode:prepublish":  "echo \"Skipping prepublish compile\"",
+                    "compile":  "tsc -p ./",
+                    "watch":  "tsc -watch -p ./",
+                    "pretest":  "npm run compile \u0026\u0026 npm run lint",
+                    "lint":  "eslint src --ext ts",
+                    "test":  "node ./out/test/runTest.js",
+                    "package":  "vsce package",
+                    "publish":  "vsce publish"
+                },
+    "devDependencies":  {
+                            "@types/node":  "16.x",
+                            "@types/vscode":  "^1.74.0",
+                            "@typescript-eslint/eslint-plugin":  "^5.45.0",
+                            "@typescript-eslint/parser":  "^5.45.0",
+                            "@vscode/test-electron":  "^2.2.0",
+                            "eslint":  "^8.28.0",
+                            "ts-loader":  "^9.5.4",
+                            "typescript":  "^4.9.4",
+                            "vsce":  "^2.15.0",
+                            "webpack":  "^5.103.0",
+                            "webpack-cli":  "^6.0.1"
+                        },
+    "dependencies":  {
+                         "@octokit/rest":  "^22.0.1",
+                         "eventemitter3":  "^4.0.7",
+                         "lodash":  "^4.17.21",
+                         "node-fetch":  "^3.3.0",
+                         "semver":  "^7.3.8",
+                         "vscode-languageclient":  "^8.0.2"
+                     }
 }

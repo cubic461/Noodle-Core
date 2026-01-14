@@ -75,3 +75,32 @@ test/
 
 # Syncthing synchronization folder
 .stfolder/
+
+# SECURITY: API keys, secrets, and sensitive configuration
+*.env
+*.env.local
+*.env.*.local
+secrets/
+credentials/
+private_keys/
+*.pem
+*.key
+*.cert
+
+# VSCode settings (may contain API keys)
+.vscode/settings.json
+.vscode/user-data.json
+
+# Noodle extension local settings (may contain API keys)
+noodle.json.local
+noodle.*.local.json
+
+# Build artifacts and compiled code
+vscode-extension/out/
+vscode-extension/node_modules/
+vscode-extension/*.vsix
+
+# Test output and temporary files
+test_output/
+output/
+*.log

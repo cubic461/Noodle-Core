@@ -1,4 +1,4 @@
-/**
+﻿/**
  * LSP Manager for Noodle VS Code Extension
  * 
  * Manages Language Server Protocol (LSP) connections and provides
@@ -416,7 +416,7 @@ export class LSPManager extends EventEmitter {
         
         let text = '$(server) LSP';
         if (runningServers > 0) {
-            text += ` 🟢${runningServers}`;
+            text += ` ðŸŸ¢${runningServers}`;
         }
         
         this.statusBarItem.text = text;
@@ -433,9 +433,9 @@ export class LSPManager extends EventEmitter {
             
             for (const [serverId, config] of this.servers) {
                 const status = this.serverStatuses.get(serverId);
-                const statusIcon = status?.status === 'running' ? '🟢' :
-                                  status?.status === 'starting' ? '🟡' :
-                                  status?.status === 'error' ? '🔴' : '⚪';
+                const statusIcon = status?.status === 'running' ? 'ðŸŸ¢' :
+                                  status?.status === 'starting' ? 'ðŸŸ¡' :
+                                  status?.status === 'error' ? 'ðŸ”´' : 'âšª';
                 
                 output += `${statusIcon} ${config.name} (${serverId})\n`;
                 output += `  Language: ${config.language}\n`;
@@ -491,11 +491,20 @@ export class LSPManager extends EventEmitter {
     /**
      * Dispose the LSP Manager
      */
-    public dispose(): void {
-        // Stop all servers
-        const stopPromises = [];
+    public async dispose(): Promise<void> {
+        this.logger.info('Disposing LSP Manager...');
+        
+        // Stop all servers and WAIT for them to stop
+        const stopPromises: Promise<void>[] = [];
         for (const serverId of this.servers.keys()) {
             stopPromises.push(this.stopServer(serverId));
+        }
+        
+        // CRITICAL: Wait for all servers to stop before continuing
+        if (stopPromises.length > 0) {
+            this.logger.info(`Waiting for ${stopPromises.length} LSP servers to stop...`);
+            await Promise.all(stopPromises);
+            this.logger.info('All LSP servers stopped');
         }
         
         // Dispose UI components
@@ -506,5 +515,7 @@ export class LSPManager extends EventEmitter {
         this.servers.clear();
         this.serverStatuses.clear();
         this.removeAllListeners();
+        
+        this.logger.info('LSP Manager disposed');
     }
 }

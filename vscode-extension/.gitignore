@@ -1,0 +1,51 @@
+# VSCode Extension - Gitignore
+
+# SECURITY: Sensitive files with API keys and secrets
+settings.json
+user-data.json
+*.env
+*.env.local
+secrets/
+credentials/
+
+# Build artifacts
+out/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# VSIX packages (contain compiled code)
+*.vsix
+
+# Test output
+test-output/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/settings.json.template
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Compiled TypeScript
+*.js
+*.js.map
+!extension.js  # Keep entry point if needed
