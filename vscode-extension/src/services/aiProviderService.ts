@@ -78,7 +78,7 @@ export class AIProviderService {
             'openai': 'https://api.openai.com/v1',
             'anthropic': 'https://api.anthropic.com/v1',
             'groq': 'https://api.groq.com/openai/v1',
-            'z.ai': 'https://api.z.ai/v1',
+            'z.ai': 'https://api.z.ai/api/paas/v4',
             'ollama': 'http://localhost:11434',
             'lmstudio': 'http://localhost:1234/v1'
         };
