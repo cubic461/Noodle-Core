@@ -130,7 +130,10 @@ export class AIProviderService {
         messages: Array<{ role: string; content: string }>
     ): Promise<AIResponse> {
         return new Promise((resolve, reject) => {
-            const url = new URL(endpoint + (endpoint.includes('/v1') ? '/chat/completions' : '/api/chat'));
+            // Don't append path if endpoint already ends with a common API path
+            const hasPath = /\/(chat\/completions|api\/chat|completions|v1\/chat|api\/v1\/chat)$/i.test(endpoint);
+            const url = new URL(hasPath ? endpoint : endpoint + (endpoint.includes('/v1') ? '/chat/completions' : '/api/chat'));
+            this.outputChannel.appendLine(`ðŸŒ Full URL: ${url.href}`);
             
             const requestBody = this.getRequestBody(messages);
             
@@ -210,6 +213,22 @@ export class AIProviderService {
         return headers;
     }
     private parseResponse(json: any): AIResponse {
+        // First check for error responses
+        if (json.code && json.msg) {
+            // Error response format (z.ai and others)
+            return {
+                success: false,
+                error: `API Error ${json.code}: ${json.msg}`
+            };
+        }
+        
+        if (json.error) {
+            // Standard error format
+            return {
+                success: false,
+                error: typeof json.error === 'string' ? json.error : json.error.message
+            };
+        }
         // Handle different response formats
         
         // OpenAI-compatible format (most providers use this)
