@@ -1,0 +1,177 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-01-17T18:08:00Z",
+  "total_plugins": 3,
+  "categories": [
+    "example",
+    "developer-tools",
+    "productivity",
+    "integration",
+    "analysis",
+    "utility"
+  ],
+  "plugins": [
+    {
+      "id": "hello-world-plugin",
+      "name": "Hello World Plugin",
+      "version": "1.0.0",
+      "description": "A comprehensive example plugin demonstrating all NIP features including tools, providers, guards, and hooks",
+      "long_description": "This plugin serves as a complete example for plugin developers. It demonstrates greeting tools, name providers, input validation guards, and event hooks. Perfect starting point for learning the NIP plugin system.",
+      "author": "NIP Development Team",
+      "author_email": "dev@nip.example.com",
+      "type": "tool",
+      "categories": ["example", "demo", "tutorial"],
+      "url": "https://github.com/nip/hello-world-plugin",
+      "download_url": "https://github.com/nip/hello-world-plugin/archive/v1.0.0.zip",
+      "homepage": "https://github.com/nip/hello-world-plugin",
+      "repository": "https://github.com/nip/hello-world-plugin",
+      "documentation": "https://github.com/nip/hello-world-plugin/blob/main/README.md",
+      "bugs": "https://github.com/nip/hello-world-plugin/issues",
+      "downloads": 5420,
+      "stars": 156,
+      "rating": 4.8,
+      "rating_count": 89,
+      "tags": ["example", "demo", "tutorial", "beginner", "learning"],
+      "dependencies": [],
+      "min_nip_version": "3.0.0",
+      "license": "MIT",
+      "verified": true,
+      "featured": true,
+      "official": true,
+      "install_count": 5420,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-17T18:00:00Z",
+      "tools": [
+        {
+          "name": "hello",
+          "description": "Say hello to someone"
+        },
+        {
+          "name": "hello_stats",
+          "description": "Get plugin usage statistics"
+        },
+        {
+          "name": "hello_broadcast",
+          "description": "Broadcast a greeting to multiple recipients"
+        }
+      ]
+    },
+    {
+      "id": "code-analysis-plugin",
+      "name": "Code Analysis Plugin",
+      "version": "1.0.0",
+      "description": "Advanced code analysis and static code review tools for Python code",
+      "long_description": "Powerful static code analysis plugin that provides complexity analysis, style checking, dependency detection, and code metrics. Essential for maintaining code quality and identifying potential issues.",
+      "author": "NIP Development Team",
+      "author_email": "dev@nip.example.com",
+      "type": "tool",
+      "categories": ["developer-tools", "analysis", "code"],
+      "url": "https://github.com/nip/code-analysis-plugin",
+      "download_url": "https://github.com/nip/code-analysis-plugin/archive/v1.0.0.zip",
+      "homepage": "https://github.com/nip/code-analysis-plugin",
+      "repository": "https://github.com/nip/code-analysis-plugin",
+      "documentation": "https://github.com/nip/code-analysis-plugin/blob/main/README.md",
+      "bugs": "https://github.com/nip/code-analysis-plugin/issues",
+      "downloads": 3890,
+      "stars": 234,
+      "rating": 4.9,
+      "rating_count": 124,
+      "tags": ["analysis", "code", "developer-tools", "static-analysis", "quality"],
+      "dependencies": [],
+      "min_nip_version": "3.0.0",
+      "license": "MIT",
+      "verified": true,
+      "featured": true,
+      "official": true,
+      "install_count": 3890,
+      "created_at": "2026-01-05T00:00:00Z",
+      "updated_at": "2026-01-17T18:00:00Z",
+      "tools": [
+        {
+          "name": "analyze_code",
+          "description": "Analyze Python code for complexity, style, and structure"
+        },
+        {
+          "name": "analyze_file",
+          "description": "Analyze a Python file"
+        },
+        {
+          "name": "find_complexity",
+          "description": "Find complexity hotspots in code"
+        },
+        {
+          "name": "extract_dependencies",
+          "description": "Extract all dependencies from Python code"
+        },
+        {
+          "name": "code_metrics",
+          "description": "Calculate code metrics (lines, functions, classes, etc.)"
+        }
+      ]
+    },
+    {
+      "id": "json-validator-plugin",
+      "name": "JSON Validator Plugin",
+      "version": "1.2.0",
+      "description": "Validate and format JSON data with advanced error reporting",
+      "long_description": "A JSON validation plugin that provides detailed error messages, formatting options, and schema validation support. Includes tools for pretty printing, minifying, and validating JSON against schemas.",
+      "author": "Community Contributor",
+      "author_email": "contributor@example.com",
+      "type": "tool",
+      "categories": ["utility", "developer-tools"],
+      "url": "https://github.com/community/json-validator-plugin",
+      "download_url": "https://github.com/community/json-validator-plugin/archive/v1.2.0.zip",
+      "homepage": "https://github.com/community/json-validator-plugin",
+      "repository": "https://github.com/community/json-validator-plugin",
+      "documentation": "https://github.com/community/json-validator-plugin/wiki",
+      "bugs": "https://github.com/community/json-validator-plugin/issues",
+      "downloads": 2150,
+      "stars": 78,
+      "rating": 4.5,
+      "rating_count": 45,
+      "tags": ["json", "validation", "formatting", "utility"],
+      "dependencies": [],
+      "min_nip_version": "3.0.0",
+      "license": "Apache-2.0",
+      "verified": true,
+      "featured": false,
+      "official": false,
+      "install_count": 2150,
+      "created_at": "2026-01-10T00:00:00Z",
+      "updated_at": "2026-01-15T00:00:00Z",
+      "tools": [
+        {
+          "name": "validate_json",
+          "description": "Validate JSON data"
+        },
+        {
+          "name": "format_json",
+          "description": "Format JSON with pretty printing"
+        },
+        {
+          "name": "minify_json",
+          "description": "Minify JSON data"
+        },
+        {
+          "name": "json_schema_validator",
+          "description": "Validate JSON against a schema"
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_downloads": 11460,
+    "total_plugins": 3,
+    "official_plugins": 2,
+    "community_plugins": 1,
+    "featured_plugins": 2,
+    "average_rating": 4.73
+  },
+  "metadata": {
+    "format_version": "1.0",
+    "nip_version": "3.0.0",
+    "registry_url": "https://plugins.nip.example.com/marketplace.json",
+    "schema": "https://plugins.nip.example.com/schema/marketplace-schema.json",
+    "supported_nip_versions": ["3.0.0"]
+  }
+}

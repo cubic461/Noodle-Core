@@ -1,0 +1,44 @@
+# NIP v3.0.0 Web UI - Requirements
+# Python 3.10+ required
+
+# Core Framework
+streamlit>=1.31.0
+
+# HTTP Client
+httpx>=0.26.0
+aiohttp>=3.9.0
+
+# Environment Management
+python-dotenv>=1.0.0
+
+# Data Processing
+pandas>=2.1.0
+numpy>=1.26.0
+
+# Visualization
+plotly>=5.18.0
+
+# UI Components
+streamlit-option-menu>=0.3.6
+streamlit-extras>=0.3.5
+
+# File Processing
+openpyxl>=3.1.2  # For Excel files
+python-multipart>=0.0.6  # For file uploads
+
+# Syntax Highlighting
+pygments>=2.17.0
+
+# Async Support
+asyncio>=3.4.3
+nest-asyncio>=1.5.8
+
+# Logging & Monitoring
+loguru>=0.7.2
+
+# Type Checking
+typing-extensions>=4.9.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2024.1
