@@ -9,7 +9,7 @@ The Planner is responsible for:
 - Generating execution plans
 """
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import Any, Optional
 from dataclasses import dataclass
 from enum import Enum
 
@@ -46,13 +46,13 @@ class Dependency:
 class ExecutionPlan:
     """An execution plan for improvement tasks."""
     plan_id: str
-    tasks: List[str]  # Task IDs in execution order
-    dependencies: List[Dependency]
+    tasks: list[str]  # Task IDs in execution order
+    dependencies: list[Dependency]
     estimated_duration: Optional[int] = None  # minutes
     estimated_impact: Optional[str] = None
     risk_assessment: Optional[str] = None
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "plan_id": self.plan_id,
@@ -62,9 +62,9 @@ class ExecutionPlan:
             "estimated_impact": self.estimated_impact,
             "risk_assessment": self.risk_assessment
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ExecutionPlan":
+    def from_dict(cls, data: dict[str, Any]) -> "ExecutionPlan":
         """Create from dictionary."""
         dependencies = [
             Dependency(**dep) for dep in data.get("dependencies", [])
@@ -82,78 +82,78 @@ class ExecutionPlan:
 class Planner(ABC):
     """
     Abstract base class for improvement planners.
-    
+
     The Planner analyzes improvement requests and creates
     execution plans that consider dependencies, priorities,
     and resource constraints.
     """
-    
+
     @abstractmethod
     def plan_improvement(
         self,
-        tasks: List[Dict[str, Any]],
-        constraints: Optional[Dict[str, Any]] = None
+        tasks: list[dict[str, Any]],
+        constraints: Optional[dict[str, Any]] = None
     ) -> ExecutionPlan:
         """
         Create an execution plan for improvement tasks.
-        
+
         Args:
             tasks: List of task specifications
             constraints: Optional constraints (time, resources, etc.)
-            
+
         Returns:
             ExecutionPlan with ordered tasks and dependencies
         """
         pass
-    
+
     @abstractmethod
     def prioritize_tasks(
         self,
-        tasks: List[Dict[str, Any]]
-    ) -> List[TaskPriority]:
+        tasks: list[dict[str, Any]]
+    ) -> list[TaskPriority]:
         """
         Assign priorities to tasks based on impact and risk.
-        
+
         Args:
             tasks: List of task specifications
-            
+
         Returns:
             List of priorities corresponding to tasks
         """
         pass
-    
+
     @abstractmethod
     def resolve_dependencies(
         self,
-        tasks: List[Dict[str, Any]]
-    ) -> List[Dependency]:
+        tasks: list[dict[str, Any]]
+    ) -> list[Dependency]:
         """
         Identify and resolve dependencies between tasks.
-        
+
         Args:
             tasks: List of task specifications
-            
+
         Returns:
             List of dependencies
         """
         pass
-    
+
     @abstractmethod
     def estimate_impact(
         self,
-        task: Dict[str, Any]
+        task: dict[str, Any]
     ) -> str:
         """
         Estimate the impact of a task.
-        
+
         Args:
             task: Task specification
-            
+
         Returns:
             Impact description (e.g., "high", "medium", "low")
         """
         pass
-    
+
     @abstractmethod
     def validate_plan(
         self,
@@ -161,10 +161,10 @@ class Planner(ABC):
     ) -> bool:
         """
         Validate that an execution plan is feasible.
-        
+
         Args:
             plan: Execution plan to validate
-            
+
         Returns:
             True if plan is valid
         """
@@ -174,26 +174,26 @@ class Planner(ABC):
 class SimplePlanner(Planner):
     """
     Simple implementation of a Planner for v2.
-    
+
     This is a basic implementation that can be extended
     with more sophisticated planning algorithms.
     """
-    
+
     def __init__(self):
         self.plans_created = 0
-    
+
     def plan_improvement(
         self,
-        tasks: List[Dict[str, Any]],
-        constraints: Optional[Dict[str, Any]] = None
+        tasks: list[dict[str, Any]],
+        constraints: Optional[dict[str, Any]] = None
     ) -> ExecutionPlan:
         """Create a simple execution plan."""
         # Prioritize tasks
         priorities = self.prioritize_tasks(tasks)
-        
+
         # Resolve dependencies
         dependencies = self.resolve_dependencies(tasks)
-        
+
         # Order tasks by priority (critical first)
         prioritized_tasks = [
             task for _, task in sorted(
@@ -203,11 +203,11 @@ class SimplePlanner(Planner):
                 )[x[0].value]
             )
         ]
-        
+
         # Create plan
         plan_id = f"plan-{self.plans_created}"
         self.plans_created += 1
-        
+
         return ExecutionPlan(
             plan_id=plan_id,
             tasks=[task.get("id", f"task-{i}") for i, task in enumerate(prioritized_tasks)],
@@ -216,17 +216,17 @@ class SimplePlanner(Planner):
             estimated_impact=self._estimate_overall_impact(tasks),
             risk_assessment=self._assess_overall_risk(tasks)
         )
-    
+
     def prioritize_tasks(
         self,
-        tasks: List[Dict[str, Any]]
-    ) -> List[TaskPriority]:
+        tasks: list[dict[str, Any]]
+    ) -> list[TaskPriority]:
         """Prioritize tasks based on risk and impact."""
         priorities = []
         for task in tasks:
             risk = task.get("risk", "medium")
             goal_type = task.get("goal", {}).get("type", "unknown")
-            
+
             # Simple prioritization logic
             if risk == "high" and goal_type == "bugfix":
                 priorities.append(TaskPriority.CRITICAL)
@@ -236,28 +236,28 @@ class SimplePlanner(Planner):
                 priorities.append(TaskPriority.MEDIUM)
             else:
                 priorities.append(TaskPriority.LOW)
-        
+
         return priorities
-    
+
     def resolve_dependencies(
         self,
-        tasks: List[Dict[str, Any]]
-    ) -> List[Dependency]:
+        tasks: list[dict[str, Any]]
+    ) -> list[Dependency]:
         """
         Identify dependencies between tasks.
-        
+
         Simple implementation: checks for overlapping file paths
         which might indicate potential conflicts.
         """
         dependencies = []
-        task_map = {task.get("id"): task for task in tasks}
-        
+        {task.get("id"): task for task in tasks}
+
         for i, task_a in enumerate(tasks):
             for task_b in tasks[i+1:]:
                 # Check for overlapping scope
                 scope_a = set(task_a.get("scope", {}).get("repo_paths", []))
                 scope_b = set(task_b.get("scope", {}).get("repo_paths", []))
-                
+
                 if scope_a & scope_b:  # Overlap detected
                     # Create soft dependency
                     dependencies.append(Dependency(
@@ -266,26 +266,24 @@ class SimplePlanner(Planner):
                         type="soft",
                         reason=f"Overlapping scope: {scope_a & scope_b}"
                     ))
-        
+
         return dependencies
-    
+
     def estimate_impact(
         self,
-        task: Dict[str, Any]
+        task: dict[str, Any]
     ) -> str:
         """Estimate task impact."""
         goal_type = task.get("goal", {}).get("type", "unknown")
         risk = task.get("risk", "medium")
-        
+
         if goal_type == "performance" and risk == "high":
             return "high"
-        elif goal_type == "bugfix":
-            return "medium"
-        elif goal_type == "feature":
+        elif goal_type == "bugfix" or goal_type == "feature":
             return "medium"
         else:
             return "low"
-    
+
     def validate_plan(
         self,
         plan: ExecutionPlan
@@ -296,47 +294,42 @@ class SimplePlanner(Planner):
         for dep in plan.dependencies:
             task_deps.setdefault(dep.depends_on, [])
             task_deps[dep.task_id].append(dep.depends_on)
-        
+
         # Simple cycle detection
         visited = set()
         rec_stack = set()
-        
+
         def has_cycle(task_id: str) -> bool:
             visited.add(task_id)
             rec_stack.add(task_id)
-            
+
             for dep in task_deps.get(task_id, []):
                 if dep not in visited:
                     if has_cycle(dep):
                         return True
                 elif dep in rec_stack:
                     return True
-            
+
             rec_stack.remove(task_id)
             return False
-        
-        for task_id in task_deps:
-            if task_id not in visited:
-                if has_cycle(task_id):
-                    return False
-        
-        return True
-    
-    def _estimate_overall_impact(self, tasks: List[Dict[str, Any]]) -> str:
+
+        return all(not (task_id not in visited and has_cycle(task_id)) for task_id in task_deps)
+
+    def _estimate_overall_impact(self, tasks: list[dict[str, Any]]) -> str:
         """Estimate overall impact of all tasks."""
         impacts = [self.estimate_impact(task) for task in tasks]
-        
+
         if "high" in impacts:
             return "high"
         elif "medium" in impacts:
             return "medium"
         else:
             return "low"
-    
-    def _assess_overall_risk(self, tasks: List[Dict[str, Any]]) -> str:
+
+    def _assess_overall_risk(self, tasks: list[dict[str, Any]]) -> str:
         """Assess overall risk of all tasks."""
         risks = [task.get("risk", "medium") for task in tasks]
-        
+
         if "high" in risks:
             return "high"
         elif "medium" in risks:
@@ -348,10 +341,10 @@ class SimplePlanner(Planner):
 def create_planner(planner_type: str = "simple") -> Planner:
     """
     Factory function to create a planner instance.
-    
+
     Args:
         planner_type: Type of planner ("simple", "advanced", etc.)
-        
+
     Returns:
         Planner instance
     """
@@ -363,16 +356,16 @@ def create_planner(planner_type: str = "simple") -> Planner:
 
 # Convenience function for quick planning
 def plan_improvements(
-    tasks: List[Dict[str, Any]],
-    constraints: Optional[Dict[str, Any]] = None
+    tasks: list[dict[str, Any]],
+    constraints: Optional[dict[str, Any]] = None
 ) -> ExecutionPlan:
     """
     Quick function to create an improvement plan.
-    
+
     Args:
         tasks: List of task specifications
         constraints: Optional constraints
-        
+
     Returns:
         ExecutionPlan
     """

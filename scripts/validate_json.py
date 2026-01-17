@@ -10,18 +10,18 @@ def validate_json_files():
     """Validate all JSON files in the project directory"""
     errors = []
     checked = 0
-    
+
     # Exclude directories
     exclude_dirs = {
         'node_modules', '.git', '.venv', 'venv', 'env',
         'build', 'dist', '__pycache__', '.pytest_cache'
     }
-    
+
     for json_file in Path('.').rglob('*.json'):
         # Skip excluded directories
         if any(excluded in str(json_file) for excluded in exclude_dirs):
             continue
-            
+
         try:
             content = json_file.read_text(encoding='utf-8')
             json.loads(content)
@@ -35,12 +35,12 @@ def validate_json_files():
             error_msg = f'⚠ {json_file}: {e}'
             print(error_msg, file=sys.stderr)
             # Don't fail on permission errors, etc.
-    
+
     print(f'\n📊 Checked {checked} JSON files')
     if errors:
         print(f'⚠ Found {len(errors)} error(s)')
         return 1
-    
+
     print('✅ All JSON files are valid!')
     return 0
 
