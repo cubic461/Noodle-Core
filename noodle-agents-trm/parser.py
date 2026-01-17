@@ -1,18 +1,8 @@
 ﻿"""
-Ai Agents::Parser - parser.py
-Copyright Â© 2025 Michael van Erp. All rights reserved.
-
-This file is part of the NoodleCore project.
-Licensed under the MIT License - see LICENSE file for details.
-
-Unauthorized copying, distribution, or modification is prohibited.
-"""
-
+# -*- coding: utf-8 -*-
 """
 TRM Parser Component
-
-Dit component is verantwoordelijk voor het parsen van Python-code
-naar Abstract Syntax Trees (AST) en het voorbereiden voor vertaling.
+Copyright © 2025 Michael van Erp. All rights reserved.
 """
 
 import ast

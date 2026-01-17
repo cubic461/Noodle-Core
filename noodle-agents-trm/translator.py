@@ -1,21 +1,11 @@
-﻿"""
-Ai Agents::Translator - translator.py
-Copyright Â© 2025 Michael van Erp. All rights reserved.
-
-This file is part of the NoodleCore project.
-Licensed under the MIT License - see LICENSE file for details.
-
-Unauthorized copying, distribution, or modification is prohibited.
-"""
-
+# -*- coding: utf-8 -*-
 """
 TRM Translator Component
-
-Dit component is verantwoordelijk voor het vertalen van AST structuren
-naar NoodleCore Intermediate Representation (IR).
+Copyright © 2025 Michael van Erp. All rights reserved.
 """
 
 import asyncio
+
 import logging
 import time
 from typing import Dict, List, Optional, Any, Union

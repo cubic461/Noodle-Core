@@ -1,0 +1,48 @@
+# Ruff configuration for Noodle/NIP v3.0.0
+
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "build",
+    "dist",
+    "*.egg-info",
+    "__pycache__",
+    ".pytest_cache",
+    ".benchmarks",
+    "node_modules",
+    "noodle-agents-trm",  # Experimental package with many encoding issues
+    "noodle-brain",  # Legacy neural network code
+    "noodle-llm-bridge",  # Legacy LLM integration
+    "noodle-nlp",  # Legacy NLP module
+    "noodle-cognitive",  # Legacy cognitive layer
+    "noodle-rag",  # Legacy RAG implementation
+]
+
+line-length = 100
+target-version = "py39"
+
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+
+ignore = [
+    "E402",  # module level import not at top of file (for __init__.py with metadata)
+    "E501",  # line too long (handled by formatter)
+]
+
+fixable = ["ALL"]
+unfixable = []
+
+[lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"tests/**/*.py" = ["S101"]  # Allow assert in tests

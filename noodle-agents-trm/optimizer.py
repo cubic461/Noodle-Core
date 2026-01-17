@@ -1,27 +1,15 @@
-﻿"""
-Ai Agents::Optimizer - optimizer.py
-Copyright Â© 2025 Michael van Erp. All rights reserved.
-
-This file is part of the NoodleCore project.
-Licensed under the MIT License - see LICENSE file for details.
-
-Unauthorized copying, distribution, or modification is prohibited.
-"""
-
-"""
-TRM Optimizer Component
-
-Dit component is verantwoordelijk voor het optimaliseren van NoodleCore-IR
-met behulp van Tiny Recursive Model (TRM) technieken.
-"""
-
 import asyncio
 import logging
 import time
 import numpy as np
-from typing import Dict, List, Optional, Any, Union, Tuple
-from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass
 from enum import Enum
+# -*- coding: utf-8 -*-
+"""
+TRM Optimizer Component
+Copyright © 2025 Michael van Erp. All rights reserved.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +113,7 @@ class TRMOptimizer:
             'optimization_types': {}
         }
         
-        logger.info(f"TRM Optimizer geÃ¯nitialiseerd met config: {self.config}")
+        logger.info(f"TRM Optimizer geïnitialiseerd met config: {self.config}")
     
     async def initialize(self):
         """Initialiseer de optimizer"""
@@ -136,7 +124,7 @@ class TRMOptimizer:
         self._cleanup_task = asyncio.create_task(self._cleanup_cache())
         self._learning_task = asyncio.create_task(self._continuous_learning())
         
-        logger.info("TRM Optimizer geÃ¯nitialiseerd")
+        logger.info("TRM Optimizer geïnitialiseerd")
     
     async def cleanup(self):
         """Clean up de optimizer"""
@@ -781,5 +769,4 @@ class TRMOptimizer:
     def __repr__(self) -> str:
         """Debug representatie"""
         return f"TRMOptimizer(cache_size={len(self.optimization_cache)}, stats={self.stats})"
-
 

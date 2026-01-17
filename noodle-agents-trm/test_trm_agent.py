@@ -10,7 +10,6 @@ Unauthorized copying, distribution, or modification is prohibited.
 
 import asyncio
 import sys
-import os
 import logging
 from pathlib import Path
 

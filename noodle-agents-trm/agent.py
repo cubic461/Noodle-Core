@@ -1,17 +1,8 @@
 ﻿"""
-Ai Agents::Agent - agent.py
-Copyright Â© 2025 Michael van Erp. All rights reserved.
-
-This file is part of the NoodleCore project.
-Licensed under the MIT License - see LICENSE file for details.
-
-Unauthorized copying, distribution, or modification is prohibited.
-"""
-
+# -*- coding: utf-8 -*-
 """
 Main TRM-Agent implementation
-
-Dit bevat de hoofd-klasse voor de TRM-Agent die alle componenten coÃ¶rdineert.
+Copyright © 2025 Michael van Erp. All rights reserved.
 """
 
 import asyncio
@@ -21,10 +12,10 @@ from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass, field
 from enum import Enum
 
-from parser import TRMParser
-from translator import TRMTranslator
-from optimizer import TRMOptimizer
-from feedback import TRMFeedback
+from .parser import TRMParser
+from .translator import TRMTranslator
+from .optimizer import TRMOptimizer
+from .feedback import TRMFeedback
 
 logger = logging.getLogger(__name__)
 
