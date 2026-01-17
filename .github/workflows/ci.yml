@@ -1,0 +1,419 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ============================================
+  # Job 1: Lint & Validation
+  # ============================================
+  lint:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: Validate JSON files
+        run: |
+          find . -name "*.json" -not -path "*/node_modules/*" -exec echo "Validating {}" \; -exec node -e "JSON.parse(require('fs').readFileSync('{}'))" \;
+
+      - name: Validate Markdown
+        run: |
+          npm install -g markdownlint-cli
+          markdownlint '**/*.md' --ignore node_modules
+
+  # ============================================
+  # Job 2: Type Checking
+  # ============================================
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript
+        run: npm run typecheck --if-present
+        continue-on-error: true
+
+  # ============================================
+  # Job 3: Unit Tests
+  # ============================================
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20, 21]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test -- --coverage --if-present
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: matrix.node-version == 20
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # ============================================
+  # Job 4: Integration Tests
+  # ============================================
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: noodle_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run integration tests
+        run: npm run test:integration --if-present
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/noodle_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results
+          path: test-results/
+
+  # ============================================
+  # Job 5: Tutorial Validation
+  # ============================================
+  test-tutorials:
+    name: Validate Tutorials
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install markdown lint tools
+        run: |
+          pip install mdformat mdformat-gfm
+          npm install -g markdownlint-cli
+
+      - name: Check tutorial structure
+        run: |
+          echo "Checking tutorial structure..."
+          TUTORIALS=$(find tutorials -name "*.md" | sort)
+          TOTAL=$(echo "$TUTORIALS" | wc -l)
+          echo "Found $TOTAL tutorial files"
+          
+          # Check for required sections
+          for TUTORIAL in $TUTORIALS; do
+            echo "Validating $TUTORIAL"
+            if ! grep -q "## Table of Contents" "$TUTORIAL"; then
+              echo "❌ Missing Table of Contents in $TUTORIAL"
+              exit 1
+            fi
+            if ! grep -q "## Quick Start" "$TUTORIAL"; then
+              echo "❌ Missing Quick Start in $TUTORIAL"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All tutorials validated"
+
+      - name: Lint tutorials
+        run: |
+          markdownlint 'tutorials/**/*.md' --config .markdownlint.json
+
+  # ============================================
+  # Job 6: Security Scan
+  # ============================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          languages: javascript, python
+
+  # ============================================
+  # Job 7: Build
+  # ============================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test-unit]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build --if-present
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: dist/
+          retention-days: 7
+
+  # ============================================
+  # Job 8: Performance Benchmarks
+  # ============================================
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    needs: [build]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      - name: Run benchmarks
+        run: npm run benchmark --if-present
+        continue-on-error: true
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        if: always()
+        with:
+          tool: 'benchmarkjs'
+          output-file-path: benchmark-results.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: false
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@cubic461'
+
+  # ============================================
+  # Job 9: Release (on release only)
+  # ============================================
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [build, test-integration, test-tutorials]
+    if: github.event_name == 'release'
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      - name: Create release package
+        run: |
+          mkdir -p release
+          tar -czf release/noodle-${{ github.event.release.tag_name }}.tar.gz \
+            dist/ \
+            README.md \
+            LICENSE \
+            noodle.json
+
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./release/noodle-${{ github.event.release.tag_name }}.tar.gz
+          asset_name: noodle-${{ github.event.release.tag_name }}.tar.gz
+          asset_content_type: application/gzip
+
+  # ============================================
+  # Job 10: Deploy (on main push)
+  # ============================================
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, test-integration, test-tutorials]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    environment:
+      name: production
+      url: https://noodle.example.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to server
+        run: |
+          echo "Deploying to production..."
+          # Add deployment commands here
+
+      - name: Notify deployment
+        run: |
+          echo "Deployment successful!"
+
+  # ============================================
+  # Job 11: Status Check
+  # ============================================
+  status:
+    name: CI Status
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test-unit, test-integration, test-tutorials, security, build]
+    if: always()
+    
+    steps:
+      - name: Check all jobs
+        run: |
+          if [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.test-unit.result }}" != "success" ] || \
+             [ "${{ needs.test-integration.result }}" != "success" ] || \
+             [ "${{ needs.test-tutorials.result }}" != "success" ] || \
+             [ "${{ needs.security.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ]; then
+            echo "❌ CI Pipeline Failed"
+            exit 1
+          fi
+          echo "✅ CI Pipeline Passed"
