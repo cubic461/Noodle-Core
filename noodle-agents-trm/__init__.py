@@ -1,11 +1,10 @@
-﻿"""
-# -*- coding: utf-8 -*-
 """
-TRM-Agent voor NoodleCore - Zelfoptimalisatie & Transpiler
-Dit package implementeert een Tiny Recursive Model (TRM) gebaseerde agent
-die Python-code kan parseren, vertalen naar NoodleCore-IR, optimaliseren,
-en leren van feedback.
-Copyright © 2025 Michael van Erp. All rights reserved.
+TRM Agent for NoodleCore - Self-optimization & Transpiler
+
+This package implements a Tiny Recursive Model (TRM) based agent
+that can parse Python code, translate to NoodleCore IR, optimize,
+and learn from feedback.
+Copyright (c) 2025 Michael van Erp. All rights reserved.
 """
 
 from .agent import TRMAgent
@@ -20,10 +19,8 @@ __email__ = "team@noodlenet.ai"
 
 __all__ = [
     'TRMAgent',
-    'TRMParser', 
+    'TRMParser',
     'TRMTranslator',
     'TRMOptimizer',
     'TRMFeedback'
 ]
-
-
