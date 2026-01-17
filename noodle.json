@@ -1,22 +1,75 @@
-{
-  "name": "Noodle",
-  "version": "1.0.0",
-  "description": "NoodleCore AI Project",
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "noodle-core": "^1.0.0"
-  },
-  "scripts": {
-    "build": "noodle build",
-    "run": "noodle run",
-    "test": "noodle test",
-    "debug": "noodle debug"
-  },
-  "ai": {
-    "defaultModel": "gpt-4",
-    "agents": [],
-    "models": [],
-    "pipelines": []
-  }
+﻿{
+    "version":  "3.0.0",
+    "name":  "Noodle",
+    "improve":  {
+                    "performanceDetectionEnabled":  true,
+                    "enabled":  true,
+                    "version":  "3.0.0",
+                    "multiCandidateComparisonEnabled":  true,
+                    "maxLocChangedDefault":  200,
+                    "maxParallelWorktrees":  3,
+                    "llm":  {
+                                "timeoutSeconds":  120,
+                                "maxCostPerTask":  1,
+                                "fallback":  [
+                                                 {
+                                                     "provider":  "openai",
+                                                     "model":  "gpt-4-turbo",
+                                                     "temperature":  0.3
+                                                 },
+                                                 {
+                                                     "provider":  "anthropic",
+                                                     "model":  "claude-3-sonnet",
+                                                     "temperature":  0.3
+                                                 }
+                                             ],
+                                "dailyBudget":  10,
+                                "maxTokens":  4096,
+                                "model":  "glm-4.7",
+                                "apiBase":  "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+                                "provider":  "z_ai",
+                                "temperature":  0.3
+                            },
+                    "parallelExecutionEnabled":  true,
+                    "networkEnabled":  false,
+                    "lspGateEnabled":  true,
+                    "performance":  {
+                                        "highThreshold":  20,
+                                        "lowThreshold":  5,
+                                        "criticalThreshold":  50,
+                                        "mediumThreshold":  10,
+                                        "minABTestConfidence":  0.8,
+                                        "requireABTestForHighRisk":  true
+                                    },
+                    "llmIntegrationEnabled":  true,
+                    "abTestingEnabled":  true,
+                    "worktreeDir":  ".noodle/improve/worktrees",
+                    "plannerEnabled":  true,
+                    "allowedCommands":  [
+                                            "make test",
+                                            "make lint",
+                                            "pytest",
+                                            "npm test",
+                                            "cargo test"
+                                        ],
+                    "rootDir":  ".noodle/improve",
+                    "snapshotDir":  ".noodle/improve/snapshots",
+                    "snapshotRetention":  {
+                                              "maxSnapshots":  10,
+                                              "maxAgeDays":  7
+                                          },
+                    "benchmarkDir":  ".noodle/improve/benchmarks"
+                },
+    "description":  "Noodle - Self-Improving Development System with v3 NIP",
+    "cli":  {
+                "path":  "./noodle-cli-typescript",
+                "language":  "typescript",
+                "version":  "0.1.0"
+            },
+    "author":  "Noodle Team",
+    "core":  {
+                 "path":  "./noodle-core",
+                 "language":  "python",
+                 "version":  "0.1.0"
+             }
 }

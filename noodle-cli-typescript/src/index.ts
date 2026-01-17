@@ -3,6 +3,9 @@
 import chalk from 'chalk';
 import { Command } from 'commander';
 
+// Import improve commands
+import { createImproveCommand } from './improve';
+
 // Initialize CLI program
 const program = new Command();
 
@@ -11,6 +14,9 @@ program
     .name('noodle')
     .description('A comprehensive CLI tool for development workflows')
     .version('1.0.0');
+
+// Add NIP improve command group
+program.addCommand(createImproveCommand());
 
 // Core Commands
 program

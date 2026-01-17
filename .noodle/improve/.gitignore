@@ -1,0 +1,8 @@
+﻿# Keep directory structure
+!.gitkeep
+tasks/
+candidates/
+evidence/
+promotions/
+snapshots/
+runs/

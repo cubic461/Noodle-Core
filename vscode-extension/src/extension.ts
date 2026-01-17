@@ -1,17 +1,12 @@
 ﻿/**
- * MINIMAL VERSION - Noodle VS Code Extension
- * 
- * Simplified activation that focuses on core functionality only.
+ * MINIMAL EXTENSION - Noodle VS Code Extension
+ * Clean, working version with node-fetch support
  */
 
 import * as vscode from 'vscode';
-import { EventEmitter } from 'events';
 import * as path from 'path';
-
-// Import essential services
-import { NoodleBackendService } from './services/backendService';
-import { LSPManager } from './lsp/lspManager';
-import { AIProviderService } from './services/aiProviderService';
+import { AIProviderService, AIMessage } from './services/aiProviderService';
+import { AIAssistantPanel } from './ai/aiAssistantPanel';
 
 /**
  * AI Chat Webview Panel
@@ -20,7 +15,7 @@ class AIChatPanel {
     public static currentPanel: AIChatPanel | undefined;
     private readonly _panel: vscode.WebviewPanel;
     private _disposables: vscode.Disposable[] = [];
-    private _messages: Array<{role: string, content: string}> = [];
+    private _messages: AIMessage[] = [];
 
     public static createOrShow(
         context: vscode.ExtensionContext,
@@ -94,11 +89,7 @@ class AIChatPanel {
 
         try {
             // Call AI Provider Service
-            const aiResponse = await this.aiService.chatCompletion(this._messages);
-
-            if (!aiResponse.success) {
-                throw new Error(aiResponse.error || 'AI request failed');
-            }
+            const aiResponse = await this.aiService.sendMessage(this._messages);
 
             const response = aiResponse.content || 'No response from AI';
 
@@ -115,7 +106,7 @@ class AIChatPanel {
         } catch (error) {
             this._panel.webview.postMessage({
                 command: 'addError',
-                error: error.message
+                error: (error as Error).message
             });
         }
     }
@@ -330,27 +321,27 @@ class AIChatPanel {
     }
 }
 
-export class NoodleExtensionMinimal extends EventEmitter {
+/**
+ * Noodle Extension Minimal
+ */
+export class NoodleExtensionMinimal {
     private context: vscode.ExtensionContext;
     private outputChannel: vscode.OutputChannel;
     private isActivated = false;
 
     // Core services
-    private lspManager: LSPManager;
-    private backendService: NoodleBackendService;
     private aiProviderService: AIProviderService;
 
     // UI components
     private statusBarItem: vscode.StatusBarItem;
 
     constructor(context: vscode.ExtensionContext) {
-        super();
         this.context = context;
         this.outputChannel = vscode.window.createOutputChannel('Noodle Extension');
     }
 
     /**
-     * Activate the extension - MINIMAL VERSION
+     * Activate the extension
      */
     public async activate(): Promise<void> {
         try {
@@ -370,64 +361,53 @@ export class NoodleExtensionMinimal extends EventEmitter {
             this.statusBarItem.tooltip = 'Noodle Extension';
             this.statusBarItem.command = 'noodle.showStatus';
             this.statusBarItem.show();
-            this.outputChannel.appendLine('✓ Status bar created');
+            this.outputChannel.appendLine('âœ“ Status bar created');
 
             // Step 2: Initialize AI Provider Service
             this.outputChannel.appendLine('Initializing AI provider service...');
             try {
-                this.aiProviderService = new AIProviderService();
-                this.outputChannel.appendLine('✓ AI provider service initialized');
+                const config = this.getDefaultAIConfig();
+                this.aiProviderService = new AIProviderService(config, this.outputChannel);
+                this.outputChannel.appendLine('âœ“ AI provider service initialized');
             } catch (error) {
-                this.outputChannel.appendLine(`⚠ AI provider service failed: ${error.message}`);
+                this.outputChannel.appendLine(`âš  AI provider service failed: ${(error as Error).message}`);
             }
 
-            // Step 3: Initialize Backend Service
-            this.outputChannel.appendLine('Initializing backend service...');
-            try {
-                this.backendService = new NoodleBackendService();
-                await this.backendService.initialize();
-                this.outputChannel.appendLine('✓ Backend service initialized');
-            } catch (error) {
-                this.outputChannel.appendLine(`⚠ Backend service failed: ${error.message}`);
-                this.outputChannel.appendLine('  Continuing without backend...');
-            }
-
-            // Step 4: Initialize LSP Manager
-            this.outputChannel.appendLine('Initializing LSP manager...');
-            try {
-                this.lspManager = new LSPManager(
-                    this.context,
-                    null, // serviceManager
-                    null, // configManager
-                    null, // eventBus
-                    null, // cacheManager
-                    null  // logger
-                );
-                await this.lspManager.initialize();
-                this.outputChannel.appendLine('✓ LSP manager initialized');
-            } catch (error) {
-                this.outputChannel.appendLine(`⚠ LSP manager failed: ${error.message}`);
-                this.outputChannel.appendLine('  Continuing without LSP...');
-            }
-
-            // Step 5: Register Commands
+            // Step 3: Register Commands
             this.outputChannel.appendLine('Registering commands...');
             this.registerCommands();
-            this.outputChannel.appendLine('✓ Commands registered');
+            this.outputChannel.appendLine('âœ“ Commands registered');
 
-            // Step 6: Show Success Message
+            // Step 4: Show Success Message
             this.isActivated = true;
             this.outputChannel.appendLine('=== Noodle Extension Activated Successfully ===');
 
             void vscode.window.showInformationMessage(
-                '🍜 Noodle Extension Active! Use noodle.ai.chat to start chatting.'
+                'ðŸœ Noodle Extension Active! Use noodle.ai.chat to start chatting.'
             );
 
         } catch (error) {
-            this.outputChannel.appendLine(`❌ CRITICAL ERROR: ${error.message}`);
+            this.outputChannel.appendLine(`âŒ CRITICAL ERROR: ${(error as Error).message}`);
             this.outputChannel.show();
             throw error;
         }
+    }
+
+    /**
+     * Get default AI configuration from VS Code settings
+     */
+    private getDefaultAIConfig(): any {
+        const config = vscode.workspace.getConfiguration('noodle.ai');
+        return {
+            provider: config.get('provider', 'openai'),
+            apiKey: config.get('apiKey', ''),
+            endpoint: config.get('endpoint', 'https://api.openai.com/v1'),
+            model: config.get('model', 'gpt-4'),
+            apiStyle: config.get('apiStyle', 'openai'),
+            temperature: config.get('temperature', 0.7),
+            maxTokens: config.get('maxTokens', 2048),
+            timeout: config.get('timeout', 30000)
+        };
     }
 
     /**
@@ -440,15 +420,6 @@ export class NoodleExtensionMinimal extends EventEmitter {
                 this.showStatus();
             }),
 
-            // LSP Commands
-            vscode.commands.registerCommand('noodle.lsp.status', () => {
-                this.showLSPStatus();
-            }),
-
-            vscode.commands.registerCommand('noodle.lsp.restart', async () => {
-                await this.restartLSP();
-            }),
-
             // AI Commands
             vscode.commands.registerCommand('noodle.ai.chat', () => {
                 AIChatPanel.createOrShow(this.context, this.aiProviderService);
@@ -456,6 +427,10 @@ export class NoodleExtensionMinimal extends EventEmitter {
 
             vscode.commands.registerCommand('noodle.ai.assist', () => {
                 AIChatPanel.createOrShow(this.context, this.aiProviderService);
+            }),
+
+            vscode.commands.registerCommand('noodle.ai.assistant', () => {
+                AIAssistantPanel.createOrShow(this.context, this.aiProviderService);
             }),
 
             vscode.commands.registerCommand('noodle.ai.testConnection', async () => {
@@ -494,44 +469,14 @@ export class NoodleExtensionMinimal extends EventEmitter {
     private showStatus(): void {
         this.outputChannel.clear();
         this.outputChannel.appendLine('=== Noodle Extension Status ===\n');
-        this.outputChannel.appendLine(`Extension: ${this.isActivated ? '✓ Active' : '✗ Inactive'}`);
-        this.outputChannel.appendLine(`AI Provider: ${this.aiProviderService ? '✓ Initialized' : '✗ Not initialized'}`);
-        this.outputChannel.appendLine(`Backend: ${this.backendService ? '✓ Initialized' : '✗ Not initialized'}`);
-        this.outputChannel.appendLine(`LSP Manager: ${this.lspManager ? '✓ Initialized' : '✗ Not initialized'}`);
-        this.outputChannel.appendLine(`\n=== Commands ===`);
-        this.outputChannel.appendLine('• noodle.ai.chat - Open AI chat');
-        this.outputChannel.appendLine('• noodle.ai.testConnection - Test AI provider');
-        this.outputChannel.appendLine('• noodle.ai.showConfig - Show AI configuration');
-        this.outputChannel.appendLine('• noodle.lsp.status - Show LSP status');
-        this.outputChannel.appendLine('• noodle.development.showOutput - Show this log');
+        this.outputChannel.appendLine(`Extension: ${this.isActivated ? 'âœ“ Active' : 'âœ— Inactive'}`);
+        this.outputChannel.appendLine(`AI Provider: ${this.aiProviderService ? 'âœ“ Initialized' : 'âœ— Not initialized'}`);
+        this.outputChannel.appendLine('\n=== Commands ===');
+        this.outputChannel.appendLine('â€¢ noodle.ai.chat - Open AI chat');
+        this.outputChannel.appendLine('â€¢ noodle.ai.testConnection - Test AI provider');
+        this.outputChannel.appendLine('â€¢ noodle.ai.showConfig - Show AI configuration');
+        this.outputChannel.appendLine('â€¢ noodle.development.showOutput - Show this log');
         this.outputChannel.show();
-    }
-
-    /**
-     * Show LSP status
-     */
-    private showLSPStatus(): void {
-        if (this.lspManager) {
-            void vscode.commands.executeCommand('noodle.lsp.status');
-        } else {
-            void vscode.window.showWarningMessage('LSP Manager is not initialized');
-        }
-    }
-
-    /**
-     * Restart LSP
-     */
-    private async restartLSP(): Promise<void> {
-        if (this.lspManager) {
-            try {
-                await this.lspManager.initialize();
-                void vscode.window.showInformationMessage('LSP Manager restarted');
-            } catch (error) {
-                void vscode.window.showErrorMessage(`Failed to restart LSP: ${error.message}`);
-            }
-        } else {
-            void vscode.window.showWarningMessage('LSP Manager is not initialized');
-        }
     }
 
     /**
@@ -543,12 +488,13 @@ export class NoodleExtensionMinimal extends EventEmitter {
             return;
         }
 
-        const result = await this.aiProviderService.testConnection();
-
-        if (result.success) {
-            vscode.window.showInformationMessage(result.message);
-        } else {
-            vscode.window.showErrorMessage(result.message);
+        try {
+            await this.aiProviderService.sendMessage([
+                { role: 'user', content: 'Hello! This is a connection test.' }
+            ]);
+            vscode.window.showInformationMessage('âœ“ AI provider connection successful!');
+        } catch (error) {
+            vscode.window.showErrorMessage(`AI provider connection failed: ${(error as Error).message}`);
         }
     }
 
@@ -570,7 +516,7 @@ export class NoodleExtensionMinimal extends EventEmitter {
         const message = `
 Provider: ${provider}
 Model: ${model}
-API Key: ${apiKey ? '✓ Configured' : '⚠ Not configured'}
+API Key: ${apiKey ? 'âœ“ Configured' : 'âš  Not configured'}
 Endpoint: ${endpoint || 'Default'}
         `.trim();
 
@@ -595,10 +541,6 @@ Endpoint: ${endpoint || 'Default'}
             this.statusBarItem.dispose();
         }
 
-        if (this.lspManager) {
-            await this.lspManager.dispose();
-        }
-
         this.outputChannel.appendLine('Noodle extension deactivated');
     }
 }
@@ -617,3 +559,5 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 export async function deactivate(): Promise<void> {
     // Cleanup is handled by the extension class
 }
+
+

@@ -1,350 +1,201 @@
 ﻿import * as vscode from 'vscode';
-import * as https from 'https';
+import fetch, { RequestInit } from 'node-fetch';
 
-export interface AIProviderConfig {
-    provider: string;
-    apiKey?: string;
-    endpoint?: string;
-    model: string;
-    temperature: number;
-    maxTokens: number;
-    timeout: number;
+export interface AIMessage {
+    role: 'system' | 'user' | 'assistant';
+    content: string;
 }
 
 export interface AIResponse {
-    success: boolean;
-    content?: string;
+    content: string;
     usage?: {
         promptTokens: number;
         completionTokens: number;
         totalTokens: number;
     };
-    error?: string;
 }
 
-/**
- * AI Provider Service
- * Handles direct communication with various AI providers
- */
+export interface AIProviderConfig {
+    provider: string;
+    apiKey: string;
+    endpoint: string;
+    model: string;
+    apiStyle: 'openai' | 'anthropic';
+    temperature?: number;
+    maxTokens?: number;
+    timeout?: number;
+}
+
 export class AIProviderService {
     private config: AIProviderConfig;
     private outputChannel: vscode.OutputChannel;
 
-    constructor() {
-        this.outputChannel = vscode.window.createOutputChannel('Noodle AI');
-        this.loadConfig();
-        
-        // Watch for config changes
-        vscode.workspace.onDidChangeConfiguration(event => {
-            if (event.affectsConfiguration('noodle.ai')) {
-                this.loadConfig();
-                this.outputChannel.appendLine('AI configuration reloaded');
-            }
-        });
+    constructor(config: AIProviderConfig, outputChannel: vscode.OutputChannel) {
+        this.config = config;
+        this.outputChannel = outputChannel;
     }
 
-    private loadConfig(): void {
-        const config = vscode.workspace.getConfiguration('noodle.ai');
-        
-        this.config = {
-            provider: config.get('provider', 'openai'),
-            apiKey: config.get('apiKey', '') || process.env.NOODLE_AI_API_KEY,
-            endpoint: config.get('endpoint', ''),
-            model: config.get('model', 'gpt-4'),
-            temperature: config.get('temperature', 0.7),
-            maxTokens: config.get('maxTokens', 2048),
-            timeout: config.get('timeout', 30000)
-        };
-
-        // Warn if no API key for providers that need it
-        if (this.requiresApiKey() && !this.config.apiKey) {
-            this.outputChannel.appendLine(`âš ï¸  Warning: No API key configured for ${this.config.provider}`);
-            this.outputChannel.appendLine('   Set noodle.ai.apiKey in settings or use NOODLE_AI_API_KEY environment variable');
-        }
-    }
-
-    private requiresApiKey(): boolean {
-        return !['local', 'ollama', 'lmstudio'].includes(this.config.provider);
-    }
-
-    private getEndpointForProvider(): string {
-        // Custom endpoint takes precedence
-        if (this.config.endpoint) {
-            return this.config.endpoint;
-        }
-
-        // Default endpoints per provider
-        const endpoints: { [key: string]: string } = {
-            'openai': 'https://api.openai.com/v1',
-            'anthropic': 'https://api.anthropic.com/v1',
-            'groq': 'https://api.groq.com/openai/v1',
-            'z.ai': 'https://api.z.ai/api/paas/v4',
-            'ollama': 'http://localhost:11434',
-            'lmstudio': 'http://localhost:1234/v1'
-        };
-
-        return endpoints[this.config.provider] || this.config.endpoint || '';
-    }
-
-    /**
-     * Send chat completion request to AI provider
-     */
-    async chatCompletion(messages: Array<{ role: string; content: string }>): Promise<AIResponse> {
+    public async sendMessage(messages: AIMessage[]): Promise<AIResponse> {
         try {
-            const endpoint = this.getEndpointForProvider();
+            await this.logRequest(messages);
             
-            if (!endpoint) {
-                return {
-                    success: false,
-                    error: `No endpoint configured for provider: ${this.config.provider}`
-                };
-            }
-
-            this.outputChannel.appendLine(`📤 Sending request to ${this.config.provider}`);
-            this.outputChannel.appendLine(`   Model: ${this.config.model}`);
-            this.outputChannel.appendLine(`   Messages: ${messages.length}`);
-            this.outputChannel.appendLine(`   Endpoint: ${endpoint}`);
-
-            const response = await this.makeProviderRequest(endpoint, messages);
+            const response = await this.makeProviderRequest(messages);
             
-            if (!response.success) {
-                this.outputChannel.appendLine(`❌ Request failed: ${response.error}`);
-            } else {
-                this.outputChannel.appendLine(`✅ Response received successfully`);
-                this.outputChannel.appendLine(`   Content length: ${response.content?.length || 0} chars`);
-            }
-            
-            return response;
-
+            return this.parseResponse(response);
         } catch (error) {
-            this.outputChannel.appendLine(`❌ Error: ${error.message}`);
-            return {
-                success: false,
-                error: error.message
-            };
+            this.handleError(error);
+            throw error;
         }
     }
 
-    private async makeProviderRequest(
-        endpoint: string,
-        messages: Array<{ role: string; content: string }>
-    ): Promise<AIResponse> {
-        return new Promise((resolve, reject) => {
-            // Don't append path if endpoint already ends with a common API path
-            const hasPath = /\/(chat\/completions|api\/chat|completions|v1\/chat|api\/v1\/chat)$/i.test(endpoint);
-            const url = new URL(hasPath ? endpoint : endpoint + (endpoint.includes('/v1') ? '/chat/completions' : '/api/chat'));
-            this.outputChannel.appendLine(`ðŸŒ Full URL: ${url.href}`);
-            
-            const requestBody = this.getRequestBody(messages);
-            
-            const options = {
-                hostname: url.hostname,
-                port: url.port || (url.protocol === 'https:' ? 443 : 80),
-                path: url.pathname + url.search,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${this.config.apiKey}`,
-                    ...this.getProviderSpecificHeaders()
-                },
-                timeout: this.config.timeout
+    private async makeProviderRequest(messages: AIMessage[]): Promise<any> {
+        const { provider, apiKey, endpoint, model, apiStyle, temperature, maxTokens, timeout } = this.config;
+        
+        // Construct full URL based on API style
+        let url = endpoint;
+        if (apiStyle === 'openai' && !url.includes('/chat/completions')) {
+            url = url.endsWith('/') ? `${url}chat/completions` : `${url}/chat/completions`;
+        } else if (apiStyle === 'anthropic' && !url.includes('/messages')) {
+            url = url.endsWith('/') ? `${url}messages` : `${url}/messages`;
+        }
+
+        this.outputChannel.appendLine(`Full URL: ${url}`);
+
+        // Build request body based on API style
+        let body: any;
+
+        if (apiStyle === 'anthropic') {
+            body = {
+                model: model,
+                max_tokens: maxTokens || 2048,
+                messages: messages,
+                anthropic_version: '2023-06-01'
             };
+            if (temperature !== undefined) {
+                body.temperature = temperature;
+            }
+        } else {
+            // OpenAI style (default)
+            body = {
+                model: model,
+                messages: messages,
+                temperature: temperature || 0.7,
+                max_tokens: maxTokens || 2048
+            };
+        }
 
-            const req = https.request(options, (res) => {
-                let data = '';
-
-                res.on('data', chunk => data += chunk);
-                res.on('end', () => {
-                    if (res.statusCode === 200) {
-                        this.outputChannel.appendLine(`📥 Raw response (${data.length} chars):`);
-                        this.outputChannel.appendLine(data.substring(0, 500) + (data.length > 500 ? '...' : ''));
-                        
-                        try {
-                            const json = JSON.parse(data);
-                            this.outputChannel.appendLine(`📋 Parsed JSON keys: ${Object.keys(json).join(', ')}`);
-                            resolve(this.parseResponse(json));
-                        } catch (e) {
-                            this.outputChannel.appendLine(`❌ JSON parse error: ${e.message}`);
-                            resolve({
-                                success: false,
-                                error: `Failed to parse response: ${e.message}. Raw response: ${data.substring(0, 200)}`
-                            });
-                        }
-                    } else {
-                        resolve({
-                            success: false,
-                            error: `HTTP ${res.statusCode}: ${data}`
-                        });
-                    }
-                });
-            });
-
-            req.on('error', reject);
-            req.on('timeout', () => {
-                req.destroy();
-                reject(new Error('Request timeout'));
-            });
-
-            req.write(JSON.stringify(requestBody));
-            req.end();
-        });
-    }
-
-    private getRequestBody(messages: Array<{ role: string; content: string }>): any {
-        // OpenAI-compatible format
-        return {
-            model: this.config.model,
-            messages: messages,
-            temperature: this.config.temperature,
-            max_tokens: this.config.maxTokens
+        // Build headers based on provider
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Noodle-VSCode-Extension/1.0.0'
         };
-    }
 
-    private getProviderSpecificHeaders(): { [key: string]: string } {
-        const headers: { [key: string]: string } = {};
-
-        // Anthropic uses different headers
-        if (this.config.provider === 'anthropic') {
+        if (provider === 'anthropic' || apiStyle === 'anthropic') {
+            headers['x-api-key'] = apiKey;
             headers['anthropic-version'] = '2023-06-01';
-            delete headers['Authorization'];
-            headers['x-api-key'] = this.config.apiKey || '';
+        } else {
+            headers['Authorization'] = `Bearer ${apiKey}`;
         }
 
-        return headers;
+        this.outputChannel.appendLine('Sending request...');
+        this.outputChannel.appendLine(`Model: ${model}`);
+        this.outputChannel.appendLine(`Headers: ${JSON.stringify({ ...headers, 'Authorization': '***REDACTED***' })}`);
+        
+        // Make request using node-fetch (better SSL/TLS handling)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout || 30000);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            this.outputChannel.appendLine(`Response status: ${response.status} ${response.statusText}`);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${response.statusText}\nResponse: ${errorText}`);
+            }
+
+            const data = await response.json();
+            this.outputChannel.appendLine('Response received successfully');
+            return data;
+
+        } catch (error: any) {
+            clearTimeout(timeoutId);
+            
+            if (error.name === 'AbortError') {
+                throw new Error(`Request timeout after ${timeout || 30000}ms`);
+            }
+            
+            // Enhance error messages for common issues
+            if (error.code === 'ECONNREFUSED') {
+                throw new Error(`Connection refused to ${url}. Check if the endpoint is correct and the server is running.`);
+            } else if (error.code === 'ENOTFOUND') {
+                throw new Error(`Cannot resolve hostname: ${url}. Check your network connection and the endpoint URL.`);
+            } else if (error.type === 'request-timeout') {
+                throw new Error(`Request timeout: The server took too long to respond. Try increasing the timeout setting.`);
+            } else if (error.message.includes('Client network socket')) {
+                throw new Error(`Network SSL/TLS Error: ${error.message}\n\nTroubleshooting:\n1. Check your internet connection\n2. Try disabling VPN or proxy\n3. Check firewall settings\n4. Verify the endpoint URL is correct`);
+            }
+            
+            throw error;
+        }
     }
-    private parseResponse(json: any): AIResponse {
-        // First check for error responses
-        if (json.code && json.msg) {
-            // Error response format (z.ai and others)
-            return {
-                success: false,
-                error: `API Error ${json.code}: ${json.msg}`
-            };
-        }
-        
-        if (json.error) {
-            // Standard error format
-            return {
-                success: false,
-                error: typeof json.error === 'string' ? json.error : json.error.message
-            };
-        }
-        // Handle different response formats
-        
-        // OpenAI-compatible format (most providers use this)
-        if (json.choices) {
-            return {
-                success: true,
-                content: json.choices[0]?.message?.content || '',
-                usage: json.usage ? {
-                    promptTokens: json.usage.prompt_tokens,
-                    completionTokens: json.usage.completion_tokens,
-                    totalTokens: json.usage.total_tokens
-                } : undefined
-            };
-        } else if (json.data && json.data.choices) {
-            // Some providers wrap in 'data' object
-            return {
-                success: true,
-                content: json.data.choices[0]?.message?.content || json.data.choices[0]?.text || '',
-                usage: json.data.usage
-            };
-        } else if (json.content) {
-            // Direct content (Anthropic, some simplified APIs)
-            return {
-                success: true,
-                content: Array.isArray(json.content) 
-                    ? json.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join('')
-                    : json.content,
-                usage: json.usage
-            };
-        } else if (json.message) {
-            // Simple message format
-            return {
-                success: true,
-                content: json.message,
-                usage: json.usage
-            };
-        } else if (json.reply) {
-            // Reply format
-            return {
-                success: true,
-                content: json.reply,
-                usage: json.usage
-            };
-        } else if (json.output) {
-            // Output format
-            return {
-                success: true,
-                content: json.output,
-                usage: json.usage
-            };
-        } else if (json.text) {
-            // Direct text format
-            return {
-                success: true,
-                content: json.text,
-                usage: json.usage
-            };
-        } else if (typeof json === 'string') {
-            // Plain string response
-            return {
-                success: true,
-                content: json
-            };
-        } else if (json.result) {
-            // Generic result format
-            return {
-                success: true,
-                content: json.result,
-                usage: json.usage
+
+    private parseResponse(data: any): AIResponse {
+        const { apiStyle } = this.config;
+
+        let content = '';
+        let usage;
+
+        if (apiStyle === 'anthropic') {
+            content = data.content[0]?.text || '';
+            usage = {
+                promptTokens: data.usage?.input_tokens || 0,
+                completionTokens: data.usage?.output_tokens || 0,
+                totalTokens: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0)
             };
         } else {
-            // Try to find any text content in common fields
-            const possibleText = 
-                json.response || 
-                json.answer || 
-                json.completion || 
-                json.generated_text ||
-                JSON.stringify(json, null, 2);
-            
-            return {
-                success: false,
-                error: `Unknown response format. Available keys: ${Object.keys(json).join(', ')}. 
-                        Tried to extract: ${possibleText.substring(0, 100)}`
+            // OpenAI style
+            content = data.choices?.[0]?.message?.content || '';
+            usage = {
+                promptTokens: data.usage?.prompt_tokens || 0,
+                completionTokens: data.usage?.completion_tokens || 0,
+                totalTokens: data.usage?.total_tokens || 0
             };
         }
-    }
 
-    /**
-     * Test connection to AI provider
-     */
-    async testConnection(): Promise<{ success: boolean; message: string }> {
-        try {
-            const result = await this.chatCompletion([
-                { role: 'user', content: 'Hello! Can you respond with just "OK"?' }
-            ]);
-
-            if (result.success) {
-                return {
-                    success: true,
-                    message: `âœ… Successfully connected to ${this.config.provider}`
-                };
-            } else {
-                return {
-                    success: false,
-                    message: `âŒ Connection failed: ${result.error}`
-                };
-            }
-        } catch (error) {
-            return {
-                success: false,
-                message: `âŒ Error: ${error.message}`
-            };
+        if (!content) {
+            throw new Error('Empty response received from AI provider');
         }
+
+        return { content, usage };
     }
 
-    dispose(): void {
-        this.outputChannel.dispose();
+    private async logRequest(messages: AIMessage[]): Promise<void> {
+        this.outputChannel.appendLine('=== AI Provider Request ===');
+        this.outputChannel.appendLine(`Provider: ${this.config.provider}`);
+        this.outputChannel.appendLine(`Endpoint: ${this.config.endpoint}`);
+        this.outputChannel.appendLine(`Model: ${this.config.model}`);
+        this.outputChannel.appendLine(`API Style: ${this.config.apiStyle}`);
+        this.outputChannel.appendLine(`Messages: ${JSON.stringify(messages)}`);
+    }
+
+    private handleError(error: any): void {
+        this.outputChannel.appendLine('=== AI Provider Error ===');
+        this.outputChannel.appendLine(`Error: ${error.message}`);
+        
+        vscode.window.showErrorMessage(`AI Error: ${error.message}`);
+    }
+
+    public updateConfig(config: Partial<AIProviderConfig>): void {
+        this.config = { ...this.config, ...config };
     }
 }
+

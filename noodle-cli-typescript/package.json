@@ -29,7 +29,7 @@
         "fs-extra": "^11.1.1",
         "glob": "^10.3.3",
         "ora": "^5.4.1",
-        "listr": "^6.6.1"
+        "listr": "^0.14.3"
     },
     "devDependencies": {
         "@types/node": "^20.4.5",

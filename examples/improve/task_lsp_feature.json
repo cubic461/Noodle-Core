@@ -1,0 +1,31 @@
+{
+  "id": "example-3",
+  "title": "Add LSP Support for New Language Feature",
+  "goal": {
+    "type": "feature",
+    "metric": "lsp_coverage",
+    "target_delta": "new",
+    "description": "Add LSP support for new language feature (generics)"
+  },
+  "scope": {
+    "repo_paths": ["lsp-vscode-extension", "noodle-lang"],
+    "selectors": ["*.ts", "*.py"]
+  },
+  "constraints": {
+    "max_loc_changed": 500,
+    "no_new_deps": false,
+    "no_public_api_break": true
+  },
+  "verification": {
+    "commands": [
+      "npm test",
+      "make test",
+      "npm run build"
+    ],
+    "required_green": true
+  },
+  "risk": "high",
+  "mode": "shadow",
+  "created_at": "2026-01-17T10:00:00Z",
+  "patchFile": null
+}

@@ -370,4 +370,4 @@ class ScopedEventBus {
     }
 }
 exports.ScopedEventBus = ScopedEventBus;
-//# sourceMappingURL=eventBus.js.map
+//# sourceMappingURL=EventBus.js.map

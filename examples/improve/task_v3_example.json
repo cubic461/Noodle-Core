@@ -1,0 +1,51 @@
+﻿{
+  "id": "TASK_V3_001",
+  "title": "Optimize Database Query Performance with v3",
+  "goal": {
+    "type": "performance",
+    "metric": "query_latency",
+    "target_delta": -30,
+    "description": "Reduce average database query latency by 30% using query optimization and indexing"
+  },
+  "scope": {
+    "repo_paths": ["noodle-core/src/noodlecore/database"],
+    "selectors": {
+      "files": ["*.py"],
+      "exclude": ["test_*.py"]
+    }
+  },
+  "constraints": {
+    "max_loc_changed": 200,
+    "no_new_deps": true,
+    "no_public_api_break": true,
+    "require_backward_compat": true
+  },
+  "verification": {
+    "commands": [
+      {
+        "command": ["pytest", "tests/database/", "-v"],
+        "required": true
+      },
+      {
+        "command": ["pytest", "tests/database/", "--benchmark"],
+        "required": true
+      },
+      {
+        "command": ["make", "lint"],
+        "required": false
+      }
+    ],
+    "required_green": true
+  },
+  "risk": "medium",
+  "mode": "shadow",
+  "metadata": {
+    "use_parallel": true,
+    "parallel_candidates": 3,
+    "enable_performance_detection": true,
+    "enable_ab_testing": true,
+    "llm_provider": "z_ai",
+    "llm_model": "glm-4.7",
+    "ranking_strategy": "performance_focused"
+  }
+}

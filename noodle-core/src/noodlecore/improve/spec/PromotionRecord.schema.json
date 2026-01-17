@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PromotionRecord",
+  "description": "Record of a candidate promotion between environments in the Noodle Improvement Pipeline",
+  "type": "object",
+  "required": ["id", "candidate_id", "from_environment", "to_environment", "timestamp", "promoted_by", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the promotion record",
+      "format": "uuid"
+    },
+    "candidate_id": {
+      "type": "string",
+      "description": "ID of the candidate that was promoted",
+      "format": "uuid"
+    },
+    "from_environment": {
+      "type": "string",
+      "description": "Source environment",
+      "enum": ["dev", "staging", "production", "test"]
+    },
+    "to_environment": {
+      "type": "string",
+      "description": "Target environment",
+      "enum": ["dev", "staging", "production", "test"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "When the promotion occurred (ISO 8601)",
+      "format": "date-time"
+    },
+    "promoted_by": {
+      "type": "string",
+      "description": "Identifier of who/what performed the promotion",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of the promotion",
+      "enum": ["succeeded", "failed", "rolled_back", "pending"]
+    },
+    "evidence_id": {
+      "type": "string",
+      "description": "ID of evidence that justified the promotion",
+      "format": "uuid"
+    },
+    "rollback_data": {
+      "type": "object",
+      "description": "Data needed to rollback the promotion",
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional flexible metadata",
+      "default": {}
+    }
+  }
+}

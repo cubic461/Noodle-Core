@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence",
+  "description": "Execution evidence for a candidate solution in the Noodle Improvement Pipeline",
+  "type": "object",
+  "required": ["id", "candidate_id", "environment", "timestamp", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the evidence record",
+      "format": "uuid"
+    },
+    "candidate_id": {
+      "type": "string",
+      "description": "ID of the candidate this evidence is for",
+      "format": "uuid"
+    },
+    "environment": {
+      "type": "string",
+      "description": "Environment where evidence was collected",
+      "enum": ["dev", "staging", "production", "test"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "When the evidence was collected (ISO 8601)",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "description": "Whether tests passed or failed",
+      "enum": ["passed", "failed", "error", "timeout"]
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Dictionary of performance/quality metrics",
+      "additionalProperties": {
+        "type": "number"
+      },
+      "default": {}
+    },
+    "logs": {
+      "type": "string",
+      "description": "Execution logs or output",
+      "default": ""
+    },
+    "test_results": {
+      "type": "object",
+      "description": "Detailed test results",
+      "additionalProperties": true,
+      "default": {}
+    },
+    "loc_added": {
+      "type": "integer",
+      "description": "Lines of code added",
+      "minimum": 0,
+      "default": 0
+    },
+    "loc_removed": {
+      "type": "integer",
+      "description": "Lines of code removed",
+      "minimum": 0,
+      "default": 0
+    },
+    "loc_modified": {
+      "type": "integer",
+      "description": "Lines of code modified",
+      "minimum": 0,
+      "default": 0
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional flexible metadata",
+      "default": {}
+    }
+  }
+}

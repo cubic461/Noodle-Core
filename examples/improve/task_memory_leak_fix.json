@@ -1,0 +1,30 @@
+{
+  "id": "example-2",
+  "title": "Fix Memory Leak in Compiler",
+  "goal": {
+    "type": "bugfix",
+    "metric": "memory_usage",
+    "target_delta": "-30%",
+    "description": "Fix memory leak in compiler backend reducing memory usage by 30%"
+  },
+  "scope": {
+    "repo_paths": ["noodle-core/src/noodlecore/compiler"],
+    "selectors": ["*.py"]
+  },
+  "constraints": {
+    "max_loc_changed": 50,
+    "no_new_deps": true,
+    "no_public_api_break": true
+  },
+  "verification": {
+    "commands": [
+      "make test",
+      "make lint"
+    ],
+    "required_green": true
+  },
+  "risk": "low",
+  "mode": "shadow",
+  "created_at": "2026-01-17T10:00:00Z",
+  "patchFile": null
+}

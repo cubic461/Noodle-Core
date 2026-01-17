@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TaskSpec",
+  "description": "Specification for an improvement task in the Noodle Improvement Pipeline",
+  "type": "object",
+  "required": ["id", "title", "description", "objective"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the task",
+      "format": "uuid"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title for the task",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the task",
+      "minLength": 1
+    },
+    "objective": {
+      "type": "string",
+      "description": "Primary objective or goal of the task",
+      "minLength": 1
+    },
+    "constraints": {
+      "type": "array",
+      "description": "List of constraints or limitations",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "description": "Criteria for task completion",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Task priority (1-10, higher is more important)",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Timestamp when task was created (ISO 8601)",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "description": "Timestamp when task was last updated (ISO 8601)",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the task",
+      "enum": ["pending", "in_progress", "completed", "failed", "cancelled"],
+      "default": "pending"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional flexible metadata",
+      "default": {}
+    }
+  }
+}
